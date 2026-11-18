@@ -90,26 +90,34 @@ function initMap() {
 
     leafletMap = L.map('map', {
         zoomControl: true,
-        attributionControl: false
+        attributionControl: false,
+        maxZoom: 22,
+        minZoom: 3
     }).setView([defaultLat, defaultLon], 14);
 
     // 1. Définition des différentes couches de tuiles (100% SANS CLÉ API)
     tileLayers = {
-        // Vue Satellite Réelle Mondiale (Esri World Imagery) - Gratuit sans clé
-        satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19
+        // Vue Satellite Google Hybride (Imagerie satellite HD + noms des rues/quartiers au Gabon, zoom jusqu'à 100%)
+        satellite: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 22,
+            maxNativeZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         }),
-        // Vue Sombre / Nuit (OpenStreetMap avec filtre sombre)
-        dark: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
+        // Vue Sombre / Nuit (CartoDB Dark Matter haute précision)
+        dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 22,
+            maxNativeZoom: 19,
+            subdomains: 'abcd'
         }),
         // Vue Rues / Cadastre Standard (OpenStreetMap)
         streets: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
+            maxZoom: 22,
+            maxNativeZoom: 19
         }),
         // Vue Topographique / Relief (OpenTopoMap)
         topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            maxZoom: 17,
+            maxZoom: 22,
+            maxNativeZoom: 17,
             subdomains: ['a', 'b', 'c']
         })
     };
@@ -137,9 +145,7 @@ function setMapView(key) {
     });
 
     const mapEl = document.getElementById('map');
-    if (key === 'dark') {
-        mapEl.classList.add('dark-tiles');
-    } else {
+    if (mapEl) {
         mapEl.classList.remove('dark-tiles');
     }
 
