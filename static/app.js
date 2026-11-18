@@ -100,28 +100,43 @@ function initMap() {
 
     // 1. Définition des différentes couches de tuiles (100% SANS CLÉ API)
     tileLayers = {
-        // Vue Satellite Google Hybride (Imagerie satellite HD + noms des rues/quartiers au Gabon, zoom jusqu'à 100%)
-        satellite: L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        // Vue Satellite Google Hybride — {s} active la rotation sur mt0/mt1/mt2/mt3 pour paralléliser les requêtes
+        satellite: L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
             maxZoom: 22,
             maxNativeZoom: 20,
-            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            tileSize: 256,
+            detectRetina: true,
+            crossOrigin: true
+        }),
+        // Vue Satellite Pure (sans labels) — fallback si hybrid ne charge pas
+        satellite_pure: L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 22,
+            maxNativeZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            tileSize: 256,
+            detectRetina: true,
+            crossOrigin: true
         }),
         // Vue Sombre / Nuit (CartoDB Dark Matter haute précision)
         dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             maxZoom: 22,
             maxNativeZoom: 19,
-            subdomains: 'abcd'
+            subdomains: 'abcd',
+            tileSize: 256
         }),
         // Vue Rues / Cadastre Standard (OpenStreetMap)
         streets: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 22,
-            maxNativeZoom: 19
+            maxNativeZoom: 19,
+            tileSize: 256
         }),
         // Vue Topographique / Relief (OpenTopoMap)
         topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 22,
             maxNativeZoom: 17,
-            subdomains: ['a', 'b', 'c']
+            subdomains: ['a', 'b', 'c'],
+            tileSize: 256
         })
     };
 
@@ -158,7 +173,7 @@ function setMapView(key) {
     activeTileKey = key;
 
     // Mettre à jour l'apparence des boutons
-    ['satellite', 'dark', 'streets', 'topo'].forEach(k => {
+    ['satellite', 'satellite_pure', 'dark', 'streets', 'topo'].forEach(k => {
         const btn = document.getElementById(`btn-view-${k}`);
         if (btn) {
             if (k === key) {
@@ -173,7 +188,7 @@ function setMapView(key) {
 // Setup buttons and GIS controls
 function setupMapControls() {
     // Boutons de changement de vue
-    ['satellite', 'dark', 'streets', 'topo'].forEach(k => {
+    ['satellite', 'satellite_pure', 'dark', 'streets', 'topo'].forEach(k => {
         const btn = document.getElementById(`btn-view-${k}`);
         if (btn) {
             btn.addEventListener('click', () => setMapView(k));
