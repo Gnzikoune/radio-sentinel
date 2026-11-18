@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import json
 import os
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "antenne.db")
@@ -56,6 +57,12 @@ def init_db():
 def insert_telemetry(data: dict):
     conn = get_connection()
     cursor = conn.cursor()
+    neighbors_val = data.get("neighbors")
+    if isinstance(neighbors_val, (list, dict)):
+        neighbors_val = json.dumps(neighbors_val)
+    elif neighbors_val is not None:
+        neighbors_val = str(neighbors_val)
+
     cursor.execute("""
         INSERT INTO telemetry (
             timestamp, csq, dbm, operator_code, operator_name, tech, reg_status, quality_label, error,
@@ -79,7 +86,7 @@ def insert_telemetry(data: dict):
         data.get("lac"),
         data.get("cell_id"),
         data.get("channel"),
-        data.get("neighbors")
+        neighbors_val
     ))
     conn.commit()
     conn.close()
