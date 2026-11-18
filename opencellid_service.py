@@ -47,7 +47,7 @@ def seed_opencellid_gabon(conn: sqlite3.Connection):
         conn.commit()
 
 def lookup_tower(conn: sqlite3.Connection, mcc: int, net: int, cell_id: int):
-    """Recherche un pylône officiel par MCC, Opérateur (NET) et Cell ID."""
+    """Recherche un pylône officiel par MCC, Opérateur (NET) et Cell ID (avec fallback RAN-sharing)."""
     cursor = conn.cursor()
     cursor.execute("""
         SELECT radio, mcc, net, area, cell, lon, lat, range, site_name
@@ -56,6 +56,14 @@ def lookup_tower(conn: sqlite3.Connection, mcc: int, net: int, cell_id: int):
         LIMIT 1
     """, (mcc, net, cell_id))
     row = cursor.fetchone()
+    if not row:
+        cursor.execute("""
+            SELECT radio, mcc, net, area, cell, lon, lat, range, site_name
+            FROM opencellid_towers
+            WHERE mcc = ? AND cell = ?
+            LIMIT 1
+        """, (mcc, cell_id))
+        row = cursor.fetchone()
     if row:
         return {
             "radio": row[0],
