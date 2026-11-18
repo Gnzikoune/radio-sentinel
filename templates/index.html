@@ -14,6 +14,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Leaflet.heat CDN (Interpolation spatiale continue Krigeage / Heatmap) -->
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <!-- Générateur de QR Code local (Appairage Mobile instantané) -->
+    <script src="/static/qrcode.min.js"></script>
 
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,6 +80,13 @@
                     🛰️ Activer le GPS local
                 </button>
 
+                <!-- Bouton QR Code Appairage Mobile -->
+                <button id="btn-open-qr-modal"
+                    class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-sans font-semibold transition flex items-center gap-1.5 shadow-lg shadow-indigo-500/20 active:scale-95"
+                    title="Scanner le QR Code pour ouvrir Radio Sentinel sur votre smartphone">
+                    📱 QR Code Mobile
+                </button>
+
                 <!-- Export CSV -->
                 <a href="/api/export-csv"
                     class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-sans font-semibold transition flex items-center gap-1.5 shadow-lg shadow-cyan-500/20">
@@ -125,6 +134,11 @@
                 <button id="btn-banner-toggle-gps"
                     class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-cyan-500/20 flex items-center gap-1.5">
                     🛰️ Activer le GPS ici
+                </button>
+                <button id="btn-banner-qr"
+                    class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-indigo-500/20 flex items-center gap-1.5"
+                    title="Scanner pour ouvrir sur smartphone">
+                    📱 QR Code
                 </button>
                 <a href="/gps" target="_blank"
                     class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition border border-slate-700">
@@ -560,6 +574,58 @@
         </div>
 
     </main>
+
+    <!-- Modal QR Code pour Appairage Mobile Instantané -->
+    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+            <!-- Bouton Fermer -->
+            <button id="btn-close-qr-modal" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg font-bold p-1">
+                ✕
+            </button>
+
+            <!-- En-tête Modale -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-lg">
+                    📱
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-100">Appairage Mobile Instantané</h3>
+                    <p class="text-xs text-slate-400">Scannez le QR Code depuis votre Samsung Galaxy A14</p>
+                </div>
+            </div>
+
+            <!-- Onglets de sélection du mode -->
+            <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-semibold">
+                <button id="btn-qr-tab-dashboard" class="py-2 rounded-lg bg-indigo-600 text-white transition shadow">
+                    Tableau Complet
+                </button>
+                <button id="btn-qr-tab-gps" class="py-2 rounded-lg text-slate-400 hover:text-white transition">
+                    Balise GPS Simple
+                </button>
+            </div>
+
+            <!-- Conteneur QR Code Blanc Haute Visibilité -->
+            <div class="flex flex-col items-center justify-center p-5 bg-white rounded-2xl shadow-inner mx-auto max-w-[240px]">
+                <div id="qrcode-display" class="flex items-center justify-center"></div>
+            </div>
+
+            <!-- Affichage de l'URL & Bouton Copier -->
+            <div class="space-y-1.5">
+                <div class="text-[11px] font-mono text-slate-400 flex justify-between">
+                    <span>URL Cible :</span>
+                    <button id="btn-copy-qr-url" class="text-cyan-400 hover:underline">Copier le lien</button>
+                </div>
+                <div id="qr-target-url-text" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-cyan-300 break-all select-all">
+                    --
+                </div>
+            </div>
+
+            <!-- Conseil utilisateur -->
+            <p class="text-[11px] text-slate-400 text-center leading-relaxed">
+                👉 Ouvrez l'application <strong>Appareil photo</strong> ou le lecteur QR de votre téléphone, visez l'écran et appuyez sur la notification pour ouvrir le tableau de bord sans rien saisir.
+            </p>
+        </div>
+    </div>
 
     <footer class="border-t border-slate-800/80 mt-12 py-6 text-center text-xs text-slate-500 font-mono">
         Radio Sentinel • Observatoire Cellulaire & Cartographie RF Mobile • Conçu avec le Samsung Galaxy A14

@@ -1004,6 +1004,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateEvents();
     setupConsole();
     setupClientGPS();
+    setupQRCodeModal();
 
     // Intervals
     setInterval(updateTelemetry, 2000);
@@ -1116,4 +1117,103 @@ function setupClientGPS() {
 
     if (btnHeader) btnHeader.addEventListener('click', toggleClientGps);
     if (btnBanner) btnBanner.addEventListener('click', toggleClientGps);
+}
+
+// -------------------------------------------------------------
+// Module QR Code pour Appairage Mobile Sans Saisie
+// -------------------------------------------------------------
+let qrCodeInstance = null;
+let currentQrMode = 'dashboard'; // 'dashboard' ou 'gps'
+
+function setupQRCodeModal() {
+    const modal = document.getElementById('qr-modal');
+    const btnOpenHeader = document.getElementById('btn-open-qr-modal');
+    const btnOpenBanner = document.getElementById('btn-banner-qr');
+    const btnClose = document.getElementById('btn-close-qr-modal');
+    const btnTabDashboard = document.getElementById('btn-qr-tab-dashboard');
+    const btnTabGps = document.getElementById('btn-qr-tab-gps');
+    const qrDisplay = document.getElementById('qrcode-display');
+    const qrText = document.getElementById('qr-target-url-text');
+    const btnCopy = document.getElementById('btn-copy-qr-url');
+
+    if (!modal || !qrDisplay) return;
+
+    function getBaseUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tunnelParam = urlParams.get('tunnel');
+        if (tunnelParam) {
+            return tunnelParam.replace(/\/+$/, '');
+        }
+        return window.location.origin;
+    }
+
+    function renderQr(mode) {
+        currentQrMode = mode;
+        const base = getBaseUrl();
+        const targetUrl = mode === 'gps' ? `${base}/gps` : base;
+
+        if (btnTabDashboard && btnTabGps) {
+            if (mode === 'dashboard') {
+                btnTabDashboard.className = "py-2 rounded-lg bg-indigo-600 text-white transition shadow";
+                btnTabGps.className = "py-2 rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                btnTabDashboard.className = "py-2 rounded-lg text-slate-400 hover:text-white transition";
+                btnTabGps.className = "py-2 rounded-lg bg-indigo-600 text-white transition shadow";
+            }
+        }
+
+        if (qrText) qrText.textContent = targetUrl;
+
+        qrDisplay.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+            qrCodeInstance = new QRCode(qrDisplay, {
+                text: targetUrl,
+                width: 190,
+                height: 190,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        } else {
+            qrDisplay.innerHTML = `<span class="text-xs text-slate-500 font-mono">Génération du code...</span>`;
+        }
+    }
+
+    function openModal() {
+        modal.classList.remove('hidden');
+        renderQr(currentQrMode);
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    if (btnOpenHeader) btnOpenHeader.addEventListener('click', openModal);
+    if (btnOpenBanner) btnOpenBanner.addEventListener('click', openModal);
+    if (btnClose) btnClose.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    if (btnTabDashboard) btnTabDashboard.addEventListener('click', () => renderQr('dashboard'));
+    if (btnTabGps) btnTabGps.addEventListener('click', () => renderQr('gps'));
+
+    if (btnCopy) {
+        btnCopy.addEventListener('click', () => {
+            const base = getBaseUrl();
+            const targetUrl = currentQrMode === 'gps' ? `${base}/gps` : base;
+            navigator.clipboard.writeText(targetUrl).then(() => {
+                const old = btnCopy.textContent;
+                btnCopy.textContent = "✅ Lien copié !";
+                setTimeout(() => { btnCopy.textContent = old; }, 2000);
+            });
+        });
+    }
+
+    // Si un tunnel public est passé dans l'URL (?tunnel=...), afficher le QR code immédiatement
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tunnel')) {
+        setTimeout(openModal, 400);
+    }
 }

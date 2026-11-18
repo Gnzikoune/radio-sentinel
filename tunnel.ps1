@@ -54,13 +54,16 @@ $ProcessInfo.UseShellExecute = $false
 $ProcessInfo.CreateNoWindow = $false
 
 $Process = [System.Diagnostics.Process]::Start($ProcessInfo)
+$OpenedBrowser = $false
 
 # Lecture du flux de log pour extraire l'URL .trycloudflare.com
 while (-not $Process.HasExited) {
     $Line = $Process.StandardError.ReadLine()
     if ($Line) {
-        if ($Line -match "https://[a-zA-Z0-9-]+\.trycloudflare\.com") {
+        if ($Line -match "https://[a-zA-Z0-9-]+\.trycloudflare\.com" -and -not $OpenedBrowser) {
             $PublicUrl = $Matches[0]
+            $OpenedBrowser = $true
+
             Write-Host ""
             Write-Host "=================================================================" -ForegroundColor Green
             Write-Host "TUNNEL PUBLIC ACTIF - VOS URLS D'ACCES 4G MOBILE :" -ForegroundColor Green
@@ -68,12 +71,18 @@ while (-not $Process.HasExited) {
             Write-Host "   Tableau de bord All-in-One : $PublicUrl" -ForegroundColor Cyan
             Write-Host "   Balise GPS allegee         : $PublicUrl/gps" -ForegroundColor Yellow
             Write-Host ""
-            Write-Host "Ouvrez l'une de ces adresses sur le navigateur de votre Samsung A14 !" -ForegroundColor White
+            Write-Host "Scannez le QR Code affiche sur votre ecran PC avec le Samsung A14 !" -ForegroundColor White
             Write-Host "=================================================================" -ForegroundColor Green
             Write-Host ""
+            Write-Host "Ouverture automatique du tableau de bord avec le QR Code de connexion..." -ForegroundColor Gray
             Write-Host "Laissez cette fenetre ouverte pendant toute votre sortie terrain." -ForegroundColor Gray
             Write-Host "Appuyez sur Ctrl+C pour arreter le tunnel." -ForegroundColor DarkGray
             Write-Host ""
+
+            # Ouverture automatique de la page avec le QR Code dynamique du tunnel
+            try {
+                Start-Process "https://localhost:8000/?tunnel=$PublicUrl"
+            } catch {}
         }
     }
 }

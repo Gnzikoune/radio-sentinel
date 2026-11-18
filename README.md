@@ -202,7 +202,11 @@ antenne/
 3. Accédez au tableau de bord local :  
    👉 **`https://127.0.0.1:8000`**
 
-### 2. Deux Modes d'Utilisation en Mobilité (Wardriving Libreville)
+### 3. Appairage Mobile par QR Code (Zéro Saisie Manuelle)
+Pour ne jamais avoir à saisir de longues URLs sur le clavier de votre téléphone :
+1. Sur le tableau de bord PC, cliquez sur le bouton violet **`📱 QR Code Mobile`** (ou double-cliquez sur `tunnel.bat` qui l'ouvre automatiquement).
+2. Pointez simplement l'appareil photo de votre smartphone vers l'écran du PC.
+3. Touchez la notification : Radio Sentinel s'ouvre instantanément sur votre Samsung A14 !
 
 #### Mode A : Vous emportez votre PC portable avec vous
 1. Activez le **Point d'accès mobile (partage Wi-Fi)** sur votre Samsung Galaxy A14.
