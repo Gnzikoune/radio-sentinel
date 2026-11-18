@@ -417,23 +417,51 @@ async function loadMapPoints() {
         // Mettre à jour l'indicateur de triangulation dans la légende
         const towerStatusEl = document.getElementById('tower-triangulation-status');
 
-        if (geoSpread >= MIN_SPREAD_FOR_TOWER && bestPoint) {
-            // ✅ Zone suffisamment couverte → on peut estimer la direction de l'antenne
-            estimatedTowerLatLng = [bestPoint.latitude, bestPoint.longitude];
+        if (geoSpread >= MIN_SPREAD_FOR_TOWER && validPts.length > 0) {
+            // ✅ Zone couverte (≥ 50m) → TRIANGULATION PAR BARYCENTRE PONDÉRÉ RF (Milliwatts)
+            // Sélection des meilleurs relevés (jusqu'à 25 points les plus forts)
+            const sortedBySignal = [...validPts].sort((a, b) => b.dbm - a.dbm);
+            const topPoints = sortedBySignal.slice(0, Math.min(25, sortedBySignal.length));
+
+            // Poids W_i = 10^(dBm / 10) (conversion logarithmique vers puissance physique linéaire en mW)
+            const minBatchDbm = topPoints[topPoints.length - 1].dbm;
+            let sumWeight = 0;
+            let weightedLatSum = 0;
+            let weightedLonSum = 0;
+
+            topPoints.forEach(p => {
+                const w = Math.pow(10, (p.dbm - minBatchDbm) / 10);
+                sumWeight += w;
+                weightedLatSum += p.latitude * w;
+                weightedLonSum += p.longitude * w;
+            });
+
+            const baryLat = weightedLatSum / sumWeight;
+            const baryLon = weightedLonSum / sumWeight;
+            estimatedTowerLatLng = [baryLat, baryLon];
+
+            // Écart-type / rayon de dispersion pondéré
+            let weightedDistSq = 0;
+            topPoints.forEach(p => {
+                const w = Math.pow(10, (p.dbm - minBatchDbm) / 10);
+                const d = getDistanceMeters(baryLat, baryLon, p.latitude, p.longitude);
+                weightedDistSq += (d * d) * w;
+            });
+            const confidenceRadius = Math.max(25, Math.min(120, Math.round(Math.sqrt(weightedDistSq / sumWeight))));
 
             if (towerStatusEl) {
-                towerStatusEl.textContent = `📡 Antenne estimée (zone couverte : ${Math.round(geoSpread)} m)`;
-                towerStatusEl.className = 'text-xs text-amber-300 font-mono';
+                towerStatusEl.textContent = `📡 Barycentre RF calculé (Rayon d'incertitude : ±${confidenceRadius} m, ${topPoints.length} relevés)`;
+                towerStatusEl.className = 'text-xs text-amber-300 font-mono font-semibold';
             }
 
-            // Halo d'ondes dorées
+            // Halo d'incertitude d'ondes dorées
             const towerHalo = L.circle(estimatedTowerLatLng, {
-                radius: 40,
+                radius: confidenceRadius,
                 color: '#f59e0b',
                 fillColor: '#fbbf24',
-                fillOpacity: 0.25,
+                fillOpacity: 0.22,
                 weight: 2,
-                dashArray: '4, 4'
+                dashArray: '5, 5'
             });
 
             // Point Jaune Émetteur
@@ -446,16 +474,17 @@ async function loadMapPoints() {
                 fillOpacity: 1
             });
 
+            const topP = topPoints[0];
             towerMarker.bindPopup(`
                 <div class="font-sans text-xs leading-relaxed">
                     <div class="flex items-center gap-1.5 text-amber-400 font-bold uppercase text-[11px] mb-1">
-                        <span class="text-base">📡</span> Antenne-Relais Estimée
+                        <span class="text-base">📡</span> Pylône Estimé (Barycentre RF)
                     </div>
-                    <strong class="text-slate-100 text-sm">${bestPoint.operator_name || 'Opérateur Réseau'}</strong><br>
-                    <span class="text-emerald-400 font-mono font-bold">Puissance Max : ${bestPoint.dbm} dBm</span><br>
-                    <span class="text-slate-300 font-mono">Norme : ${bestPoint.tech || '3G+ HSPA+'}</span><br>
-                    <span class="text-amber-300 font-mono text-[10px]">Zone de plus forte réception (${Math.round(geoSpread)} m couverts)</span><br>
-                    <span class="text-slate-500 font-mono text-[10px]">⚠️ Position approximative — continuez à vous déplacer pour affiner</span>
+                    <strong class="text-slate-100 text-sm">${topP.operator_name || 'Opérateur Réseau'}</strong><br>
+                    <span class="text-emerald-400 font-mono font-bold">Signal Crête : ${topP.dbm} dBm</span><br>
+                    <span class="text-slate-300 font-mono">Cell ID: <strong>${topP.cell_id || '--'}</strong> • LAC: ${topP.lac || '--'}</span><br>
+                    <span class="text-amber-300 font-mono text-[10px]">Pondération : ${topPoints.length} relevés en milliwatts (10^(dBm/10))</span><br>
+                    <span class="text-slate-400 font-mono text-[10px]">Précision géométrique : ±${confidenceRadius} m</span>
                 </div>
             `);
 
