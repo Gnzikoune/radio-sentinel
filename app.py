@@ -106,6 +106,7 @@ def export_csv():
     writer.writerow([
         "ID", "Timestamp", "CSQ", "dBm", "Code_Operateur", "Nom_Operateur",
         "Technologie", "Statut_Enregistrement", "Qualite",
+        "Cell_ID_3GPP", "Code_Zone_LAC", "Canal_UARFCN",
         "Latitude", "Longitude", "Precision_GPS_m", "Vitesse_kmh", "Erreur"
     ])
     for r in records:
@@ -113,6 +114,7 @@ def export_csv():
             r.get("id"), r.get("timestamp"), r.get("csq"), r.get("dbm"),
             r.get("operator_code"), r.get("operator_name"), r.get("tech"),
             r.get("reg_status"), r.get("quality_label"),
+            r.get("cell_id"), r.get("lac"), r.get("channel"),
             r.get("latitude"), r.get("longitude"), r.get("accuracy"), r.get("speed"),
             r.get("error")
         ])

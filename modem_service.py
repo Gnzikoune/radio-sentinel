@@ -74,7 +74,13 @@ class ModemService:
             "longitude": None,
             "accuracy": None,
             "speed": None,
-            "gps_connected": False
+            "gps_connected": False,
+            "lac": "--",
+            "cell_id": "--",
+            "channel": "--",
+            "freq_mhz": None,
+            "rxlev": None,
+            "neighbors": []
         }
         
         self.last_csq = None
@@ -251,16 +257,64 @@ class ModemService:
                 reg_code = match_creg.group(1)
                 reg_status_desc = REG_STATUS_MAP.get(reg_code, f"Code [{reg_code}]")
 
+            # 4. Engineering Cell Data (AT+CCED=0,1) - Cell ID, LAC, Canal Fréquence 3GPP
+            cced_raw = self._send_raw_command("AT+CCED=0,1")
+            cell_id = self.live_state.get("cell_id", "--")
+            lac = self.live_state.get("lac", "--")
+            channel = self.live_state.get("channel", "--")
+            freq_mhz = self.live_state.get("freq_mhz")
+            rxlev = self.live_state.get("rxlev")
+            
+            match_cced = re.search(r'\+CCED:\s*(\d+),(\d+),(\w+),(\w+),(\w+),(\w+),(\w+)', cced_raw)
+            if match_cced:
+                mcc = match_cced.group(1)
+                mnc = match_cced.group(2)
+                lac_val = match_cced.group(3)
+                ci_val = match_cced.group(4)
+                ch_val = match_cced.group(6)
+                rx_val = match_cced.group(7)
+
+                lac = str(lac_val)
+                cell_id = str(ci_val)
+                channel = str(ch_val)
+                try: rxlev = int(rx_val)
+                except: pass
+
+                # Déduction de la fréquence porteuse (UMTS Band 1 / Band 8)
+                try:
+                    ch_num = int(channel)
+                    if 10562 <= ch_num <= 10838:
+                        freq_mhz = round(2110 + (ch_num - 10562) * 0.2, 1) # UMTS 2100 Band 1
+                    elif 2937 <= ch_num <= 3088:
+                        freq_mhz = round(925 + (ch_num - 2937) * 0.2, 1)   # UMTS 900 Band 8
+                except:
+                    pass
+
+            # 5. Cellules Voisines (Neighbor Cells - AT+CCED=0,2)
+            cced_nc = self._send_raw_command("AT+CCED=0,2")
+            neighbors = []
+            if "+CCED:" in cced_nc:
+                nc_matches = re.findall(r'(\d+),(\d+),(\w+),(\w+),(\w+),(\w+)', cced_nc)
+                for nc in nc_matches:
+                    neighbors.append({
+                        "mcc": nc[0],
+                        "mnc": nc[1],
+                        "lac": nc[2],
+                        "cell_id": nc[3],
+                        "channel": nc[4],
+                        "rxlev": nc[5]
+                    })
+
             # Outage checking
             is_outage = (csq is None or csq == 0 or csq == 99)
             if self.last_csq is not None:
                 if self.last_csq > 0 and is_outage:
                     database.log_event("OUTAGE", f"Coupure réseau détectée ! Le signal est tombé à {csq}")
                 elif self.last_csq == 0 and not is_outage:
-                    database.log_event("RECONNECT", f"Signal rétabli : CSQ={csq} ({dbm} dBm) sur {op_name}")
+                    database.log_event("RECONNECT", f"Signal rétabli : CSQ={csq} ({dbm} dBm) sur {op_name} (Cell ID: {cell_id})")
             self.last_csq = csq if csq is not None else 0
 
-            # 4. GPS Synchronization (Depuis le Samsung Galaxy A14)
+            # 6. GPS Synchronization (Depuis le Samsung Galaxy A14)
             current_gps = gps_instance.get_current()
             lat = current_gps.get("latitude")
             lon = current_gps.get("longitude")
@@ -285,7 +339,13 @@ class ModemService:
                 "longitude": lon,
                 "accuracy": accuracy,
                 "speed": speed,
-                "gps_connected": gps_connected
+                "gps_connected": gps_connected,
+                "lac": lac,
+                "cell_id": cell_id,
+                "channel": channel,
+                "freq_mhz": freq_mhz,
+                "rxlev": rxlev,
+                "neighbors": neighbors
             })
 
             # Sauvegarde en BDD (avec GPS si actif)

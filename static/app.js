@@ -4,6 +4,8 @@ let leafletMap = null;
 let currentPositionMarker = null;
 let currentAccuracyCircle = null;
 let mapPointsLayer = null;
+let heatLayer = null;
+let isHeatmapActive = true;
 let towerLayer = null;
 let estimatedTowerLatLng = null;
 let hasCenteredOnGPS = false;
@@ -128,7 +130,8 @@ function initMap() {
     // Échelle métrique en bas à gauche
     L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(leafletMap);
 
-    // Groupes de calques pour les points et l'antenne
+    // Groupes de calques pour la Heatmap continue, l'antenne et les balises
+    heatLayer = L.layerGroup().addTo(leafletMap);
     towerLayer = L.layerGroup().addTo(leafletMap);
     mapPointsLayer = L.layerGroup().addTo(leafletMap);
 
@@ -174,6 +177,22 @@ function setupMapControls() {
             btn.addEventListener('click', () => setMapView(k));
         }
     });
+
+    // Bouton Toggle Heatmap Continue
+    const btnHeatmap = document.getElementById('btn-toggle-heatmap');
+    if (btnHeatmap) {
+        btnHeatmap.addEventListener('click', () => {
+            isHeatmapActive = !isHeatmapActive;
+            if (isHeatmapActive) {
+                btnHeatmap.className = "px-2.5 py-1.5 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition flex items-center gap-1 font-semibold";
+                btnHeatmap.innerHTML = "🔥 Carte Thermique (ON)";
+            } else {
+                btnHeatmap.className = "px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:text-white transition flex items-center gap-1 font-semibold";
+                btnHeatmap.innerHTML = "🔥 Carte Thermique (OFF)";
+            }
+            loadMapPoints();
+        });
+    }
 
     // Centrer sur le mobile
     const btnRecenter = document.getElementById('btn-recenter');
@@ -270,7 +289,7 @@ function getDistanceMeters(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-// Load and draw points on the Leaflet Map + Antenna Tower (Point Jaune)
+// Load and draw points on the Leaflet Map + Antenna Tower (Point Jaune) + Heatmap continue
 async function loadMapPoints() {
     if (!leafletMap || !mapPointsLayer || !towerLayer) return;
 
@@ -278,9 +297,11 @@ async function loadMapPoints() {
         const res = await fetch('/api/map-points?limit=1000');
         const points = await res.json();
 
+        if (heatLayer) heatLayer.clearLayers();
         mapPointsLayer.clearLayers();
         towerLayer.clearLayers();
 
+        let heatPoints = [];
         let bestPoint = null;
         let maxDbm = -999;
         let lastFilteredLat = null;
@@ -293,6 +314,10 @@ async function loadMapPoints() {
                     maxDbm = pt.dbm;
                     bestPoint = pt;
                 }
+
+                // Alimenter la Heatmap RF (Interpolation de surface Krigeage continue)
+                const intensity = Math.max(0.05, Math.min(1.0, (pt.dbm - (-115)) / (-50 - (-115))));
+                heatPoints.push([pt.latitude, pt.longitude, intensity]);
 
                 // FILTRE INTELLIGENT DE DÉRIVE GPS EN INTÉRIEUR :
                 // On n'affiche un nouveau point QUE si on s'est déplacé d'au moins 6 mètres
@@ -328,11 +353,16 @@ async function loadMapPoints() {
                 });
 
                 const time = pt.timestamp?.split('T')[1]?.substring(0, 8) || pt.timestamp;
+                const cellInfo = pt.cell_id ? `<br><span class="text-slate-300 font-mono text-[11px]">Cell ID: <strong class="text-cyan-300">${pt.cell_id}</strong> (LAC: ${pt.lac || '--'})</span>` : '';
+                const chanInfo = pt.channel ? `<br><span class="text-slate-400 font-mono text-[10px]">Canal Radio: ${pt.channel}</span>` : '';
+
                 marker.bindPopup(`
                     <div class="font-sans text-xs leading-relaxed">
                         <span class="text-cyan-400 font-bold uppercase text-[10px] tracking-wider">Mesure sur le Terrain</span><br>
                         <strong class="text-slate-100 text-sm">${pt.operator_name || 'Opérateur'}</strong><br>
-                        <span class="font-mono font-bold text-sm" style="color: ${color}">${pt.dbm} dBm (${label})</span><br>
+                        <span class="font-mono font-bold text-sm" style="color: ${color}">${pt.dbm} dBm (${label})</span>
+                        ${cellInfo}
+                        ${chanInfo}<br>
                         <span class="text-slate-300 font-mono">CSQ: ${pt.csq}/31 • ${pt.tech || 'Cellulaire'}</span><br>
                         <span class="text-slate-400 font-mono text-[10px]">${time} • Vitesse: ${Math.round(pt.speed || 0)} km/h</span>
                     </div>
@@ -341,6 +371,24 @@ async function loadMapPoints() {
                 mapPointsLayer.addLayer(marker);
             }
         });
+
+        // 1.5. Affichage de la Heatmap continue RF (Diffusion spatiale du champ électromagnétique)
+        if (isHeatmapActive && heatPoints.length > 0 && typeof L.heatLayer === 'function') {
+            const heat = L.heatLayer(heatPoints, {
+                radius: 32,
+                blur: 22,
+                maxZoom: 18,
+                minOpacity: 0.35,
+                gradient: {
+                    0.05: '#ef4444', // Rouge sang (Zone blanche / signal critique < -100 dBm)
+                    0.35: '#f97316', // Orange vif (Signal faible -95 à -85 dBm)
+                    0.60: '#eab308', // Jaune doré (Signal moyen -85 à -75 dBm)
+                    0.80: '#10b981', // Vert émeraude (Bon signal -75 à -65 dBm)
+                    1.00: '#06b6d4'  // Cyan électrique (Signal d'excellence > -65 dBm)
+                }
+            });
+            heatLayer.addLayer(heat);
+        }
 
         // 2. Affichage de l'Antenne-Relais (LE POINT JAUNE BRILLANT 📡)
         // RÈGLE DE TRIANGULATION :
@@ -568,11 +616,44 @@ async function updateTelemetry() {
             document.getElementById('val-operator').textContent = live.operator_name;
         }
         if (live.operator_code) {
-            document.getElementById('val-mcc-mnc').textContent = `Code Réseau: ${live.operator_code}`;
+            document.getElementById('val-mcc-mnc').textContent = `Code: ${live.operator_code}`;
             if (live.operator_code.startsWith('628')) {
                 document.getElementById('val-country').textContent = 'Gabon (628)';
             } else {
                 document.getElementById('val-country').textContent = `Pays ${live.operator_code.substring(0, 3)}`;
+            }
+        }
+
+        // Topologie 3GPP : Cell ID, LAC, Canal UARFCN & Fréquence physique
+        const valCellId = document.getElementById('val-cell-id');
+        const valLacChan = document.getElementById('val-lac-channel');
+        const valNeighbors = document.getElementById('val-neighbors-badge');
+        const hwCellId = document.getElementById('hw-cell-id');
+        const hwFreq = document.getElementById('hw-freq');
+
+        if (live.cell_id && live.cell_id !== "--") {
+            const hexCi = "0x" + parseInt(live.cell_id).toString(16).toUpperCase();
+            if (valCellId) valCellId.textContent = `Cell ID: ${live.cell_id}`;
+            if (hwCellId) hwCellId.textContent = `${live.cell_id} (${hexCi})`;
+        } else {
+            if (valCellId) valCellId.textContent = "Cell ID: --";
+        }
+
+        if (live.channel && live.channel !== "--") {
+            const freqStr = live.freq_mhz ? ` (${live.freq_mhz} MHz)` : '';
+            if (valLacChan) valLacChan.textContent = `LAC: ${live.lac || '--'} • CH: ${live.channel}${freqStr}`;
+            if (hwFreq) hwFreq.textContent = `CH ${live.channel}${freqStr}`;
+        } else {
+            if (valLacChan) valLacChan.textContent = `LAC: ${live.lac || '--'} • UARFCN: --`;
+        }
+
+        if (live.neighbors && Array.isArray(live.neighbors)) {
+            const count = live.neighbors.length;
+            if (valNeighbors) {
+                valNeighbors.textContent = `${count} voisine(s)`;
+                valNeighbors.className = count > 0 
+                    ? "px-1.5 py-0.5 rounded bg-cyan-900/50 text-cyan-300 border border-cyan-700/50 text-[10px] font-bold"
+                    : "px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px]";
             }
         }
 

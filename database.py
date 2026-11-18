@@ -40,10 +40,13 @@ def init_db():
     """)
     conn.commit()
 
-    # Migration automatique si colonnes GPS absentes
+    # Migration automatique si colonnes GPS ou Ingénierie absentes
     cursor.execute("PRAGMA table_info(telemetry)")
     columns = [row["name"] for row in cursor.fetchall()]
-    for col, col_type in [("latitude", "REAL"), ("longitude", "REAL"), ("accuracy", "REAL"), ("speed", "REAL")]:
+    for col, col_type in [
+        ("latitude", "REAL"), ("longitude", "REAL"), ("accuracy", "REAL"), ("speed", "REAL"),
+        ("lac", "TEXT"), ("cell_id", "TEXT"), ("channel", "TEXT"), ("neighbors", "TEXT")
+    ]:
         if col not in columns:
             cursor.execute(f"ALTER TABLE telemetry ADD COLUMN {col} {col_type}")
     
@@ -56,9 +59,9 @@ def insert_telemetry(data: dict):
     cursor.execute("""
         INSERT INTO telemetry (
             timestamp, csq, dbm, operator_code, operator_name, tech, reg_status, quality_label, error,
-            latitude, longitude, accuracy, speed
+            latitude, longitude, accuracy, speed, lac, cell_id, channel, neighbors
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         data.get("timestamp", datetime.now().isoformat()),
         data.get("csq"),
@@ -72,7 +75,11 @@ def insert_telemetry(data: dict):
         data.get("latitude"),
         data.get("longitude"),
         data.get("accuracy"),
-        data.get("speed")
+        data.get("speed"),
+        data.get("lac"),
+        data.get("cell_id"),
+        data.get("channel"),
+        data.get("neighbors")
     ))
     conn.commit()
     conn.close()
@@ -100,7 +107,7 @@ def get_map_points(limit: int = 1000):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT id, timestamp, dbm, csq, operator_name, tech, quality_label, latitude, longitude, accuracy, speed
+        SELECT id, timestamp, dbm, csq, operator_name, tech, quality_label, latitude, longitude, accuracy, speed, lac, cell_id, channel
         FROM telemetry
         WHERE latitude IS NOT NULL AND longitude IS NOT NULL
         ORDER BY id DESC LIMIT ?
