@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Radio Sentinel — Passerelle d'Accès Distant Nomade (Cloudflare Tunnel)
 # Permet de laisser le PC allume a la maison et d'utiliser la sonde 4G/GPS sur le
 # Samsung Galaxy A14 n'importe ou dans Libreville en donnees mobiles (sans Wi-Fi).

@@ -1003,9 +1003,117 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateTelemetry();
     await updateEvents();
     setupConsole();
+    setupClientGPS();
 
     // Intervals
     setInterval(updateTelemetry, 2000);
     setInterval(loadMapPoints, 3000);
     setInterval(updateEvents, 5000);
 });
+
+// -------------------------------------------------------------
+// Module GPS & Sonde 4G Intégré Côté Client (Mobile ou Laptop)
+// Permet d'activer la puce GPS de l'appareil directement sur index.html
+// -------------------------------------------------------------
+let clientGpsWatchId = null;
+let clientWakeLock = null;
+
+function setupClientGPS() {
+    const btnHeader = document.getElementById('btn-toggle-client-gps');
+    const btnBanner = document.getElementById('btn-banner-toggle-gps');
+
+    function updateGpsButtons(isActive) {
+        const text = isActive ? "🛑 Arrêter le GPS" : "🛰️ Activer le GPS local";
+        const bannerText = isActive ? "🛑 Arrêter le GPS" : "🛰️ Activer le GPS ici";
+        const cls = isActive
+            ? "px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-sans font-semibold transition flex items-center gap-1.5 active:scale-95 shadow-md shadow-rose-500/20"
+            : "px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-sans font-semibold transition flex items-center gap-1.5 active:scale-95 shadow-sm";
+        const bannerCls = isActive
+            ? "px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-rose-500/20 flex items-center gap-1.5"
+            : "px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-cyan-500/20 flex items-center gap-1.5";
+
+        if (btnHeader) {
+            btnHeader.innerHTML = text;
+            btnHeader.className = cls;
+        }
+        if (btnBanner) {
+            btnBanner.innerHTML = bannerText;
+            btnBanner.className = bannerCls;
+        }
+    }
+
+    async function toggleClientGps() {
+        if (clientGpsWatchId !== null) {
+            navigator.geolocation.clearWatch(clientGpsWatchId);
+            clientGpsWatchId = null;
+            if (clientWakeLock) {
+                try { await clientWakeLock.release(); } catch(e){}
+                clientWakeLock = null;
+            }
+            updateGpsButtons(false);
+            return;
+        }
+
+        if (!navigator.geolocation) {
+            alert("La géolocalisation n'est pas supportée par ce navigateur.");
+            return;
+        }
+
+        try {
+            if ('wakeLock' in navigator) {
+                clientWakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch(e) {}
+
+        updateGpsButtons(true);
+
+        clientGpsWatchId = navigator.geolocation.watchPosition(
+            async (pos) => {
+                const c = pos.coords;
+                let netType = '4g', downlink = null, rtt = null;
+                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (conn) {
+                    netType = conn.effectiveType || '4g';
+                    downlink = conn.downlink || null;
+                    rtt = conn.rtt || null;
+                }
+
+                const tStart = performance.now();
+                try {
+                    await fetch('/api/gps', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            latitude: c.latitude,
+                            longitude: c.longitude,
+                            accuracy: c.accuracy,
+                            speed: c.speed ? c.speed * 3.6 : 0,
+                            altitude: c.altitude,
+                            network_type: netType,
+                            downlink_mbps: downlink,
+                            rtt_ms: rtt,
+                            ping_ms: Math.round(performance.now() - tStart),
+                            operator_sim: "SIM Mobile Directe",
+                            device_model: "Samsung Galaxy A14 (All-in-One)"
+                        })
+                    });
+                } catch(err) {
+                    console.error("Erreur envoi GPS direct:", err);
+                }
+            },
+            (err) => {
+                console.error("Erreur GPS:", err);
+                alert("Erreur GPS : " + err.message);
+                if (clientGpsWatchId !== null) {
+                    navigator.geolocation.clearWatch(clientGpsWatchId);
+                    clientGpsWatchId = null;
+                }
+                updateGpsButtons(false);
+            },
+            { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+        );
+    }
+
+    if (btnHeader) btnHeader.addEventListener('click', toggleClientGps);
+    if (btnBanner) btnBanner.addEventListener('click', toggleClientGps);
+}

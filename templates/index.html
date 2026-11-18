@@ -64,12 +64,19 @@
                 <!-- GPS Status (Samsung A14) -->
                 <div id="badge-gps-container"
                     class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/80 flex items-center gap-1.5">
-                    <span class="text-slate-400">GPS Samsung :</span>
+                    <span class="text-slate-400">GPS :</span>
                     <span id="badge-gps" class="text-amber-400 font-semibold flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                         En attente du mobile
                     </span>
                 </div>
+
+                <!-- Bouton activation directe du GPS sur cet appareil (Mobile ou PC) -->
+                <button id="btn-toggle-client-gps"
+                    class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-sans font-semibold transition flex items-center gap-1.5 active:scale-95 shadow-sm"
+                    title="Activer le récepteur GPS de cet appareil directement sur ce tableau de bord">
+                    🛰️ Activer le GPS local
+                </button>
 
                 <!-- Export CSV -->
                 <a href="/api/export-csv"
@@ -94,7 +101,7 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
 
-        <!-- Banner for Samsung Galaxy A14 Connection -->
+        <!-- Banner for Mobile GPS & Direct Activation -->
         <div id="gps-helper-banner"
             class="p-4 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900 border border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -107,19 +114,23 @@
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                        Connecter votre Samsung Galaxy A14 pour le GPS
+                        Position Satellite & Sonde 4G
                     </h4>
                     <p class="text-xs text-slate-400">
-                        Ouvrez simplement le navigateur de votre Samsung sur :
-                        <code
-                            class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 font-mono text-xs font-bold border border-cyan-500/20">https://192.168.1.134:8000/gps</code>
+                        Vous pouvez activer le GPS directement sur cet écran (smartphone/laptop) ou ouvrir <code class="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 font-mono text-xs">/gps</code> sur un second terminal.
                     </p>
                 </div>
             </div>
-            <a href="/gps" target="_blank"
-                class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono font-semibold transition border border-slate-700 flex-shrink-0 text-center">
-                Tester la page mobile ↗
-            </a>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button id="btn-banner-toggle-gps"
+                    class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-cyan-500/20 flex items-center gap-1.5">
+                    🛰️ Activer le GPS ici
+                </button>
+                <a href="/gps" target="_blank"
+                    class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition border border-slate-700">
+                    Page /gps ↗
+                </a>
+            </div>
         </div>
 
         <!-- Cyber-Sécurité & Détection IMSI-Catcher Banner -->

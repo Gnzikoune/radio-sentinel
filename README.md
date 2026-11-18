@@ -213,6 +213,7 @@ antenne/
 #### Mode B : Vous laissez le PC allumé à la maison et sortez avec le téléphone seul en 4G
 1. Sur le PC à la maison, double-cliquez sur **`tunnel.bat`**.
 2. Une URL publique chiffrée et gratuite est générée automatiquement par Cloudflare (ex: `https://radio-sentinel-xyz.trycloudflare.com`).
-3. Dans la rue avec votre Samsung connecté en 4G (Airtel ou Moov), ouvrez simplement :  
-   👉 **`https://<VOTRE_TUNNEL>.trycloudflare.com/gps`**
-4. Votre position satellite et vos métriques 4G sont injectées en direct dans votre base de données à la maison à travers la ville !
+3. Dans la rue avec votre Samsung connecté en 4G (Airtel ou Moov), deux options s'offrent à vous :
+   - **Option 1 (Tableau de bord All-in-One)** : Ouvrez `https://<VOTRE_TUNNEL>.trycloudflare.com` directement sur le smartphone et cliquez sur le bouton vert **`🛰️ Activer le GPS local`** en haut de page. Vous avez ainsi la carte satellite HD, les graphiques temps réel et la transmission GPS active sur un seul et même écran.
+   - **Option 2 (Balise allégée)** : Ouvrez `https://<VOTRE_TUNNEL>.trycloudflare.com/gps` pour une interface tactile ultra-sobre minimisant la consommation de batterie.
+4. Votre position satellite, votre débit 4G et vos pings sont injectés en continu dans la base de données de votre PC à la maison à travers la ville !
