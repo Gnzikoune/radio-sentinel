@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 import json
 import os
+from opencellid_service import seed_opencellid_gabon, lookup_tower
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "antenne.db")
 
@@ -51,6 +52,9 @@ def init_db():
         if col not in columns:
             cursor.execute(f"ALTER TABLE telemetry ADD COLUMN {col} {col_type}")
     
+    # Initialisation de la base OpenCellID Gabon
+    seed_opencellid_gabon(conn)
+
     conn.commit()
     conn.close()
 
@@ -142,3 +146,10 @@ def get_stats():
     stats.update(dict(cursor.fetchone()))
     conn.close()
     return stats
+
+def get_official_tower(mcc: int, net: int, cell_id: int):
+    """Interroge la table locale OpenCellID pour un pylône officiel au Gabon."""
+    conn = get_connection()
+    res = lookup_tower(conn, mcc, net, cell_id)
+    conn.close()
+    return res

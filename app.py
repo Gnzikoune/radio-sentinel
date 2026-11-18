@@ -63,11 +63,23 @@ def get_gps():
 
 @app.get("/api/telemetry/live")
 def get_live():
+    live = modem_instance.live_state
+    official_tower = None
+    try:
+        if live.get("operator_code") and live.get("cell_id") and live.get("cell_id") != "--":
+            mcc = int(live["operator_code"][:3])
+            net = int(live["operator_code"][3:])
+            ci = int(live["cell_id"])
+            official_tower = database.get_official_tower(mcc, net, ci)
+    except Exception:
+        pass
+
     return {
-        "live": modem_instance.live_state,
+        "live": live,
         "hardware": modem_instance.hardware_info,
         "gps": gps_instance.get_current(),
-        "stats": database.get_stats()
+        "stats": database.get_stats(),
+        "official_tower": official_tower
     }
 
 @app.get("/api/telemetry/history")

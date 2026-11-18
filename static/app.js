@@ -7,6 +7,7 @@ let mapPointsLayer = null;
 let heatLayer = null;
 let isHeatmapActive = true;
 let towerLayer = null;
+let officialTowerLayer = null;
 let estimatedTowerLatLng = null;
 let hasCenteredOnGPS = false;
 
@@ -132,6 +133,7 @@ function initMap() {
 
     // Groupes de calques pour la Heatmap continue, l'antenne et les balises
     heatLayer = L.layerGroup().addTo(leafletMap);
+    officialTowerLayer = L.layerGroup().addTo(leafletMap);
     towerLayer = L.layerGroup().addTo(leafletMap);
     mapPointsLayer = L.layerGroup().addTo(leafletMap);
 
@@ -684,6 +686,64 @@ async function updateTelemetry() {
                     ? "px-1.5 py-0.5 rounded bg-cyan-900/50 text-cyan-300 border border-cyan-700/50 text-[10px] font-bold"
                     : "px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px]";
             }
+        }
+
+        // Pylône Officiel Référencé (Base OpenCellID Gabon)
+        if (officialTowerLayer) officialTowerLayer.clearLayers();
+        if (data.official_tower && leafletMap) {
+            const tow = data.official_tower;
+            const towLatLng = [tow.lat, tow.lon];
+
+            const offMarker = L.circleMarker(towLatLng, {
+                radius: 11,
+                fillColor: '#06b6d4',
+                color: '#ffffff',
+                weight: 2.5,
+                opacity: 1,
+                fillOpacity: 0.95
+            });
+
+            const offRadius = L.circle(towLatLng, {
+                radius: tow.range || 1000,
+                color: '#06b6d4',
+                fillColor: '#0891b2',
+                fillOpacity: 0.08,
+                weight: 1.5,
+                dashArray: '3, 6'
+            });
+
+            if (gps && gps.latitude && gps.longitude) {
+                const distToTow = Math.round(getDistanceMeters(gps.latitude, gps.longitude, tow.lat, tow.lon));
+                const beamLine = L.polyline([[gps.latitude, gps.longitude], towLatLng], {
+                    color: '#06b6d4',
+                    weight: 2,
+                    opacity: 0.7,
+                    dashArray: '6, 6'
+                });
+                officialTowerLayer.addLayer(beamLine);
+
+                offMarker.bindPopup(`
+                    <div class="font-sans text-xs leading-relaxed">
+                        <div class="flex items-center gap-1.5 text-cyan-400 font-bold uppercase text-[11px] mb-1">
+                            <span class="text-base">🏢</span> Pylône Officiel (OpenCellID Gabon)
+                        </div>
+                        <strong class="text-slate-100 text-sm">${tow.site_name || 'Site Pylône Officiel'}</strong><br>
+                        <span class="text-slate-300 font-mono">Cell ID: <strong class="text-cyan-300">${tow.cell}</strong> • LAC: ${tow.area}</span><br>
+                        <span class="text-emerald-400 font-mono font-bold">Distance de vous : ${distToTow} m</span><br>
+                        <span class="text-slate-400 font-mono text-[10px]">Norme : ${tow.radio} • Rayon cellulaire : ${tow.range} m</span>
+                    </div>
+                `);
+            } else {
+                offMarker.bindPopup(`
+                    <div class="font-sans text-xs leading-relaxed">
+                        <strong class="text-slate-100 text-sm">${tow.site_name || 'Site Pylône Officiel'}</strong><br>
+                        <span class="text-slate-300 font-mono">Cell ID: ${tow.cell} • LAC: ${tow.area}</span>
+                    </div>
+                `);
+            }
+
+            officialTowerLayer.addLayer(offRadius);
+            officialTowerLayer.addLayer(offMarker);
         }
 
         // Stats
