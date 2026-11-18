@@ -181,6 +181,7 @@ antenne/
 ├── kml_service.py          # Moteur de génération de tracés 3D Google Earth
 ├── database.py             # Persistance spatio-temporelle SQLite (antenne.db)
 ├── lancer.bat              # Script de lancement automatique en un clic
+├── tunnel.bat / .ps1       # Passerelle Cloudflare Tunnel (accès 4G extérieur sans Wi-Fi)
 ├── cert.pem / key.pem      # Certificat SSL local (requis pour l'API GPS sous Android)
 ├── README.md               # Documentation de référence du projet
 ├── static/
@@ -197,14 +198,21 @@ antenne/
 
 ### 1. Démarrage de la Station Hôte (PC)
 1. Insérez la clé modem Alcatel dans n'importe quel port USB.
-2. Exécutez le script **`lancer.bat`** (ou lancez Uvicorn avec les certificats SSL).
+2. Exécutez le script **`lancer.bat`**.
 3. Accédez au tableau de bord local :  
    👉 **`https://127.0.0.1:8000`**
 
-### 2. Synchronisation de la Balise Satellite (Samsung A14)
-1. Connectez le smartphone au même réseau Wi-Fi ou activez le point d'accès du téléphone vers le PC.
-2. Ouvrez le navigateur du smartphone sur :  
-   👉 **`https://<IP_DU_PC>:8000/gps`** *(ex: `https://192.168.1.134:8000/gps`)*
-3. Validez l'exception de sécurité du certificat SSL local si demandé.
-4. Pressez **`Démarrer la Transmission GPS`** et accordez l'accès haute précision.
-5. Le voyant GPS de la station passe instantanément au vert et le centrage satellite s'active.
+### 2. Deux Modes d'Utilisation en Mobilité (Wardriving Libreville)
+
+#### Mode A : Vous emportez votre PC portable avec vous
+1. Activez le **Point d'accès mobile (partage Wi-Fi)** sur votre Samsung Galaxy A14.
+2. Connectez le PC au Wi-Fi du Samsung.
+3. Ouvrez sur le smartphone : `https://<IP_DU_PC>:8000/gps` *(ex: `https://192.168.43.50:8000/gps`)*.
+4. Aucun accès Internet fixe requis : 100 % autonome partout sur le terrain.
+
+#### Mode B : Vous laissez le PC allumé à la maison et sortez avec le téléphone seul en 4G
+1. Sur le PC à la maison, double-cliquez sur **`tunnel.bat`**.
+2. Une URL publique chiffrée et gratuite est générée automatiquement par Cloudflare (ex: `https://radio-sentinel-xyz.trycloudflare.com`).
+3. Dans la rue avec votre Samsung connecté en 4G (Airtel ou Moov), ouvrez simplement :  
+   👉 **`https://<VOTRE_TUNNEL>.trycloudflare.com/gps`**
+4. Votre position satellite et vos métriques 4G sont injectées en direct dans votre base de données à la maison à travers la ville !

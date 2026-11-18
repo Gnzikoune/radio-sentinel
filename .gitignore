@@ -23,3 +23,6 @@ venv/
 .idea/
 Thumbs.db
 Desktop.ini
+
+# Binaire passerelle Cloudflare Tunnel (téléchargé dynamiquement)
+cloudflared.exe
