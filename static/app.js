@@ -237,6 +237,22 @@ function setupMapControls() {
     const mapEl = document.getElementById('map');
     let isFullscreen = false;
 
+    // Contrôles de simulation Cyber-Sécurité (IMSI-Catcher / 2G Downgrade)
+    const btnSimulate = document.getElementById('btn-sec-simulate');
+    const btnResetSec = document.getElementById('btn-sec-reset');
+    if (btnSimulate) {
+        btnSimulate.addEventListener('click', async () => {
+            await fetch('/api/security/simulate-downgrade', { method: 'POST' });
+            updateEvents();
+        });
+    }
+    if (btnResetSec) {
+        btnResetSec.addEventListener('click', async () => {
+            await fetch('/api/security/reset-alert', { method: 'POST' });
+            updateEvents();
+        });
+    }
+
     if (btnFullscreen && mapCard && mapEl) {
         btnFullscreen.addEventListener('click', () => {
             isFullscreen = !isFullscreen;
@@ -744,6 +760,42 @@ async function updateTelemetry() {
 
             officialTowerLayer.addLayer(offRadius);
             officialTowerLayer.addLayer(offMarker);
+        }
+
+        // 7. Surveillance Cyber-Sécurité & Détection Faux Relais (IMSI-Catcher / 2G Downgrade)
+        const secBanner = document.getElementById('security-monitor-banner');
+        const secPill = document.getElementById('sec-pill');
+        const secDetails = document.getElementById('sec-details');
+        const secIconBox = document.getElementById('sec-icon-box');
+        const btnReset = document.getElementById('btn-sec-reset');
+
+        if (live.security && secBanner && secPill) {
+            const sec = live.security;
+            if (sec.status === "ALERT") {
+                secBanner.className = "p-4 rounded-2xl bg-rose-950/40 border-2 border-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.4)] flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 animate-pulse";
+                secPill.className = "px-2.5 py-0.5 rounded text-[10px] font-mono font-extrabold bg-rose-600 text-white border border-rose-400";
+                secPill.innerHTML = "🚨 ALERTE INTERCEPTION";
+                secDetails.textContent = sec.message || "Rétrogradation 2G anormale détectée !";
+                secDetails.className = "text-xs text-rose-300 font-bold mt-0.5";
+                secIconBox.className = "flex-shrink-0 w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/50 flex items-center justify-center text-rose-400 animate-bounce";
+                if (btnReset) btnReset.style.display = "inline-flex";
+            } else if (sec.status === "WARNING") {
+                secBanner.className = "p-4 rounded-2xl bg-amber-950/30 border border-amber-500/50 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300";
+                secPill.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                secPill.innerHTML = "⚠️ VULNÉRABILITÉ 2G";
+                secDetails.textContent = sec.message || "Mode 2G actif (chiffrement faible)";
+                secDetails.className = "text-xs text-amber-300 mt-0.5";
+                secIconBox.className = "flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400";
+                if (btnReset) btnReset.style.display = "inline-flex";
+            } else {
+                secBanner.className = "p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300";
+                secPill.className = "px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                secPill.innerHTML = "🛡️ INTÉGRITÉ NOMINALE";
+                secDetails.textContent = "Chiffrement 3GPP actif • Aucune rétrogradation 2G ni anomalie de signal détectée";
+                secDetails.className = "text-xs text-slate-400 mt-0.5";
+                secIconBox.className = "flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400";
+                if (btnReset) btnReset.style.display = "none";
+            }
         }
 
         // Stats

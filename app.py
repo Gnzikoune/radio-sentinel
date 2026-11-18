@@ -91,6 +91,24 @@ def get_map_points(limit: int = 1000):
     """Retourne les coordonnées couplées aux dBm pour afficher la carte 2D."""
     return database.get_map_points(limit=limit)
 
+@app.post("/api/security/simulate-downgrade")
+def simulate_downgrade():
+    """Déclenche une simulation de rétrogradation 2G pour démonstration aux autorités."""
+    modem_instance.simulated_alert = {
+        "status": "ALERT",
+        "level": "CRITICAL",
+        "message": "⚠️ ALERTE INTERCEPTION : Décrochage forcé 3G->2G GSM détecté ! Pylône pirate suspect à forte puissance (+22 dBm)",
+        "timestamp": database.datetime.now().isoformat()
+    }
+    database.log_event("SECURITY_ALERT", modem_instance.simulated_alert["message"])
+    return {"status": "ok", "alert": modem_instance.simulated_alert}
+
+@app.post("/api/security/reset-alert")
+def reset_security_alert():
+    """Réinitialise l'alerte de sécurité."""
+    modem_instance.simulated_alert = None
+    return {"status": "ok", "message": "Statut de sécurité réinitialisé"}
+
 @app.post("/api/clear-points")
 def clear_points():
     """Efface l'historique des points GPS pour repartir sur une carte propre."""

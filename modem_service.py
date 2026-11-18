@@ -80,10 +80,21 @@ class ModemService:
             "channel": "--",
             "freq_mhz": None,
             "rxlev": None,
-            "neighbors": []
+            "neighbors": [],
+            "security": {
+                "status": "SECURE",
+                "level": "OK",
+                "message": "Intégrité spectrale nominale (Chiffrement 3GPP actif)",
+                "timestamp": None
+            }
         }
         
         self.last_csq = None
+        self.prev_tech = None
+        self.prev_dbm = None
+        self.prev_lac = None
+        self.prev_cell_id = None
+        self.simulated_alert = None
 
     def find_available_port(self):
         """Scanne tous les ports COM pour trouver l'interface Modem Alcatel (VID 1BBB)."""
@@ -305,6 +316,55 @@ class ModemService:
                         "rxlev": nc[5]
                     })
 
+            # 5.5. Détection d'anomalies de sécurité (IMSI-Catcher & 2G Downgrade Attack)
+            sec_alert = {
+                "status": "SECURE",
+                "level": "OK",
+                "message": "Intégrité spectrale nominale (Chiffrement Kasumi/SNOW 3GPP actif)",
+                "timestamp": now_iso
+            }
+
+            if self.simulated_alert:
+                sec_alert = self.simulated_alert
+            elif self.prev_tech is not None and dbm is not None:
+                is_prev_3g_4g = any(k in self.prev_tech for k in ["UTRAN", "3G", "4G", "LTE", "HSPA"])
+                is_curr_2g = any(k in tech_desc for k in ["GSM", "2G", "EDGE", "GPRS"])
+                
+                # 1. Rétrogradation 2G suspecte (Downgrade Attack vers chiffrement faible A5/1)
+                if is_prev_3g_4g and is_curr_2g:
+                    dbm_diff = dbm - (self.prev_dbm if self.prev_dbm is not None else dbm)
+                    if dbm_diff >= 12 or (self.prev_lac and lac != "--" and lac != self.prev_lac):
+                        sec_alert = {
+                            "status": "ALERT",
+                            "level": "CRITICAL",
+                            "message": f"ALERTE DOWNGRADE : Décrochage forcé 3G->2G avec saut de puissance (+{dbm_diff} dBm) ou changement de zone LAC ({lac})",
+                            "timestamp": now_iso
+                        }
+                        database.log_event("SECURITY_ALERT", sec_alert["message"])
+                    else:
+                        sec_alert = {
+                            "status": "WARNING",
+                            "level": "WARN",
+                            "message": "Attention : Basculement en mode 2G GSM (chiffrement faible A5/1)",
+                            "timestamp": now_iso
+                        }
+                # 2. Saut anormal de puissance sur cellule inconnue
+                elif self.prev_cell_id and cell_id != "--" and self.prev_cell_id != cell_id and dbm is not None and self.prev_dbm is not None:
+                    dbm_diff = dbm - self.prev_dbm
+                    if dbm_diff >= 25:
+                        sec_alert = {
+                            "status": "WARNING",
+                            "level": "WARN",
+                            "message": f"Anomalie de propagation : Remplacement brutal de cellule (+{dbm_diff} dBm) vers Cell ID {cell_id}",
+                            "timestamp": now_iso
+                        }
+                        database.log_event("SECURITY_ALERT", sec_alert["message"])
+
+            self.prev_tech = tech_desc
+            self.prev_dbm = dbm
+            self.prev_lac = lac
+            self.prev_cell_id = cell_id
+
             # Outage checking
             is_outage = (csq is None or csq == 0 or csq == 99)
             if self.last_csq is not None:
@@ -345,7 +405,8 @@ class ModemService:
                 "channel": channel,
                 "freq_mhz": freq_mhz,
                 "rxlev": rxlev,
-                "neighbors": neighbors
+                "neighbors": neighbors,
+                "security": sec_alert
             })
 
             # Sauvegarde en BDD (avec GPS si actif)

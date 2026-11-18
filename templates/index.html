@@ -115,6 +115,43 @@
             </a>
         </div>
 
+        <!-- Cyber-Sécurité & Détection IMSI-Catcher Banner -->
+        <div id="security-monitor-banner"
+            class="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
+            <div class="flex items-center gap-3">
+                <div id="sec-icon-box"
+                    class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                        </path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Surveillance Électromagnétique & Faux Relais</h4>
+                        <span id="sec-pill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            🛡️ INTÉGRITÉ NOMINALE
+                        </span>
+                    </div>
+                    <p id="sec-details" class="text-xs text-slate-400 mt-0.5">
+                        Chiffrement 3GPP actif • Aucune rétrogradation 2G ni anomalie de signal détectée
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="btn-sec-simulate"
+                    class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-300 text-xs font-mono font-semibold transition border border-slate-700 flex items-center gap-1.5"
+                    title="Simuler une attaque de rétrogradation 2G pour démonstration devant témoins">
+                    🚨 Simuler Attaque 2G
+                </button>
+                <button id="btn-sec-reset" style="display: none;"
+                    class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono font-semibold transition border border-slate-700">
+                    ↺ Réinitialiser
+                </button>
+            </div>
+        </div>
+
         <!-- Top Telemetry Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
