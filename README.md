@@ -21,13 +21,13 @@
 ## 📋 Table des Matières
 
 1. [Matériel Utilisé (Récupération & Zéro Dépense)](#-matériel-utilisé-récupération--zéro-dépense)
-2. [Phase 1 : Station Fixe & Télémétrie Réelle](#-phase-1--station-fixe--télémétrie-réelle)
+2. [Station Fixe & Télémétrie Réelle](#-station-fixe--télémétrie-réelle)
    * [Chipset Spreadtrum SC7702 & Zero-CD](#chipset-spreadtrum-sc7702--zero-cd)
    * [Écoute Passive Sans Carte SIM (Mode Urgence 3GPP)](#écoute-passive-sans-carte-sim-mode-urgence-3gpp)
    * [Tolérance au Débranchement (Hot-Plug & Port Dynamique)](#tolérance-au-débranchement-hot-plug--port-dynamique)
-3. [Phase 2 : Cartographie 2D & Relais GPS Mobile](#-phase-2--cartographie-2d--relais-gps-mobile)
+3. [Cartographie Interactive & Relais GPS Mobile](#-cartographie-interactive--relais-gps-mobile)
    * [Le Relais Satellite Mobile Sans Application](#le-relais-satellite-mobile-sans-application)
-   * [La Cartographie Interactive 2D Multi-Vues](#la-cartographie-interactive-2d-multi-vues)
+   * [La Cartographie Interactive Multi-Vues](#la-cartographie-interactive-multi-vues)
    * [Filtre Anti-Dérive GPS (Haversine)](#filtre-anti-dérive-gps-haversine)
    * [Triangulation de l'Antenne-Relais](#triangulation-de-lantenne-relais)
 4. [Guide d'Utilisation Pas à Pas](#-guide-dutilisation-pas-à-pas)
@@ -49,7 +49,7 @@
 
 ---
 
-## 🔌 Phase 1 : Station Fixe & Télémétrie Réelle
+## 🔌 Station Fixe & Télémétrie Réelle
 
 ### Chipset Spreadtrum SC7702 & Zero-CD
 À l'insertion dans le port USB, la clé se fait passer pour un faux lecteur de CD-ROM virtuel (`VID_1BBB&PID_022C`) afin de proposer ses pilotes d'origine. Le système Windows commute ensuite le périphérique en mode modem composite, exposant un port série virtuel (ex: `COM9` ou `COM12`).
@@ -73,7 +73,7 @@ Le pilote Python (`modem_service.py`) scanne en permanence les identifiants mat�
 
 ---
 
-## 🗺️ Phase 2 : Cartographie 2D & Relais GPS Mobile
+## 🗺️ Cartographie Interactive & Relais GPS Mobile
 
 ### Le Relais Satellite Mobile Sans Application
 Pour éviter d'acheter un récepteur GPS USB pour le PC, le smartphone **Samsung Galaxy A14** sert de passerelle :

@@ -23,7 +23,7 @@
    * [L'Obstacle du HTTPS sous Android](#lobstacle-du-https-sous-android)
    * [Génération du Certificat SSL Local](#génération-du-certificat-ssl-local)
    * [Le Relais Mobile via HTML5 Geolocation & WakeLock](#le-relais-mobile-via-html5-geolocation--wakelock)
-6. [Étape 5 : Cartographie 2D & Résolution des Pièges Physiques](#6-étape-5--cartographie-2d--résolution-des-pièges-physiques)
+6. [Étape 5 : Cartographie Interactive & Résolution des Pièges Physiques](#6-étape-5--cartographie-interactive--résolution-des-pièges-physiques)
    * [Intégration Leaflet Multi-Vues 100% Gratuite](#intégration-leaflet-multi-vues-100-gratuite)
    * [Résolution du Bruit Satellite en Intérieur (Filtre Haversine)](#résolution-du-bruit-satellite-en-intérieur-filtre-haversine)
    * [Correction de la Triangulation de l'Antenne (Règle des 50 m)](#correction-de-la-triangulation-de-lantenne-règle-des-50-m)
@@ -134,7 +134,7 @@ La page web mobile (`templates/gps.html`) utilise deux APIs natives des navigate
 
 ---
 
-## 6. Étape 5 : Cartographie 2D & Résolution des Pièges Physiques
+## 6. Étape 5 : Cartographie Interactive & Résolution des Pièges Physiques
 
 ### Intégration Leaflet Multi-Vues 100% Gratuite
 Pour afficher la carte sans dépendre d'une clé d'API payante (comme Google Maps ou Mapbox), nous avons intégré la bibliothèque open-source **Leaflet** avec 4 sources de tuiles gratuites mondiales :
