@@ -14,7 +14,9 @@
    - **Barycentre pondéré en puissance réelle ($10^{\text{dBm}/10}\text{ mW}$)** : Calcul du centre géométrique des 25 meilleurs échantillons radio pour localiser les pylônes même en milieu urbain dense.
    - **Base locale OpenCellID Gabon (MCC 628)** : Confrontation instantanée de la cellule active avec le registre officiel des sites Moov Africa (MNC 01), Airtel Gabon (MNC 02) et Azur (MNC 03).
    - **Vecteur de liaison RF dynamique** : Tracé vectoriel en direct entre la position satellite du terminal et le pylône émetteur rattaché.
-3. **Filtre de Plausibilité Spatiale (GIS Sanity Check) :**  
+3. **Audit Bi-Réseau & Performance 4G Active (SIM Mobile + Écoute Spectre) :**  
+   Exploitation de la carte SIM active du Samsung Galaxy A14 pour comparer simultanément deux opérateurs (ex. Airtel vs Moov). Mesure conjointe de la couche physique (dBm, canal) et de la couche applicative réelle (débit descendant estimé en Mbps, latence RTT, ping serveur), avec diagnostic automatique de saturation cœur de réseau versus atténuation hertzienne.
+4. **Filtre de Plausibilité Spatiale (GIS Sanity Check) :**  
    Calcul de distance géodésique par formule de Haversine pour qualifier la fiabilité du raccordement cellulaire (`HIGH` < 5 km, `MEDIUM` < 25 km, `LOW` > 25 km) et détecter les réutilisations de Cell ID entre quartiers distants.
 4. **Détection d'Anomalies de Sécurité & Faux Relais (IMSI-Catchers) :**  
    Surveillance en continu de l'intégrité de la couche radio : alerte rouge instantanée en cas de rétrogradation forcée (**2G Downgrade Attack**) provoquant la rupture du chiffrement 3GPP (Kasumi/SNOW) vers une cellule 2G non chiffrée avec saut brutal de puissance et changement suspect de LAC.
@@ -98,12 +100,22 @@ Le pilote matériel dialogue directement avec le microcontrôleur du modem via l
   - **UARFCN / ARFCN** : Canal de fréquence porteuse physique et calcul automatique de la fréquence radio réelle en MHz (ex: canal `2995` $\rightarrow 936.6\text{ MHz}$).
 * **Tolérance au Débranchement (Hot-Plug)** : Détection dynamique de l'insertion/retrait de la clé USB avec journalisation automatique des événements de coupure (`OUTAGE`) et reprise sans plantage (`RECONNECT`).
 
-### 2. Relais Satellite Mobile Sans Application
-Pour supprimer le besoin d'acheter un dongle GPS USB :
+### 2. Relais Satellite Mobile & Sonde 4G Active
+Pour supprimer le besoin d'acheter un dongle GPS USB et étendre l'écoute passive à la mesure de performance réelle :
 1. Le smartphone Samsung ouvre la page web mobile servie par le PC : `https://<IP_LOCAL>:8000/gps`.
 2. L'API **HTML5 Geolocation (`watchPosition`)** transmet en continu latitude, longitude, précision (en mètres) et vitesse.
-3. Le verrouillage **Screen WakeLock** maintient l'écran allumé pendant les tournées de mesure (wardriving).
-4. Un filtre de mouvement Haversine (> 5 mètres) évite l'accumulation de points parasites en phase stationnaire.
+3. L'API **NetworkInformation** du terminal mobile remonte en direct :
+   - Le type de connexion cellulaire (`4G LTE`).
+   - Le débit descendant estimé en mégabits/seconde (`downlink_mbps`).
+   - La latence aller-retour (`rtt_ms`) et le ping HTTP réel mesuré à chaque cycle.
+   - L'opérateur de la carte SIM active (Airtel Gabon, Moov Africa, etc.).
+4. **Moteur de Corrélation Couche Physique vs Données** :
+   - *🟢 Nominal* : Puissance radio et débit data en parfaite adéquation.
+   - *🟠 Saturation Cœur de Réseau* : Signal fort ($\ge -85\text{ dBm}$) mais latence élevée ($> 250\text{ ms}$) $\rightarrow$ congestion logique chez l'opérateur.
+   - *🔴 Atténuation Hertzienne* : Signal dégradé ($< -95\text{ dBm}$) causé par un obstacle ou un éloignement excessif.
+   - *🔵 Audit Bi-Réseau* : Comparaison simultanée de deux opérateurs différents sur un même écran (ex. Azur en écoute passive sur la clé vs Airtel 4G sur la SIM du téléphone).
+5. Le verrouillage **Screen WakeLock** maintient l'écran allumé pendant les tournées de mesure (wardriving).
+6. Un filtre de mouvement Haversine (> 5 mètres) évite l'accumulation de points parasites en phase stationnaire.
 
 ### 3. Cartographie Leaflet Multi-Vues & Satellite HD
 La cartographie embarque 5 fonds de carte indépendants sans aucune clé API requise :

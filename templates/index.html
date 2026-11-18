@@ -249,6 +249,79 @@
 
         </div>
 
+        <!-- Section: Audit Bi-Réseau & Performance 4G (Sonde Samsung A14 avec SIM) -->
+        <div id="dual-audit-card" class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-900 border border-slate-800 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
+                        ⚡
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
+                            Audit Bi-Réseau & Performance 4G Mobile
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">SIM + Spectre</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-400">Corrélation temps réel entre l'écoute physique passive (Clé USB) et la performance data active (Samsung A14)</p>
+                    </div>
+                </div>
+                <div id="dual-diag-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                    <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                    <span>En attente de la sonde mobile...</span>
+                </div>
+            </div>
+
+            <!-- 3 Columns Comparator -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3">
+                <!-- Col 1: Sonde Spectrale (Clé USB) -->
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono mb-1">
+                        <span>📡 SONDE SPECTRE (CLÉ USB)</span>
+                        <span class="text-cyan-400 font-bold">Sans SIM</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-100" id="dual-modem-op">--</div>
+                    <div class="text-xs font-mono text-slate-400 mt-1 flex justify-between">
+                        <span id="dual-modem-tech">3G+ UTRAN</span>
+                        <span id="dual-modem-dbm" class="text-cyan-400 font-bold">-- dBm</span>
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-500 mt-1 truncate" id="dual-modem-cell">
+                        Cell ID: -- • CH: --
+                    </div>
+                </div>
+
+                <!-- Col 2: Sonde Data 4G (Samsung A14) -->
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono mb-1">
+                        <span>📱 SONDE DATA (SAMSUNG A14)</span>
+                        <span id="dual-sim-badge" class="text-emerald-400 font-bold">SIM 4G</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-100" id="dual-sim-op">Airtel Gabon</div>
+                    <div class="text-xs font-mono text-slate-400 mt-1 flex justify-between">
+                        <span id="dual-sim-downlink" class="text-amber-300 font-bold">Débit: -- Mbps</span>
+                        <span id="dual-sim-ping" class="text-emerald-400 font-bold">Ping: -- ms</span>
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-500 mt-1 truncate" id="dual-sim-rtt">
+                        Techno: 4G LTE • RTT: -- ms
+                    </div>
+                </div>
+
+                <!-- Col 3: Diagnostic de Corrélation -->
+                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 flex flex-col justify-between">
+                    <div>
+                        <div class="text-[11px] text-slate-400 font-mono mb-1">
+                            🎯 VERDICT DE CORRÉLATION
+                        </div>
+                        <p id="dual-diag-text" class="text-xs text-slate-300 leading-relaxed">
+                            Ouvrez l'URL <code class="text-cyan-300 font-mono">/gps</code> sur votre Samsung pour démarrer la comparaison bi-réseau en direct.
+                        </p>
+                    </div>
+                    <div class="mt-2 text-[10px] text-slate-500 font-mono border-t border-slate-900 pt-1 flex justify-between">
+                        <span>Couche Physique vs Données</span>
+                        <span class="text-slate-400">Radio Sentinel v2.5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Interactive Map Section with Full Layer Switcher & GIS Controls -->
         <div id="map-section-card" class="p-6 rounded-2xl bg-slate-900 border border-slate-800/80 space-y-4">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">

@@ -26,6 +26,12 @@ class GPSPayload(BaseModel):
     accuracy: Optional[float] = None
     speed: Optional[float] = None
     altitude: Optional[float] = None
+    network_type: Optional[str] = None
+    downlink_mbps: Optional[float] = None
+    rtt_ms: Optional[float] = None
+    ping_ms: Optional[float] = None
+    operator_sim: Optional[str] = None
+    device_model: Optional[str] = None
 
 @app.on_event("startup")
 def startup_event():
@@ -47,13 +53,19 @@ def read_gps():
 
 @app.post("/api/gps")
 def post_gps(payload: GPSPayload):
-    """Reçoit en direct les coordonnées satellites du smartphone."""
+    """Reçoit en direct les coordonnées satellites et les métriques 4G du smartphone."""
     gps_instance.update(
         lat=payload.latitude,
         lon=payload.longitude,
         accuracy=payload.accuracy,
         speed=payload.speed,
-        altitude=payload.altitude
+        altitude=payload.altitude,
+        network_type=payload.network_type,
+        downlink_mbps=payload.downlink_mbps,
+        rtt_ms=payload.rtt_ms,
+        ping_ms=payload.ping_ms,
+        operator_sim=payload.operator_sim,
+        device_model=payload.device_model
     )
     return {"status": "ok", "received": payload.dict()}
 
@@ -96,13 +108,65 @@ def get_live():
         pass
 
     gps_data = gps_instance.get_current()
+
+    # Calcul du diagnostic de corrélation & Audit Bi-Réseau (Clé USB vs SIM Mobile)
+    dual_audit = None
+    if gps_data.get("connected") and gps_data.get("network_type"):
+        dbm = live.get("dbm")
+        rtt = gps_data.get("rtt_ms") or gps_data.get("ping_ms")
+        downlink = gps_data.get("downlink_mbps")
+        op_modem = live.get("operator_name") or "--"
+        op_sim = gps_data.get("operator_sim") or "Airtel Gabon"
+
+        status_code = "NOMINAL"
+        badge_text = "🟢 Nominal"
+        diag_text = "Couverture radio et débit mobile en parfaite santé."
+
+        if dbm is not None and dbm >= -85 and rtt is not None and rtt > 250:
+            status_code = "CONGESTION"
+            badge_text = "🟠 Saturation Cœur de Réseau"
+            diag_text = "Signal radio fort mais latence élevée : possible congestion ou saturation IP chez l'opérateur mobile."
+        elif dbm is not None and dbm < -95 and (rtt is None or rtt > 300):
+            status_code = "RF_WEAK"
+            badge_text = "🔴 Atténuation Hertzienne"
+            diag_text = "Zone d'ombre ou forte atténuation hertzienne affectant le débit."
+        elif op_modem != "--" and op_sim and not (op_modem.lower() in op_sim.lower() or op_sim.lower() in op_modem.lower()):
+            status_code = "DUAL_COMPARE"
+            badge_text = "🔵 Audit Bi-Réseau"
+            diag_text = f"Comparaison active : {op_modem} (Écoute spectrale) vs {op_sim} (Données 4G SIM)."
+
+        dual_audit = {
+            "active": True,
+            "probe_modem": {
+                "operator": op_modem,
+                "tech": live.get("tech") or "UTRAN (3G+)",
+                "dbm": dbm,
+                "csq": live.get("csq"),
+                "cell_id": live.get("cell_id"),
+                "channel": live.get("channel")
+            },
+            "probe_mobile": {
+                "operator": op_sim,
+                "tech": (gps_data.get("network_type") or "4g").upper(),
+                "downlink_mbps": downlink,
+                "rtt_ms": rtt,
+                "ping_ms": gps_data.get("ping_ms")
+            },
+            "correlation": {
+                "status": status_code,
+                "badge": badge_text,
+                "diagnosis": diag_text
+            }
+        }
+
     return {
         "live": live,
         "hardware": modem_instance.hardware_info,
         "gps": gps_data,
         "stats": database.get_stats(),
         "official_tower": official_tower,
-        "tower_match_note": tower_match_note
+        "tower_match_note": tower_match_note,
+        "dual_audit": dual_audit
     }
 
 @app.get("/api/telemetry/history")

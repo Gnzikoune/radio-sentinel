@@ -374,13 +374,18 @@ class ModemService:
                     database.log_event("RECONNECT", f"Signal rétabli : CSQ={csq} ({dbm} dBm) sur {op_name} (Cell ID: {cell_id})")
             self.last_csq = csq if csq is not None else 0
 
-            # 6. GPS Synchronization (Depuis le Samsung Galaxy A14)
+            # 6. GPS & Sonde Mobile 4G (Depuis le Samsung Galaxy A14 avec SIM)
             current_gps = gps_instance.get_current()
             lat = current_gps.get("latitude")
             lon = current_gps.get("longitude")
             accuracy = current_gps.get("accuracy")
             speed = current_gps.get("speed")
             gps_connected = current_gps.get("connected", False)
+            mobile_net_type = current_gps.get("network_type")
+            mobile_downlink = current_gps.get("downlink_mbps")
+            mobile_rtt = current_gps.get("rtt_ms")
+            mobile_ping = current_gps.get("ping_ms")
+            mobile_operator = current_gps.get("operator_sim")
 
             # Update live state
             self.live_state.update({
@@ -406,7 +411,12 @@ class ModemService:
                 "freq_mhz": freq_mhz,
                 "rxlev": rxlev,
                 "neighbors": neighbors,
-                "security": sec_alert
+                "security": sec_alert,
+                "mobile_net_type": mobile_net_type,
+                "mobile_downlink": mobile_downlink,
+                "mobile_rtt": mobile_rtt,
+                "mobile_ping": mobile_ping,
+                "mobile_operator": mobile_operator
             })
 
             # Sauvegarde en BDD (avec GPS si actif)

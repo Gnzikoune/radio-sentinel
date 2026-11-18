@@ -388,6 +388,7 @@ async function loadMapPoints() {
                 const time = pt.timestamp?.split('T')[1]?.substring(0, 8) || pt.timestamp;
                 const cellInfo = pt.cell_id ? `<br><span class="text-slate-300 font-mono text-[11px]">Cell ID: <strong class="text-cyan-300">${pt.cell_id}</strong> (LAC: ${pt.lac || '--'})</span>` : '';
                 const chanInfo = pt.channel ? `<br><span class="text-slate-400 font-mono text-[10px]">Canal Radio: ${pt.channel}</span>` : '';
+                const mobile4gInfo = pt.mobile_downlink ? `<br><span class="text-amber-300 font-mono text-[10px]">⚡ 4G Mobile: <strong>${pt.mobile_downlink} Mbps</strong> • Ping: ${pt.mobile_ping || pt.mobile_rtt || '--'} ms (${pt.mobile_operator || 'SIM'})</span>` : '';
 
                 marker.bindPopup(`
                     <div class="font-sans text-xs leading-relaxed">
@@ -395,7 +396,8 @@ async function loadMapPoints() {
                         <strong class="text-slate-100 text-sm">${pt.operator_name || 'Opérateur'}</strong><br>
                         <span class="font-mono font-bold text-sm" style="color: ${color}">${pt.dbm} dBm (${label})</span>
                         ${cellInfo}
-                        ${chanInfo}<br>
+                        ${chanInfo}
+                        ${mobile4gInfo}<br>
                         <span class="text-slate-300 font-mono">CSQ: ${pt.csq}/31 • ${pt.tech || 'Cellulaire'}</span><br>
                         <span class="text-slate-400 font-mono text-[10px]">${time} • Vitesse: ${Math.round(pt.speed || 0)} km/h</span>
                     </div>
@@ -853,6 +855,61 @@ async function updateTelemetry() {
         }
         if (stats.geo_samples !== undefined) {
             document.getElementById('stat-geo').textContent = stats.geo_samples;
+        }
+
+        // 8. Télémétrie 4G Mobile & Audit Bi-Réseau (Samsung Galaxy A14 avec SIM)
+        const dualBadge = document.getElementById('dual-diag-badge');
+        const dualModemOp = document.getElementById('dual-modem-op');
+        const dualModemTech = document.getElementById('dual-modem-tech');
+        const dualModemDbm = document.getElementById('dual-modem-dbm');
+        const dualModemCell = document.getElementById('dual-modem-cell');
+
+        const dualSimOp = document.getElementById('dual-sim-op');
+        const dualSimBadge = document.getElementById('dual-sim-badge');
+        const dualSimDownlink = document.getElementById('dual-sim-downlink');
+        const dualSimPing = document.getElementById('dual-sim-ping');
+        const dualSimRtt = document.getElementById('dual-sim-rtt');
+        const dualDiagText = document.getElementById('dual-diag-text');
+
+        if (data.dual_audit && data.dual_audit.active) {
+            const audit = data.dual_audit;
+            const corr = audit.correlation || {};
+            const pModem = audit.probe_modem || {};
+            const pMobile = audit.probe_mobile || {};
+
+            // Mise à jour de la colonne Modem Clé USB
+            if (dualModemOp) dualModemOp.textContent = pModem.operator || live.operator_name || 'Écoute radio';
+            if (dualModemTech) dualModemTech.textContent = pModem.tech || '3G+ UTRAN';
+            if (dualModemDbm) dualModemDbm.textContent = pModem.dbm ? `${pModem.dbm} dBm` : '-- dBm';
+            if (dualModemCell) dualModemCell.textContent = `Cell ID: ${pModem.cell_id || '--'} • CH: ${pModem.channel || '--'}`;
+
+            // Mise à jour de la colonne Sonde Mobile Samsung A14
+            if (dualSimOp) dualSimOp.textContent = pMobile.operator || 'Opérateur Mobile';
+            if (dualSimBadge) dualSimBadge.textContent = pMobile.tech || '4G LTE';
+            if (dualSimDownlink) dualSimDownlink.textContent = pMobile.downlink_mbps ? `Débit: ${pMobile.downlink_mbps} Mbps` : 'Débit: Estim. en cours';
+            if (dualSimPing) dualSimPing.textContent = pMobile.ping_ms ? `Ping: ${pMobile.ping_ms} ms` : (pMobile.rtt_ms ? `RTT: ${pMobile.rtt_ms} ms` : 'Ping: --');
+            if (dualSimRtt) dualSimRtt.textContent = `Techno: ${pMobile.tech || '4G'} • RTT: ${pMobile.rtt_ms || '--'} ms`;
+
+            // Badge & Diagnostic de corrélation
+            if (dualBadge) {
+                if (corr.status === "CONGESTION") {
+                    dualBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse";
+                } else if (corr.status === "RF_WEAK") {
+                    dualBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                } else if (corr.status === "DUAL_COMPARE") {
+                    dualBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30";
+                } else {
+                    dualBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                }
+                dualBadge.innerHTML = `<span>${corr.badge || '🟢 Nominal'}</span>`;
+            }
+            if (dualDiagText) {
+                dualDiagText.textContent = corr.diagnosis || "Corrélation spectrale et data établie.";
+            }
+        } else {
+            if (dualModemOp) dualModemOp.textContent = live.operator_name || 'En attente...';
+            if (dualModemDbm) dualModemDbm.textContent = live.dbm ? `${live.dbm} dBm` : '-- dBm';
+            if (dualModemCell) dualModemCell.textContent = `Cell ID: ${live.cell_id || '--'} • CH: ${live.channel || '--'}`;
         }
 
     } catch (e) {

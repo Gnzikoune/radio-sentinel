@@ -3,75 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Radio Sentinel - Relais GPS Mobile</title>
+    <title>Radio Sentinel - Balise GPS & Sonde 4G Mobile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus_Jakarta_Sans', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-6 antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between p-4 antialiased">
 
     <!-- Top Header -->
-    <header class="text-center pt-2">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 mb-3 shadow-lg shadow-cyan-500/10">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <header class="text-center pt-1">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 mb-2 shadow-lg shadow-cyan-500/10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
         </div>
-        <h1 class="text-xl font-bold tracking-tight">Relais GPS Mobile</h1>
-        <p class="text-xs text-slate-400 mt-0.5">Transmission Satellite pour Radio Sentinel</p>
+        <h1 class="text-lg font-bold tracking-tight">Balise GPS & Sonde 4G Mobile</h1>
+        <p class="text-[11px] text-slate-400">Station d'audit terrain Samsung Galaxy A14</p>
     </header>
 
-    <!-- Main Live Stats Box -->
-    <main class="my-auto space-y-4">
+    <!-- Main Content -->
+    <main class="my-auto space-y-3">
 
-        <!-- Status Card -->
-        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-            <div id="status-pill" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4">
+        <!-- Carte Opérateur SIM Mobile -->
+        <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <span>💳</span> Carte SIM Active
+                </span>
+                <span id="badge-tech" class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    4G LTE
+                </span>
+            </div>
+            <select id="select-operator" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-semibold focus:outline-none focus:border-cyan-500 transition">
+                <option value="Airtel Gabon (4G)" selected>Airtel Gabon (SIM 4G)</option>
+                <option value="Moov Africa Gabon (4G)">Moov Africa Gabon (SIM 4G)</option>
+                <option value="Connexion Wi-Fi / Partage">Connexion Wi-Fi / Routeur</option>
+                <option value="Autre Opérateur">Autre Réseau</option>
+            </select>
+        </div>
+
+        <!-- Métriques 4G QoS & Débit Réel -->
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800">
+            <div class="flex items-center justify-between mb-2.5">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <span>⚡</span> Télémétrie 4G (Données Réelles)
+                </span>
+                <span id="val-rtt" class="text-[10px] font-mono text-emerald-400 font-bold">RTT: -- ms</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase block">Réseau</span>
+                    <p id="val-eff-type" class="text-xs font-mono font-bold text-cyan-400 mt-0.5">4G</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase block">Débit Est.</span>
+                    <p id="val-downlink" class="text-xs font-mono font-bold text-amber-300 mt-0.5">-- Mbps</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase block">Ping Serveur</span>
+                    <p id="val-ping" class="text-xs font-mono font-bold text-emerald-400 mt-0.5">-- ms</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Position Satellite GPS Card -->
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 text-center">
+            <div id="status-pill" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-3">
                 <span id="status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                 <span id="status-text">En attente d'activation</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-left">
-                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span class="text-[10px] text-slate-500 font-mono uppercase">Latitude</span>
-                    <p id="val-lat" class="text-sm font-mono font-bold text-cyan-400 truncate mt-1">--</p>
+            <div class="grid grid-cols-2 gap-2 text-left">
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase">Latitude</span>
+                    <p id="val-lat" class="text-xs font-mono font-bold text-cyan-400 truncate mt-0.5">--</p>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span class="text-[10px] text-slate-500 font-mono uppercase">Longitude</span>
-                    <p id="val-lon" class="text-sm font-mono font-bold text-cyan-400 truncate mt-1">--</p>
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase">Longitude</span>
+                    <p id="val-lon" class="text-xs font-mono font-bold text-cyan-400 truncate mt-0.5">--</p>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span class="text-[10px] text-slate-500 font-mono uppercase">Précision</span>
-                    <p id="val-acc" class="text-sm font-mono font-bold text-slate-200 mt-1">--</p>
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase">Précision</span>
+                    <p id="val-acc" class="text-xs font-mono font-bold text-slate-200 mt-0.5">--</p>
                 </div>
-                <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <span class="text-[10px] text-slate-500 font-mono uppercase">Vitesse</span>
-                    <p id="val-speed" class="text-sm font-mono font-bold text-slate-200 mt-1">--</p>
+                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
+                    <span class="text-[9px] text-slate-500 font-mono uppercase">Vitesse</span>
+                    <p id="val-speed" class="text-xs font-mono font-bold text-slate-200 mt-0.5">--</p>
                 </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between text-xs text-slate-400 font-mono">
-                <span>Paquets envoyés :</span>
+            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex justify-between text-[11px] text-slate-400 font-mono">
+                <span>Échantillons transmis :</span>
                 <span id="val-packets" class="text-cyan-400 font-bold">0</span>
             </div>
         </div>
 
         <!-- Action Button -->
-        <button id="toggle-btn" class="w-full py-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+        <button id="toggle-btn" class="w-full py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Démarrer la Transmission GPS
+            Démarrer la Sonde 4G & GPS
         </button>
 
     </main>
 
     <!-- Footer info -->
-    <footer class="text-center text-[11px] text-slate-500 pb-2">
-        <p>Gardez cet onglet ouvert pour continuer la transmission des coordonnées au PC.</p>
+    <footer class="text-center text-[10px] text-slate-500 pb-1">
+        <p>Gardez cet écran actif lors de vos déplacements pour alimenter Radio Sentinel.</p>
     </footer>
 
     <script>
@@ -90,24 +132,61 @@
         const valSpeed = document.getElementById('val-speed');
         const valPackets = document.getElementById('val-packets');
 
-        // Prevent screen sleep
+        const selectOperator = document.getElementById('select-operator');
+        const badgeTech = document.getElementById('badge-tech');
+        const valEffType = document.getElementById('val-eff-type');
+        const valDownlink = document.getElementById('val-downlink');
+        const valRtt = document.getElementById('val-rtt');
+        const valPing = document.getElementById('val-ping');
+
+        // Lecture des métriques réseau via l'API NetworkInformation du navigateur
+        function getNetworkInfo() {
+            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            if (conn) {
+                const effType = (conn.effectiveType || '4g').toUpperCase();
+                const downlink = conn.downlink || 0;
+                const rtt = conn.rtt || 0;
+
+                valEffType.textContent = effType;
+                valDownlink.textContent = downlink ? `${downlink} Mbps` : '--';
+                valRtt.textContent = rtt ? `RTT: ${rtt} ms` : 'RTT: --';
+                badgeTech.textContent = effType;
+
+                return {
+                    network_type: conn.effectiveType || '4g',
+                    downlink_mbps: downlink,
+                    rtt_ms: rtt
+                };
+            }
+            return {
+                network_type: '4g',
+                downlink_mbps: null,
+                rtt_ms: null
+            };
+        }
+
+        // Maintien de l'écran allumé (Screen WakeLock)
         async function requestWakeLock() {
             try {
                 if ('wakeLock' in navigator) {
                     wakeLock = await navigator.wakeLock.request('screen');
                 }
             } catch (err) {
-                console.log('WakeLock non supporté ou refusé:', err);
+                console.log('WakeLock refusé ou non supporté:', err);
             }
         }
 
-        async function sendGPS(pos) {
+        async function sendTelemetry(pos) {
             const coords = pos.coords;
             valLat.textContent = coords.latitude.toFixed(6);
             valLon.textContent = coords.longitude.toFixed(6);
             valAcc.textContent = coords.accuracy ? `±${Math.round(coords.accuracy)}m` : '--';
             valSpeed.textContent = coords.speed ? `${Math.round(coords.speed * 3.6)} km/h` : '0 km/h';
 
+            const netInfo = getNetworkInfo();
+            const operatorSim = selectOperator.value;
+
+            const tStart = performance.now();
             try {
                 const res = await fetch('/api/gps', {
                     method: 'POST',
@@ -117,40 +196,52 @@
                         longitude: coords.longitude,
                         accuracy: coords.accuracy,
                         speed: coords.speed ? coords.speed * 3.6 : 0,
-                        altitude: coords.altitude
+                        altitude: coords.altitude,
+                        network_type: netInfo.network_type,
+                        downlink_mbps: netInfo.downlink_mbps,
+                        rtt_ms: netInfo.rtt_ms,
+                        ping_ms: Math.round(performance.now() - tStart),
+                        operator_sim: operatorSim,
+                        device_model: 'Samsung Galaxy A14'
                     })
                 });
+
+                const roundTripPing = Math.round(performance.now() - tStart);
+                valPing.textContent = `${roundTripPing} ms`;
+
                 if (res.ok) {
                     packetCount++;
                     valPackets.textContent = packetCount;
                 }
             } catch (err) {
-                console.error('Erreur transmission GPS au PC:', err);
+                console.error('Erreur transmission télémétrie:', err);
+                valPing.textContent = 'Erreur';
             }
         }
 
-        function startGPS() {
+        function startSonde() {
             if (!navigator.geolocation) {
                 alert("La géolocalisation n'est pas supportée par votre navigateur.");
                 return;
             }
 
             requestWakeLock();
+            getNetworkInfo();
 
-            statusText.textContent = "Acquisition Satellite en direct";
-            statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-4";
+            statusText.textContent = "Sonde active (GPS & 4G)";
+            statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-3";
             statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
-            toggleBtn.className = "w-full py-4 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2";
+            toggleBtn.className = "w-full py-3.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2";
             toggleBtn.innerHTML = `
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Arrêter la Transmission
+                Arrêter la Sonde
             `;
 
             watchId = navigator.geolocation.watchPosition(
-                sendGPS,
+                sendTelemetry,
                 (err) => {
                     alert("Erreur GPS : " + err.message);
-                    stopGPS();
+                    stopSonde();
                 },
                 { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
             );
@@ -158,7 +249,7 @@
             isRunning = true;
         }
 
-        function stopGPS() {
+        function stopSonde() {
             if (watchId !== null) {
                 navigator.geolocation.clearWatch(watchId);
                 watchId = null;
@@ -168,22 +259,25 @@
                 wakeLock = null;
             }
 
-            statusText.textContent = "Transmission arrêtée";
-            statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4";
+            statusText.textContent = "Sonde arrêtée";
+            statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-3";
             statusDot.className = "w-2 h-2 rounded-full bg-amber-500";
-            toggleBtn.className = "w-full py-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2";
+            toggleBtn.className = "w-full py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2";
             toggleBtn.innerHTML = `
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Démarrer la Transmission GPS
+                Démarrer la Sonde 4G & GPS
             `;
 
             isRunning = false;
         }
 
         toggleBtn.addEventListener('click', () => {
-            if (isRunning) stopGPS();
-            else startGPS();
+            if (isRunning) stopSonde();
+            else startSonde();
         });
+
+        // Lecture initiale du réseau au chargement
+        getNetworkInfo();
     </script>
 </body>
 </html>
