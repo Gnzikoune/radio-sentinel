@@ -1,0 +1,95 @@
+/* Custom styles and scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Pulse animation on status indicators */
+@keyframes signalGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.4));
+    }
+    50% {
+        filter: drop-shadow(0 0 16px rgba(6, 182, 212, 0.8));
+    }
+}
+
+.glow-cyan {
+    animation: signalGlow 2.5s infinite ease-in-out;
+}
+
+/* Thème sombre conditionnel pour la carte Leaflet */
+.leaflet-container {
+    background-color: #020617 !important;
+    font-family: 'Plus_Jakarta_Sans', sans-serif !important;
+}
+
+/* Le filtre sombre s'applique UNIQUEMENT quand le mode Sombre est actif, PAS en Satellite ! */
+.dark-tiles .leaflet-tile {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.leaflet-popup-content-wrapper {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+    background-color: #0f172a !important;
+}
+
+/* Animation d'onde pour l'antenne-relais jaune */
+@keyframes towerWave {
+    0% {
+        r: 10px;
+        opacity: 0.9;
+    }
+    100% {
+        r: 35px;
+        opacity: 0;
+    }
+}
+
+.antenna-wave {
+    animation: towerWave 2s infinite ease-out;
+}
+
+/* Contrôles Leaflet personnalisés */
+.leaflet-control-layers {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+    font-family: 'Plus_Jakarta_Sans', sans-serif !important;
+    font-size: 11px !important;
+}
+
+.leaflet-control-layers-separator {
+    border-top: 1px solid #334155 !important;
+}
+
+.leaflet-control-scale-line {
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: #38bdf8 !important;
+    border: 1px solid #38bdf8 !important;
+    border-top: none !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 10px !important;
+}

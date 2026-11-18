@@ -1,0 +1,25 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Base SQLite locale et traces GPS personnelles
+antenne.db
+antenne.db-journal
+*.csv
+
+# Certificats SSL locaux (générés automatiquement par generate_cert.py)
+key.pem
+cert.pem
+
+# Environnements virtuels
+.env
+.venv
+env/
+venv/
+
+# Éditeurs et OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
