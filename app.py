@@ -10,6 +10,7 @@ import csv
 import database
 from modem_service import modem_instance
 from gps_service import gps_instance
+from kml_service import generate_kml_3d
 
 app = FastAPI(title="Radio Sentinel - Observatoire Cellulaire & Cartographie RF")
 
@@ -153,6 +154,17 @@ def export_csv():
         iter([output.getvalue()]),
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=telemetrie_ondes_et_gps.csv"}
+    )
+
+@app.get("/api/export-kml")
+def export_kml():
+    """Génère un fichier KML 3D avec extrusion proportionnelle aux dBm pour Google Earth."""
+    records = database.get_recent_telemetry(limit=10000)
+    kml_content = generate_kml_3d(records)
+    return StreamingResponse(
+        iter([kml_content]),
+        media_type="application/vnd.google-earth.kml+xml",
+        headers={"Content-Disposition": "attachment; filename=radio_sentinel_gabon_3d.kml"}
     )
 
 if __name__ == "__main__":
