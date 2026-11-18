@@ -66,21 +66,43 @@ def get_gps():
 def get_live():
     live = modem_instance.live_state
     official_tower = None
+    tower_match_note = None
     try:
         if live.get("operator_code") and live.get("cell_id") and live.get("cell_id") != "--":
             mcc = int(live["operator_code"][:3])
             net = int(live["operator_code"][3:])
             ci = int(live["cell_id"])
-            official_tower = database.get_official_tower(mcc, net, ci)
+            # Récupération de la position GPS courante pour le GIS Sanity Check
+            gps = gps_instance.get_current()
+            user_lat = gps.get("latitude") if gps else None
+            user_lon = gps.get("longitude") if gps else None
+            official_tower = database.get_official_tower(mcc, net, ci, user_lat=user_lat, user_lon=user_lon)
+            if official_tower is None and user_lat:
+                tower_match_note = (
+                    f"Cell ID {ci} capté — aucun pylône de référence à moins de 5 km. "
+                    "Cell ID probablement réutilisé dans plusieurs secteurs."
+                )
+            elif official_tower:
+                conf = official_tower.get("confidence", "UNKNOWN")
+                dist = official_tower.get("distance_m")
+                dist_txt = f"{dist/1000:.1f} km" if dist else "?"
+                if conf == "HIGH":
+                    tower_match_note = f"✅ Pylône confirmé à {dist_txt} (Cell ID local vérifié)"
+                elif conf == "MEDIUM":
+                    tower_match_note = f"⚠️ Pylône estimé à {dist_txt} — couverture longue portée (rural/péri-urbain)"
+                elif conf == "LOW":
+                    tower_match_note = f"🔴 Cell ID {ci} réutilisé dans plusieurs secteurs — pylône indicatif à {dist_txt}"
     except Exception:
         pass
 
+    gps_data = gps_instance.get_current()
     return {
         "live": live,
         "hardware": modem_instance.hardware_info,
-        "gps": gps_instance.get_current(),
+        "gps": gps_data,
         "stats": database.get_stats(),
-        "official_tower": official_tower
+        "official_tower": official_tower,
+        "tower_match_note": tower_match_note
     }
 
 @app.get("/api/telemetry/history")

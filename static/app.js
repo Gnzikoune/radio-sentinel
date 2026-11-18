@@ -719,15 +719,31 @@ async function updateTelemetry() {
             }
         }
 
-        // Pylône Officiel Référencé (Base OpenCellID Gabon)
+        // Pylône Officiel Référencé (Base OpenCellID Gabon) & GIS Sanity Check
+        const valTowerBox = document.getElementById('val-tower-box');
+        const valTowerName = document.getElementById('val-tower-name');
+
         if (officialTowerLayer) officialTowerLayer.clearLayers();
         if (data.official_tower && leafletMap) {
             const tow = data.official_tower;
             const towLatLng = [tow.lat, tow.lon];
+            const conf = tow.confidence || 'UNKNOWN';
+
+            // Affichage dans la carte Opérateur & Pylône
+            if (valTowerBox && valTowerName) {
+                valTowerBox.classList.remove('hidden');
+                let confBadge = '';
+                if (conf === 'HIGH') confBadge = ' <span class="text-emerald-400 font-bold">[Vérifié]</span>';
+                else if (conf === 'MEDIUM') confBadge = ' <span class="text-amber-400 font-bold">[Rural]</span>';
+                else if (conf === 'LOW') confBadge = ' <span class="text-rose-400 font-bold">[Indicatif]</span>';
+                valTowerName.innerHTML = `🏢 ${tow.site_name || 'Pylône Référencé'}${confBadge}`;
+            }
+
+            const markerColor = conf === 'LOW' ? '#f59e0b' : '#06b6d4';
 
             const offMarker = L.circleMarker(towLatLng, {
                 radius: 11,
-                fillColor: '#06b6d4',
+                fillColor: markerColor,
                 color: '#ffffff',
                 weight: 2.5,
                 opacity: 1,
@@ -736,17 +752,26 @@ async function updateTelemetry() {
 
             const offRadius = L.circle(towLatLng, {
                 radius: tow.range || 1000,
-                color: '#06b6d4',
-                fillColor: '#0891b2',
+                color: markerColor,
+                fillColor: markerColor,
                 fillOpacity: 0.08,
                 weight: 1.5,
                 dashArray: '3, 6'
             });
 
+            let confLabel = '';
+            if (conf === 'HIGH') {
+                confLabel = '<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">✅ Cellule locale confirmée (&lt; 5 km)</span>';
+            } else if (conf === 'MEDIUM') {
+                confLabel = '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px]">⚠️ Couverture rurale / longue portée (&lt; 25 km)</span>';
+            } else if (conf === 'LOW') {
+                confLabel = '<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold text-[10px]">🔴 Cell ID réutilisé dans un autre secteur</span>';
+            }
+
             if (gps && gps.latitude && gps.longitude) {
-                const distToTow = Math.round(getDistanceMeters(gps.latitude, gps.longitude, tow.lat, tow.lon));
+                const distToTow = tow.distance_m || Math.round(getDistanceMeters(gps.latitude, gps.longitude, tow.lat, tow.lon));
                 const beamLine = L.polyline([[gps.latitude, gps.longitude], towLatLng], {
-                    color: '#06b6d4',
+                    color: markerColor,
                     weight: 2,
                     opacity: 0.7,
                     dashArray: '6, 6'
@@ -759,6 +784,7 @@ async function updateTelemetry() {
                             <span class="text-base">🏢</span> Pylône Officiel (OpenCellID Gabon)
                         </div>
                         <strong class="text-slate-100 text-sm">${tow.site_name || 'Site Pylône Officiel'}</strong><br>
+                        <div class="my-1">${confLabel}</div>
                         <span class="text-slate-300 font-mono">Cell ID: <strong class="text-cyan-300">${tow.cell}</strong> • LAC: ${tow.area}</span><br>
                         <span class="text-emerald-400 font-mono font-bold">Distance de vous : ${distToTow} m</span><br>
                         <span class="text-slate-400 font-mono text-[10px]">Norme : ${tow.radio} • Rayon cellulaire : ${tow.range} m</span>
@@ -775,6 +801,11 @@ async function updateTelemetry() {
 
             officialTowerLayer.addLayer(offRadius);
             officialTowerLayer.addLayer(offMarker);
+        } else {
+            if (valTowerBox && valTowerName && data.tower_match_note) {
+                valTowerBox.classList.remove('hidden');
+                valTowerName.innerHTML = `⚠️ <span class="text-amber-300">${data.tower_match_note}</span>`;
+            }
         }
 
         // 7. Surveillance Cyber-Sécurité & Détection Faux Relais (IMSI-Catcher / 2G Downgrade)

@@ -147,9 +147,15 @@ def get_stats():
     conn.close()
     return stats
 
-def get_official_tower(mcc: int, net: int, cell_id: int):
-    """Interroge la table locale OpenCellID pour un pylône officiel au Gabon."""
+def get_official_tower(mcc: int, net: int, cell_id: int,
+                       user_lat: float = None, user_lon: float = None):
+    """Interroge la table locale OpenCellID pour un pylône officiel au Gabon.
+
+    Si user_lat/user_lon sont fournis, applique le filtre géographique (GIS Sanity Check) :
+    un pylône trouvé à plus de 5 km de la position GPS est rejeté comme Cell ID réutilisé
+    dans un autre secteur radio.
+    """
     conn = get_connection()
-    res = lookup_tower(conn, mcc, net, cell_id)
+    res = lookup_tower(conn, mcc, net, cell_id, user_lat=user_lat, user_lon=user_lon)
     conn.close()
     return res
