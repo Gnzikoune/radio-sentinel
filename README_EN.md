@@ -1,120 +1,108 @@
-# 📡 Radio Sentinel — Cellular Network Observatory & RF Wardriving Station
+# 📡 Radio Sentinel™ — Cellular Spectrum Intelligence & Telecom Audit Platform
 
-[![Language: FR](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue.svg)](README.md)
+[![Language: FR](https://img.shields.io/badge/Language-Fran%C3%A7ais-blue.svg)](README.md)
 [![Language: EN](https://img.shields.io/badge/Language-English-green.svg)](README_EN.md)
-[![Website: GitHub Pages](https://img.shields.io/badge/Web-Live%20Showcase-purple.svg)](https://gnzikoune.github.io/radio-sentinel/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform: Web](https://img.shields.io/badge/Web-Live%20Showcase-purple.svg)](https://gnzikoune.github.io/radio-sentinel/)
+[![Docs: Portal](https://img.shields.io/badge/Docs-Official%20Portal-cyan.svg)](https://gnzikoune.github.io/radio-sentinel/docs.html)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-teal.svg)](https://fastapi.tiangolo.com/)
 
-> **Autonomous platform for cellular spectrum auditing, radio infrastructure geolocation, and mobile cyber-threat detection.**  
-> Built by upcycling an old consumer 3G USB modem (*Alcatel OneTouch X602D* / *Spreadtrum SC7702* chipset) paired with an everyday smartphone (*Samsung Galaxy A14*) as an active multi-constellation GNSS & 4G probe.  
-> **100% sovereign, $0 in paid APIs or subscriptions, zero simulated or mocked data.**
+> **Sovereign cellular spectrum intelligence, 2G/3G/4G radio coverage audit, base station triangulation, and cellular counter-measure (Anti-IMSI Catcher) platform.**  
+> Designed for national telecom regulators (ARCEP), mobile network operators (MNOs), enterprise IT directorates (CIO/CTO), and defense/homeland security organizations.  
+> **Dual physical probe architecture delivering 100% real empirical RF measurements with zero reliance on paid third-party geolocation APIs.**
 
 ---
 
-## 🎯 Key Operational Capabilities & Use Cases
+## 🎯 Key Operational Capabilities
 
-1. **Continuous RF Heatmap Coverage (GIS Interpolation):**  
-   Real-time generation of continuous radio coverage heatmaps using spatial interpolation along traveled routes. Yields professional-grade coverage gradients (Green / Amber / Red) comparable to telecom regulator toolsets (such as ARCEP).
-2. **Cell Tower Identification & Triangulation:**  
-   - **Weighted Real-Power Centroid ($10^{\text{dBm}/10}\text{ mW}$):** Calculates the spatial center of mass for top signal samples to estimate cell tower coordinates even in dense multipath urban environments.
-   - **Integrated Gabon OpenCellID Registry (MCC 628):** Real-time matching against official tower databases for Moov Africa (`MNC 01`), Airtel Gabon (`MNC 02`), and Azur (`MNC 03`).
-   - **Dynamic RF Vector Beam:** Live visual vector connecting the user's GPS position to the serving base station.
-3. **Dual-Network Audit & Active 4G Mobile QoS (SIM + Spectrum):**  
-   Leverages the active SIM card of the Samsung Galaxy A14 to monitor two operators simultaneously (e.g. passive spectral listen on Operator A vs active 4G data on Operator B). Correlates physical layer metrics (dBm, channel, frequency) with real application layer performance (estimated downlink Mbps, RTT latency, server ping).
-4. **Spatial GIS Sanity Check:**  
-   Applies Haversine geodesic filtering (`HIGH` < 5 km, `MEDIUM` < 25 km, `LOW` > 25 km) to validate cell associations and detect Cell ID reuse across distant districts.
-5. **Cybersecurity & Rogue Base Station Detection (Anti IMSI-Catcher):**  
-   Continuous physical layer security monitoring: triggers critical red alerts upon forced **2G Downgrade Attacks** (coercing phones to switch from encrypted 3G/4G to unencrypted 2G GSM with sudden power spikes and unexpected LAC changes).
-6. **3D Google Earth Geospatial Export (.kml):**  
-   One-click export of war-driving survey traces into Google Earth Pro. Each GPS coordinate is extruded vertically proportionally to measured signal power in dBm.
-7. **SIM-less Passive Listening (3GPP Emergency Mode):**  
-   Taps into open Broadcast Control Channels (BCCH) mandated by emergency regulations (112/911), enabling radio surveys even with no SIM card inserted.
-8. **Executive Audit Report Generator (PDF / Print):**  
-   One-click generation of a formal telecom coverage & QoS audit report at `/audit-report`. Includes SLA coverage percentage, signal distribution charts (Excellent/Good/Fair/Poor per ARCEP/UIT thresholds), multi-operator comparison, cell tower inventory, and a security incident log. Fully printable as a clean PDF via native browser print dialog — suitable for regulatory submissions (ARCEP-GA), enterprise DSI reviews, or investor briefings.
-
----
-
-## 🛠️ Hardware Requirements
-
-* **Repurposed USB Radio Modem:** Alcatel OneTouch X602D (*TCT Mobile*, Spreadtrum SC7702 chipset, USB composite ID `VID_1BBB&PID_022C`).
-* **Mobile Satellite Probe:** Any standard Android smartphone (tested on Samsung Galaxy A14) running modern Chrome/Samsung Internet via HTML5 Geolocation API without needing third-party native apps.
-* **Host Station:** Windows PC running Python 3.10+, FastAPI, and Uvicorn over local HTTPS.
+1. **Continuous High-Resolution RF Heatmap Coverage:**  
+   Dynamic spatial interpolation along survey routes producing professional-grade coverage gradients (Green / Amber / Red) strictly aligned with 3GPP and regulator standards, layered over Google Satellite HD and OpenStreetMap.
+2. **Base Station Identification & Real-Power Triangulation:**  
+   - **Weighted Real-Power Centroid ($10^{\text{dBm}/10}\text{ mW}$)**: Calculates the physical energy center of gravity to pinpoint base stations accurately even in dense multipath urban corridors.
+   - **Integrated Gabon OpenCellID Registry (MCC 628)**: Instant matching against official tower databases for Moov Africa (`MNC 01`), Airtel Gabon (`MNC 02`), and Azur (`MNC 03`).
+   - **Haversine Geodesic Sanity Check**: Automatic rejection of spurious cell associations due to Cell ID reuse across distant provinces (`HIGH` < 5 km, `MEDIUM` < 25 km, `LOW` > 25 km).
+   - **Live Vector Beam**: Dynamic vector directly connecting the mobile terminal to the serving cell tower.
+3. **Dual-Network Audit & Active 4G Mobile QoS Correlation:**  
+   Simultaneous monitoring of two operators: passive physical spectrum listening via the RF USB probe alongside active real-world data throughput and latency measurements on the smartphone's active SIM card (downlink Mbps, RTT latency, server ping).
+4. **Cybersecurity & Rogue Base Station Defense (Anti IMSI-Catcher):**  
+   Continuous physical layer integrity monitoring: immediate alert triggers on forced **2G Downgrade Attacks** with power surges. Advanced filtering algorithm shielding against sentinel transition false-positives (-113 dBm).
+5. **Executive Telecom Audit Report Generator (PDF / Print):**  
+   One-click generation at `/audit-report` of formal telecom compliance reports (SLA coverage percentage, ARCEP signal tiers, cell tower inventory, multi-operator comparison, and verified network outage isolation).
+6. **Modular Multi-Workspace Cockpit v3:**  
+   Aeronautical engineering cockpit separating the persistent Flight HUD (vital telemetry always visible) from 5 specialized operational workspaces (GIS Map, Dual-Network Audit, Spectrum Waterfall, Cybersecurity, AT Command Console).
+7. **Smart QR Nomad 4G Pairing & Encrypted Tunnels:**  
+   Zero manual URL typing on mobile devices. Automatic detection between Nomad 4G field mode (Cloudflare / Ngrok encrypted tunnel) and local Wi-Fi laboratory mode, complete with one-click PNG QR export.
+8. **3D Google Earth Geospatial Export (.kml) & CSV:**  
+   Volumetric ribbon and extruded column export into Google Earth Pro with each GPS coordinate extruded proportionally to received radio power in dBm.
 
 ---
 
-## 🔬 Architecture & Signal Processing
+## 🏗️ System Architecture
 
-### 1. Physical AT Telemetry
-* `AT+CSQ`: Raw received signal strength indication converted to real dBm ($\text{dBm} = 2 \times \text{CSQ} - 113$).
-* `AT+CCED=0,1`: 3GPP cellular topology extraction:
-  - **MCC / MNC**: Mobile Country Code and Network Code (`628-01` Moov, `628-02` Airtel, `628-03` Azur).
-  - **LAC**: Location Area Code.
-  - **Cell ID**: Unique base station sector identifier.
-  - **UARFCN / ARFCN**: Carrier radio channel with real-time frequency computation in MHz.
-
-### 2. Physical vs Data Layer Correlation
-* *🟢 Nominal*: Healthy RF signal and responsive mobile latency.
-* *🟠 Core Network Congestion*: Strong physical signal ($\ge -85\text{ dBm}$) combined with high latency ($> 250\text{ ms}$) $\rightarrow$ carrier backbone congestion.
-* *🔴 RF Attenuation*: Degraded signal ($< -95\text{ dBm}$) caused by physical obstacles or distance.
-* *🔵 Dual-Network Compare*: Real-time side-by-side comparison between passive listening and active SIM data.
-
-### 3. Modular Multi-Workspace Cockpit (UI v3)
-Eliminates vertical visual clutter and cognitive fatigue through NOC-inspired ergonomics:
-* **Persistent Flight HUD**: Top sticky bar continuously displaying live dBm, active operator, GNSS accuracy, and quick actions.
-* **5 Dedicated Workspaces (Instant Tab Switching)**:
-  - 🗺️ **Map & GIS**: Expansive 75% screen map view with a dedicated right-hand engineering telemetry drawer.
-  - ⚡ **Dual-Network Audit**: Full-width side-by-side modem vs SIM 4G comparator with real-time saturation diagnosis.
-  - 📊 **Spectrum & Topology**: High-resolution Chart.js time-series graph with neighbor cell table (`AT+CCED=0,2`).
-  - 🛡️ **Cybersecurity & Logs**: Anti-IMSI-catcher monitor with acoustic/visual alerts and outage event logs.
-  - ⚙️ **AT Console & Hardware**: Alcatel X602D hardware spec sheet and interactive serial Hayes terminal.
-
----
-
-## 🚀 Quick Start Guide
-
-### 1. Host Station Setup (PC)
-1. Plug the Alcatel USB modem into any USB port.
-2. Run **`lancer.bat`** (or `python -m uvicorn app:app --host 0.0.0.0 --port 8000 --ssl-keyfile key.pem --ssl-certfile cert.pem`).
-3. Open the dashboard at:  
-   👉 **`https://127.0.0.1:8000`**
-
-### 2. Smartphone Instant Pairing via Smart QR Code
-1. On the PC dashboard, click **`📱 QR Code Mobile`** (or run `tunnel.bat` to launch the Cloudflare secure gateway).
-2. Choose your network environment:
-   - 🌍 **Nomad 4G Mode (Outdoor / Cellular Data)**: Points to the public HTTPS tunnel. Scanning this at home keeps the connection alive when stepping out onto 4G data!
-   - 🏠 **Local Wi-Fi Mode (Indoor)**: Connects directly through your local router IP (`https://192.168.1.x:8000/gps`).
-3. Scan with your phone's camera: Radio Sentinel opens instantly with zero typing.
-4. Download the QR Code as a high-resolution PNG via **`📥 Save PNG`** for field reference.
+```text
+  ┌───────────────────────────────────────────────────────────────┐
+  │                      FIELD ACQUISITION                        │
+  ├────────────────────────────────┬──────────────────────────────┤
+  │    Physical RF Probe           │    Mobile GNSS / Data Probe  │
+  │    Alcatel OneTouch X602D      │    Samsung Galaxy A14        │
+  │    (Serial COMx - AT Commands) │    (HTML5 Geo / HTTPS)       │
+  └────────────────┬───────────────┴──────────────┬───────────────┘
+                   │ Raw RF Telemetry (CSQ, CCED) │ GPS Coordinates + QoS
+                   ▼                              ▼
+  ┌───────────────────────────────────────────────────────────────┐
+  │                 RADIO SENTINEL™ CORE (FastAPI)                │
+  ├───────────────────────────────────────────────────────────────┤
+  │  • modem_service.py   : 3GPP AT decoder & Anti-IMSI engine    │
+  │  • gps_service.py     : GNSS synch & QoS measurement broker   │
+  │  • opencellid_service : Local Gabon base station db (MCC 628) │
+  │  • database.py        : SQLite spatial-temporal persistence   │
+  │  • kml_service.py     : 3D Google Earth volumetric KML engine │
+  └───────────────────────────────┬───────────────────────────────┘
+                                  │
+                                  ▼
+  ┌───────────────────────────────────────────────────────────────┐
+  │                 MODULAR COCKPIT v3 INTERFACE                  │
+  ├───────────────────────────────────────────────────────────────┤
+  │  • Persistent Flight HUD (COM, dBm, PLMN, GPS Fix)            │
+  │  • Workspace 1 : Interactive GIS Map & Satellite HD           │
+  │  • Workspace 2 : Dual-Network Physical vs Data Audit          │
+  │  • Workspace 3 : Real-time Rolling Spectrum Chart             │
+  │  • Workspace 4 : Cybersecurity & Anti-Downgrade Defense       │
+  │  • Workspace 5 : Direct AT Command Engineering Console        │
+  │  • Module 6    : Executive Audit Report Generator (PDF)       │
+  └───────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 🔌 REST API Endpoints
+## 🔌 REST API Specification
 
-| Method | Route | Description |
-| :---: | :--- | :--- |
-| `GET` | `/` | Main command dashboard (Leaflet GIS, live charts, RF cockpit). |
-| `GET` | `/gps` | Touch-optimized smartphone probe page for satellite & 4G relay. |
-| `POST` | `/api/gps` | Ingests real-time GNSS coordinates and 4G QoS metrics. |
-| `GET` | `/api/status` | System health, dynamic local IP detection, and active tunnel state. |
-| `POST` | `/api/tunnel` | Registers / updates public nomad tunnel URL (Cloudflare / Ngrok). |
-| `DELETE` | `/api/tunnel` | Revokes and resets nomad tunnel status. |
-| `GET` | `/audit-report` | Official interactive telecom audit report, printable as PDF. |
-| `GET` | `/api/audit-report` | Compiled statistical data: SLA coverage, operators, tower inventory, security events. |
-| `GET` | `/api/telemetry/live` | Live telemetry payload (RF signal, hardware, GPS, dual-audit, tower match). |
-| `GET` | `/api/telemetry/history` | Rolling historical window for Chart.js. |
-| `GET` | `/api/map-points` | Geospatial points with dBm for continuous heatmap rendering. |
-| `POST` | `/api/security/simulate-downgrade` | Triggers a simulated 2G Downgrade Attack for demonstration/auditing. |
-| `POST` | `/api/security/reset-alert` | Resets cybersecurity alert monitor. |
-| `POST` | `/api/clear-points` | Clears stored GPS trajectory points. |
-| `GET` | `/api/events` | Outage and reconnection log stream. |
-| `POST` | `/api/command` | Raw AT command injection console to the physical modem. |
-| `GET` | `/api/export-csv` | Raw telemetry dataset export as CSV. |
-| `GET` | `/api/export-kml` | 3D extruded geospatial model for Google Earth Pro. |
+| Method | Endpoint | Operational Role |
+|---|---|---|
+| `GET` | `/api/status` | Global station health, local IP auto-discovery, nomad tunnel status. |
+| `GET` | `/api/telemetry/live` | Complete real-time payload (physical RF, cell topology, GNSS, QoS). |
+| `GET` | `/api/telemetry/history` | Rolling historical window for Chart.js spectral viewer. |
+| `GET` | `/api/map-points` | Geospatial survey samples for GIS heatmap and route plotting. |
+| `GET` | `/api/events` | Operational audit log (outages, reconnections, security alerts). |
+| `GET` | `/api/audit-report` | Compiled statistics for the executive telecom audit report. |
+| `GET` | `/audit-report` | Official executive audit report webpage ready for PDF printing. |
+| `GET` | `/api/export-kml` | 3D Google Earth volumetric KML file extruded by dBm power. |
+| `GET` | `/api/export-csv` | Full tabular export compatible with GIS software (QGIS, ArcGIS). |
+| `POST` | `/api/gps` | Ingestion of GNSS coordinates and active mobile data metrics. |
+| `POST` | `/api/tunnel` | Dynamic registration of public Nomad 4G tunnel URL. |
+| `DELETE` | `/api/tunnel` | Revocation and closing of remote tunnel state. |
+| `POST` | `/api/at-command` | Direct AT command dispatch to the modem with response capture. |
 
 ---
 
-## 📜 License & Ethics
+## 🔒 Intellectual Property & Commercial License
 
-Radio Sentinel is open-source under the **MIT License**. It complies strictly with 3GPP safety specifications and acts exclusively in passive reception mode or standard authorized cellular interaction.
+**Radio Sentinel™** is proprietary software protected under international copyright and intellectual property treaties.  
+**Copyright © 2026 Gildas Nzikoune. All Rights Reserved.**
+
+Any reproduction, decompilation, unauthorized modification, distribution, or commercial exploitation is strictly prohibited without prior written authorization.
+
+For commercial licensing, institutional deployment, and custom mission integration:  
+📧 Contact: [gildas.nzikoune@gmail.com](mailto:gildas.nzikoune@gmail.com)  
+🌐 Online Documentation Portal: [https://gnzikoune.github.io/radio-sentinel/docs.html](https://gnzikoune.github.io/radio-sentinel/docs.html)

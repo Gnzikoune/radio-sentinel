@@ -5,7 +5,7 @@
 ## 1. Reddit : r/wardriving & r/RTLSDR & r/selfhosted
 
 **Titre :**  
-> I built Radio Sentinel: an open-source cellular RF wardriving station & rogue base station detector made from an upcycled $0 3G USB stick and an Android phone
+> I built Radio Sentinel: an souverain cellular RF wardriving station & rogue base station detector made from an upcycled $0 3G USB stick and an Android phone
 
 **Contenu (Markdown) :**
 ```text
@@ -23,7 +23,7 @@ Here is what it does with zero paid APIs and zero third-party mobile apps:
 - 🗺️ **GIS Heatmap & 3D Google Earth Export**: Continuous signal heatmapping with Leaflet, plus 3D extruded ribbon export to KML.
 - 🌍 **Zero-Config Remote Nomad Tunnel**: Integrated Cloudflare tunnel launcher so you can leave your PC at home and wardrive with just your phone on cellular data.
 
-Code is 100% open-source under MIT:
+Code is 100% souverain under MIT:
 👉 GitHub: https://github.com/Gnzikoune/radio-sentinel
 👉 Live Showcase: https://gnzikoune.github.io/radio-sentinel/
 
@@ -38,7 +38,7 @@ Would love your thoughts, feedback, and pull requests!
 ```text
 📡 Peut-on transformer une vieille clé USB 3G oubliée au fond d'un tiroir en station d'audit radio et de cybersécurité télécom professionnelle à 0 € ?
 
-C'est le défi relevé avec le projet open source que je viens de publier : Radio Sentinel.
+C'est le défi relevé avec le projet souverain que je viens de publier : Radio Sentinel.
 
 En combinant une clé USB 3G recyclée (Alcatel X602D) et un smartphone Android ordinaire (Samsung Galaxy A14), la plateforme offre :
 

@@ -68,7 +68,7 @@ Radio Sentinel continuously checks modulation transitions:
 
 ---
 
-## 6. Open Source Code & Links
+## 6. Souverain Code & Links
 
 The full source code is released under the **MIT License**:
 

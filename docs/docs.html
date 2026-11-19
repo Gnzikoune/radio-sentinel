@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Officielle — Radio Sentinel™</title>
+
+    <!-- Meta Tags -->
+    <meta name="description"
+        content="Documentation technique et opérationnelle de Radio Sentinel™ : Plateforme souveraine d'audit spectral, cartographie de couverture et contre-mesures cellulaires.">
+    <meta name="author" content="Gildas Nzikoune">
+    <meta name="robots" content="index, follow">
+
+    <!-- Fonts & Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-radial { background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12) 0%, rgba(15, 23, 42, 0) 70%); }
+        .sidebar-link.active {
+            color: #22d3ee;
+            border-left-color: #22d3ee;
+            background-color: rgba(6, 182, 212, 0.08);
+            font-weight: 600;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1120; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-xl shadow-lg shadow-cyan-500/10 group-hover:scale-105 transition">📡</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-base tracking-tight text-white group-hover:text-cyan-400 transition">Radio Sentinel<span class="text-cyan-400">™</span></span>
+                            <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Enterprise</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono">Documentation Technique v3.4</div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="text-xs font-semibold text-slate-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-slate-900 transition flex items-center gap-1.5">
+                    <span>←</span> Retour au Site
+                </a>
+                <a href="#contact" class="hidden sm:inline-flex text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-3.5 py-1.5 rounded-lg shadow-sm transition">
+                    Demander une Licence
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Docs Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex gap-8">
+
+        <!-- Left Sticky Sidebar Navigation -->
+        <aside class="w-64 shrink-0 hidden lg:block sticky top-24 self-start max-h-[calc(100vh-8rem)] overflow-y-auto pr-3 space-y-6 text-xs font-mono">
+            <div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">1. Vue d'Ensemble</div>
+                <ul class="space-y-1 border-l border-slate-800">
+                    <li><a href="#intro" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Présentation & Enjeux</a></li>
+                    <li><a href="#valeur" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Cas d'Usage Régulateurs & DSI</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">2. Architecture & Sondes</div>
+                <ul class="space-y-1 border-l border-slate-800">
+                    <li><a href="#hardware" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Double Sonde Physique</a></li>
+                    <li><a href="#alcatel" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Sonde Alcatel X602D (AT)</a></li>
+                    <li><a href="#mobile" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Sonde Galaxy A14 (GNSS/4G)</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">3. Cockpit & Espaces de Travail</div>
+                <ul class="space-y-1 border-l border-slate-800">
+                    <li><a href="#hud" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">HUD de Vol Persistant</a></li>
+                    <li><a href="#espaces" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Les 5 Espaces de Travail</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">4. Ingénierie & Algorithmes</div>
+                <ul class="space-y-1 border-l border-slate-800">
+                    <li><a href="#triangulation" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Barycentre Réel en mW</a></li>
+                    <li><a href="#opencellid" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Base OpenCellID & Filtre Haversine</a></li>
+                    <li><a href="#cyber" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Moteur Anti-IMSI & Filtre Faux-Positifs</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">5. Rapports & Appairage</div>
+                <ul class="space-y-1 border-l border-slate-800">
+                    <li><a href="#audit-report" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Rapport d'Audit Officiel 3GPP</a></li>
+                    <li><a href="#smart-qr" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Smart QR & Tunnels Nomades</a></li>
+                    <li><a href="#kml" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Export 3D Google Earth (KML)</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">6. API & Déploiement</div>
+                <ul class="space-y-1 border-l border-slate-800">
+                    <li><a href="#api" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Référentiel API REST</a></li>
+                    <li><a href="#license" class="sidebar-link block pl-3 py-1.5 text-slate-400 hover:text-white border-l-2 border-transparent transition">Licence Propriétaire & Contact</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Right Main Documentation Content -->
+        <main class="flex-1 min-w-0 space-y-16">
+
+            <!-- Section 1 : Introduction -->
+            <section id="intro" class="space-y-6 pt-4 border-b border-slate-800/80 pb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/80 text-cyan-300 border border-cyan-800">
+                    <span>📡 SPÉCIFICATION SYSTÈME</span>
+                    <span>•</span>
+                    <span>RADIO SENTINEL ENTERPRISE</span>
+                </div>
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                    Manuel d'Ingénierie & d'Exploitation
+                </h1>
+                <p class="text-base text-slate-300 leading-relaxed max-w-3xl">
+                    <strong>Radio Sentinel™</strong> est une plateforme propriétaire d'intelligence spectrale, d'audit de conformité de couverture mobile et de détection de contre-mesures cellulaires (anti-IMSI-Catchers). Conçue pour opérer en parfaite autonomie hors-ligne ou interconnectée à des centres de supervision opérationnelle (SOC/NOC), elle délivre des métriques RF objectives de niveau métrologique.
+                </p>
+
+                <!-- Value Proposition Alert -->
+                <div class="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-800/50 text-xs font-mono space-y-2">
+                    <div class="font-bold text-cyan-300 flex items-center gap-2">
+                        <span>💡</span> Architecture Souveraine & Indépendante
+                    </div>
+                    <p class="text-slate-300 leading-relaxed">
+                        Contrairement aux solutions propriétaires lourdes et opaques du marché, Radio Sentinel tire parti d'une architecture à double sonde combinant une interface physique directe par commandes AT 3GPP et une sonde GNSS/Data applicative. Le système garantit l'intégrité intégrale de la chaîne de mesure sans dépendre d'API tierces hébergées à l'étranger.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 2 : Cas d'Usage -->
+            <section id="valeur" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-sm">🎯</span>
+                    Cas d'Usage Stratégiques & Institutionnels
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-cyan-400">Régulateurs Télécoms (ARCEP)</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Contrôle objectif des obligations de couverture des opérateurs titulaires de licences (Cahiers des charges 2G/3G/4G). Audits impartiaux le long des axes routiers et dans les zones d'intérêt stratégique avec génération instantanée de rapports de non-conformité.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-emerald-400">Directions des Systèmes d'Information (DSI)</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Audit de la connectivité multi-opérateurs sur les sites critiques (usines, mines, ports, plateformes logistiques, sièges bancaires) avant déploiement de liaisons de secours 4G/LTE ou flottes d'équipements IoT.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-rose-400">Forces de Sécurité & Ministères Régaliens</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Détection précoce et géolocalisation de fausses stations de base (IMSI-Catchers, stingrays) et d'attaques par rétrogradation forcée en 2G GSM (A5/1) dans les périmètres sensibles ou lors de déplacements officiels.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="text-sm font-bold text-amber-400">Opérateurs Mobiles & TowerCos</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Vérification de la concordance entre le plan de fréquence théorique et le rayonnement réel sur le terrain. Diagnostic des pannes d'antennes et d'interférences de canaux adjacents sans mobiliser de camions de mesure lourds.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3 : Double Sonde Physique -->
+            <section id="hardware" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-sm">🔬</span>
+                    Architecture à Double Sonde Physique
+                </h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Radio Sentinel repose sur le couplage d'une sonde d'écoute physique RF et d'une sonde applicative mobile. Ce procédé assure une corrélation en temps réel entre la couche physique (dBm, canal, cellule) et la qualité perçue applicative (débit, latence, ping).
+                </p>
+
+                <!-- Architecture Comparison Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400">
+                                <th class="py-2.5 px-3">Composant</th>
+                                <th class="py-2.5 px-3">Rôle Opérationnel</th>
+                                <th class="py-2.5 px-3">Protocole / Couche</th>
+                                <th class="py-2.5 px-3">Métriques Extraites</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/80">
+                            <tr>
+                                <td class="py-3 px-3 font-bold text-cyan-400" id="alcatel">Sonde RF Alcatel OneTouch X602D</td>
+                                <td class="py-3 px-3 text-slate-300">Écoute passive brute du spectre radio (avec ou sans SIM)</td>
+                                <td class="py-3 px-3 text-slate-400">Commandes AT série directes (3GPP TS 27.007)</td>
+                                <td class="py-3 px-3 text-emerald-400">CSQ, dBm, MCC, MNC, LAC, Cell ID, Canal Fréquence (UARFCN), Cellules voisines</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-3 font-bold text-indigo-400" id="mobile">Sonde Mobile Samsung Galaxy A14</td>
+                                <td class="py-3 px-3 text-slate-300">Géoréférencement haute précision et audit data actif</td>
+                                <td class="py-3 px-3 text-slate-400">API GNSS W3C & NetworkInformation</td>
+                                <td class="py-3 px-3 text-emerald-400">Latitude, Longitude, Altitude, Vitesse, Précision GPS, Downlink Mbps, RTT ms, Ping serveur</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Deep dive Alcatel -->
+                <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span>⚙️</span> Fonctionnement Bas-Niveau de la Sonde Spectrale (Alcatel X602D)
+                    </h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Le modem est piloté par un service asynchrone multithreadé (<code class="text-cyan-300">modem_service.py</code>) interrogeant le port série à intervalle régulier (1,5 s). Le dialogue s'effectue via des primitives AT normalisées :
+                    </p>
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-cyan-300 space-y-1">
+                        <div><span class="text-slate-500">// Interrogation de la puissance reçue</span></div>
+                        <div>AT+CSQ → +CSQ: 18,99  <span class="text-slate-500">→ Calcul dBm : -113 + (2 × 18) = -77 dBm</span></div>
+                        <div class="pt-2"><span class="text-slate-500">// Paramètres radio d'ingénierie (Cell ID, LAC, Canal)</span></div>
+                        <div>AT+CCED=0,1 → +CCED: 628,01,012F,820D,0,10712,48  <span class="text-slate-500">→ Cell ID 33293, Canal 10712 (2140 MHz)</span></div>
+                        <div class="pt-2"><span class="text-slate-500">// Cellules voisines en veille (Monitored Neighbors)</span></div>
+                        <div>AT+CCED=0,2 → +CCED: 628,01,012F,820E,10712,32 ...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 : Cockpit Modulaire v3 -->
+            <section id="hud" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-sm">🎛️</span>
+                    Cockpit Modulaire v3 & Navigation Multi-Espaces
+                </h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    L'interface opérationnelle de Radio Sentinel est structurée autour d'un <strong>HUD de Vol Persistant</strong> (Flight HUD) affiché en permanence en tête d'écran, et d'un routeur à 5 espaces de travail spécialisés garantissant une ergonomie sans saturation cognitive.
+                </p>
+
+                <!-- HUD Details -->
+                <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                    <div class="text-sm font-bold text-cyan-400">Le HUD de Vol Persistant (Toujours Visible)</div>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Quelle que soit la vue active, l'opérateur conserve un aperçu immédiat des indicateurs vitaux : statut physique du port COM, jauge de puissance en dBm avec badge de couleur ARCEP, opérateur détecté (PLMN), technologie active, coordonnées GPS temps réel, commutateur Satellite HD et accès aux exports.
+                    </p>
+                </div>
+
+                <!-- Les 5 espaces -->
+                <div id="espaces" class="space-y-4 pt-2">
+                    <div class="text-sm font-bold text-white uppercase tracking-wider font-mono">Détail des 5 Espaces de Travail</div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                            <div class="font-bold text-cyan-400 flex items-center gap-2"><span>🗺️</span> 1. Carte SIG & Pylônes</div>
+                            <p class="text-slate-300">Carte interactive Leaflet en plein écran avec couches OSM et Google Satellite HD. Affiche le tracé de wardriving en dégradé continu, les pylônes OpenCellID identifiés, et le vecteur RF orienté vers l'antenne serveuse.</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                            <div class="font-bold text-emerald-400 flex items-center gap-2"><span>⚡</span> 2. Audit Bi-Réseau</div>
+                            <p class="text-slate-300">Tableau de bord de corrélation comparative : mesure passive de la clé USB (ex. Gabon Telecom / Moov) mise en miroir avec les métriques actives de la carte SIM du smartphone (ex. Azur ou Airtel).</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                            <div class="font-bold text-indigo-400 flex items-center gap-2"><span>📊</span> 3. Visualiseur Spectral</div>
+                            <p class="text-slate-300">Graphique dynamique Chart.js déroulant l'historique glissant de la puissance RF reçue, avec seuils visuels de criticité et tableau de bord des cellules voisines (Neighbor Cells).</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
+                            <div class="font-bold text-rose-400 flex items-center gap-2"><span>🛡️</span> 4. Centre Cyber-Sécurité</div>
+                            <p class="text-slate-300">Moniteur de surveillance contre-mesures. Affiche le statut d'intégrité de chiffrement 3GPP et le journal des alertes de sécurité avec filtres intelligents anti-faux-positifs.</p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5 md:col-span-2">
+                            <div class="font-bold text-amber-400 flex items-center gap-2"><span>⌨️</span> 5. Console de Commande AT Directe</div>
+                            <p class="text-slate-300">Terminal d'ingénierie permettant à un spécialiste radio d'envoyer des commandes AT brutes au modem (ex. <code>AT+COPS=?</code>, <code>AT+CSQ</code>, <code>AT+CGMI</code>) avec historique et affichage instantané de la réponse série.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 : Ingénierie & Algorithmes -->
+            <section id="triangulation" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-sm">📐</span>
+                    Algorithmes de Triangulation & Filtrage Géodésique
+                </h2>
+
+                <div class="space-y-4 text-xs">
+                    <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                        <div class="text-sm font-bold text-cyan-400">1. Barycentre Pondéré en Milliwatts Réels</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Les valeurs de signal mesurées sont exprimées en décibels-milliwatts (<code class="text-cyan-300">dBm</code>), une échelle logarithmique où chaque augmentation de 3 dB représente un doublement de la puissance réelle. Calculer la moyenne arithmétique des dBm fausserait lourdement la position estimée de l'antenne.
+                        </p>
+                        <p class="text-slate-300 leading-relaxed">
+                            Radio Sentinel convertit systématiquement chaque échantillon en puissance linéaire réelle :
+                        </p>
+                        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono text-cyan-300">
+                            P (mW) = 10^(dBm / 10)
+                        </div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Le barycentre spatial est ensuite calculé en pondérant chaque coordonnée GPS par sa puissance en milliwatts, garantissant une convergence précise vers le pylône même en présence d'échos urbains.
+                        </p>
+                    </div>
+
+                    <div id="opencellid" class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                        <div class="text-sm font-bold text-emerald-400">2. Base OpenCellID Gabon (MCC 628) & Filtre Haversine</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Radio Sentinel intègre localement la cartographie officielle des pylônes du Gabon (Moov Africa MNC 01, Airtel MNC 02, Azur MNC 03).
+                        </p>
+                        <p class="text-slate-300 leading-relaxed">
+                            Pour éliminer le phénomène récurrent de <strong>réutilisation de Cell ID</strong> par les opérateurs entre différentes villes distantes, le moteur applique une vérification géodésique stricte par formule de Haversine :
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-400 font-mono">
+                            <li><strong class="text-emerald-400">Distance &lt; 5 km :</strong> Association validée (Confiance HAUTE). Pylône affiché et relié par vecteur RF.</li>
+                            <li><strong class="text-amber-400">Distance 5 à 25 km :</strong> Confiance MOYENNE. Avertissement affiché.</li>
+                            <li><strong class="text-rose-400">Distance &gt; 25 km :</strong> Association rejetée. Anomalie signalée (Cell ID réutilisé dans une autre province).</li>
+                        </ul>
+                    </div>
+
+                    <div id="cyber" class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                        <div class="text-sm font-bold text-rose-400">3. Moteur Anti-IMSI Catcher & Filtrage des Faux-Positifs</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Les fausses stations de base (IMSI-Catchers) forcent les téléphones à rétrograder en 2G GSM non chiffrée ou faiblement chiffrée (A5/1) en émettant un signal anormalement puissant. Radio Sentinel surveille en continu les transitions 3G/4G vers 2G associées à des hausses brutales de puissance (&ge; +12 dBm) ou des changements de zone LAC.
+                        </p>
+                        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 font-mono text-slate-300 space-y-1">
+                            <div class="text-rose-400 font-bold">Filtre Anti-Faux-Positifs de Déconnexion :</div>
+                            <p class="text-slate-400">
+                                Lorsque le modem perd le signal ou redémarre, la valeur sentinelle retournée par le standard 3GPP est <code class="text-cyan-300">CSQ = 0 (-113 dBm)</code>. Lors de la reconnexion à -73 dBm, un algorithme naïf interpréterait ce saut de +40 dBm comme une attaque. Le moteur Radio Sentinel filtre spécifiquement les transitions émanant de -113 dBm, garantissant un taux de faux positifs nul en environnement opérationnel instable.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6 : Rapport d'Audit Exécutif -->
+            <section id="audit-report" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-sm">📄</span>
+                    Générateur de Rapport d'Audit Exécutif (PDF / Print)
+                </h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Accessible directement sur <code class="text-cyan-300">/audit-report</code> ou via le bouton dédié du HUD, ce module compile l'intégralité des échantillons capturés pour produire un rapport officiel instantané, formaté pour une impression propre en PDF.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                        <div class="font-bold text-purple-400">KPIs Synthétiques</div>
+                        <p class="text-slate-400">Taux de couverture exploitable (SLA), volume d'échantillons géolocalisés, puissance moyenne en dBm, pannes réseau réelles identifiées.</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                        <div class="font-bold text-cyan-400">Seuils 3GPP / ARCEP</div>
+                        <p class="text-slate-400">Distribution visuelle en 4 paliers : Excellent (&ge; -75 dBm), Bon (-76 à -85 dBm), Moyen (-86 à -95 dBm), Faible (&lt; -95 dBm).</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1.5">
+                        <div class="font-bold text-emerald-400">Sécurité des Données</div>
+                        <p class="text-slate-400">Masquage automatique en CSS <code class="text-slate-300">@media print</code> des URLs privées de tunnels Cloudflare ou Ngrok pour diffusion publique sécurisée.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7 : Appairage & Tunnels -->
+            <section id="smart-qr" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-sm">📱</span>
+                    Appairage QR Code Intelligent & Mode Nomade 4G
+                </h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Pour éliminer toute saisie manuelle d'adresses IP ou d'URL sur le smartphone lors des opérations en mobilité, Radio Sentinel dispose d'un modal d'appairage dynamique :
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="font-bold text-cyan-400">Mode 1 : Wi-Fi Local (Atelier / Bureau)</div>
+                        <p class="text-slate-400">
+                            Génère un QR code pointant directement sur l'adresse IP locale du poste hôte (<code class="text-slate-300">https://192.168.x.x:8000/gps</code>). Idéal pour les tests en laboratoire sur le même réseau local.
+                        </p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="font-bold text-emerald-400">Mode 2 : Nomade 4G (Wardriving en Extérieur)</div>
+                        <p class="text-slate-400">
+                            Dès le lancement de <code class="text-slate-300">tunnel.bat</code>, l'URL publique chiffrée (Cloudflare Tunnel ou Ngrok) est automatiquement enregistrée sur le serveur FastAPI. Le QR code bascule instantanément sur l'URL sécurisée accessible depuis n'importe où en 4G.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8 : API REST -->
+            <section id="api" class="space-y-6 border-b border-slate-800/80 pb-12">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-sm">🔌</span>
+                    Référentiel Complet de l'API REST FastAPI
+                </h2>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Toutes les données de la station peuvent être consommées par des systèmes tiers (SIEM, SIG d'entreprise, logiciels de supervision télécom) via des endpoints REST JSON :
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400">
+                                <th class="py-2.5 px-3">Méthode</th>
+                                <th class="py-2.5 px-3">Point d'Accès</th>
+                                <th class="py-2.5 px-3">Description Opérationnelle</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/80">
+                            <tr>
+                                <td class="py-2 px-3 text-cyan-400 font-bold">GET</td>
+                                <td class="py-2 px-3 text-white">/api/status</td>
+                                <td class="py-2 px-3 text-slate-400">Statut de la station, détection automatique de l'IP locale et état du tunnel nomade.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-cyan-400 font-bold">GET</td>
+                                <td class="py-2 px-3 text-white">/api/telemetry/live</td>
+                                <td class="py-2 px-3 text-slate-400">Payload complet temps réel (RF physique, GNSS, audit data mobile, sécurité).</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-cyan-400 font-bold">GET</td>
+                                <td class="py-2 px-3 text-white">/api/map-points</td>
+                                <td class="py-2 px-3 text-slate-400">Échantillons géoréférencés pour tracé de parcours et heatmap SIG.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-cyan-400 font-bold">GET</td>
+                                <td class="py-2 px-3 text-white">/api/audit-report</td>
+                                <td class="py-2 px-3 text-slate-400">Données statistiques compilées pour le rapport d'audit exécutif.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-cyan-400 font-bold">GET</td>
+                                <td class="py-2 px-3 text-white">/api/export-kml</td>
+                                <td class="py-2 px-3 text-slate-400">Génération du fichier 3D Google Earth extrudé selon le relief dBm.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-emerald-400 font-bold">POST</td>
+                                <td class="py-2 px-3 text-white">/api/gps</td>
+                                <td class="py-2 px-3 text-slate-400">Ingestion des coordonnées satellite et des métriques data depuis la sonde mobile.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-3 text-emerald-400 font-bold">POST</td>
+                                <td class="py-2 px-3 text-white">/api/tunnel</td>
+                                <td class="py-2 px-3 text-slate-400">Enregistrement dynamique de l'URL publique du tunnel nomade 4G.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 9 : Licence Propriétaire & Contact -->
+            <section id="license" class="space-y-6 pb-12">
+                <div class="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-amber-950/80 text-amber-300 border border-amber-800">
+                        <span>🔒 PROPRIÉTÉ INTELLECTUELLE & LICENCE COMMERCIALE</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">
+                        Déploiement Institutionnel & Partenariats Stratégiques
+                    </h2>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Radio Sentinel™ est une marque et un logiciel propriétaire développés par <strong>Gildas Nzikoune</strong>. Tous droits de reproduction, modification, décompilation et commercialisation sont strictement réservés.
+                    </p>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Des démonstrations sur mesure et des déploiements dédiés sont proposés pour les régulateurs télécoms, les opérateurs de réseaux mobiles, les ministères et les gestionnaires d'infrastructures critiques.
+                    </p>
+                    <div id="contact" class="pt-2 flex flex-wrap gap-3">
+                        <a href="mailto:gildas.nzikoune@gmail.com?subject=Radio%20Sentinel%20-%20Demande%20de%20démonstration%20ou%20licence"
+                           class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition shadow-lg shadow-cyan-500/20">
+                           📧 Contacter pour une Démonstration / Devis
+                        </a>
+                        <a href="index.html"
+                           class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition">
+                           ← Retour à la Page Principale
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-8 px-6 border-t border-slate-800/80 text-center text-xs text-slate-500 font-mono space-y-2">
+        <div>Radio Sentinel™ • Plateforme Propriétaire d'Audit & d'Intelligence Spectrale</div>
+        <div>Copyright © 2026 Gildas Nzikoune. Tous droits réservés.</div>
+    </footer>
+
+</body>
+</html>

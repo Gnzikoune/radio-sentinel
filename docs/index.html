@@ -4,207 +4,593 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radio Sentinel — Observatoire Cellulaire & Cartographie RF Open Source</title>
+    <title>Radio Sentinel™ — Observatoire d'Intelligence Cellulaire & d'Audit Spectral</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Radio Sentinel : Plateforme open source d'audit spectral, cartographie de couverture 3G/4G, géolocalisation de pylônes et détection d'IMSI-Catchers avec une vieille clé USB 3G et un smartphone.">
+        content="Radio Sentinel™ : Plateforme souveraine d'audit spectral, cartographie de couverture mobile 2G/3G/4G, géolocalisation de pylônes et détection de contre-mesures cellulaires pour régulateurs, opérateurs et DSI.">
     <meta name="keywords"
-        content="wardriving, rf-mapping, cellular-network, gsm-modem, at-commands, fastapi, cartographie-reseau, telecom, open-source, imsi-catcher, alcatel-x602d, opencellid, gabon, airtel, moov">
-    <meta name="author" content="Gnzikoune">
+        content="audit telecom, couverture mobile, wardriving professionnel, rf mapping, arcep, cartographie reseau, imsi catcher, alcatel x602d, opencellid gabon, cyber defense telecom">
+    <meta name="author" content="Gildas Nzikoune">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://gnzikoune.github.io/radio-sentinel/">
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Social -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://gnzikoune.github.io/radio-sentinel/">
-    <meta property="og:title" content="Radio Sentinel — Observatoire Cellulaire & Cartographie RF">
+    <meta property="og:title" content="Radio Sentinel™ — Intelligence Cellulaire & Audit Spectral">
     <meta property="og:description"
-        content="Transformez une vieille clé USB 3G à 0 € en scanner de réseau mobile professionnel avec cartographie Heatmap et détection d'IMSI-Catchers.">
+        content="Plateforme d'audit de couverture mobile, cartographie de pylônes par barycentre mW et détection d'IMSI-Catchers.">
     <meta property="og:image" content="https://raw.githubusercontent.com/Gnzikoune/radio-sentinel/main/static/preview.png">
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://gnzikoune.github.io/radio-sentinel/">
-    <meta property="twitter:title" content="Radio Sentinel — Observatoire Cellulaire & Cartographie RF">
-    <meta property="twitter:description"
-        content="Station autonome d'audit hertzien 3G/4G, géolocalisation de pylônes et détection de rétrogradation 2G non sécurisée.">
-    <meta property="twitter:image" content="https://raw.githubusercontent.com/Gnzikoune/radio-sentinel/main/static/preview.png">
-
-    <!-- Schema.org JSON-LD -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Radio Sentinel",
-      "operatingSystem": "Windows, Linux",
-      "applicationCategory": "TelecommunicationsApplication, UtilitiesApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "EUR"
-      },
-      "description": "Station autonome d'audit spectral 3G/4G, de cartographie de couverture RF et de détection d'anomalies cellulaires avec du matériel recyclé.",
-      "url": "https://github.com/Gnzikoune/radio-sentinel",
-      "author": {
-        "@type": "Person",
-        "name": "Gnzikoune"
-      }
-    }
-    </script>
-
+    <!-- Fonts & Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .gradient-radial { background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15) 0%, rgba(15, 23, 42, 0) 70%); }
+
+        .glow-radial {
+            background: radial-gradient(circle at 50% -10%, rgba(6, 182, 212, 0.18) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+        .glow-subtle {
+            background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.6);
+        }
+        .radar-sweep {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, rgba(6, 182, 212, 0.25) 0deg, transparent 60deg, transparent 360deg);
+            animation: rotateRadar 5s linear infinite;
+        }
+        @keyframes rotateRadar {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .tab-btn.active {
+            background-color: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.35);
+        }
     </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-slate-950">
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-slate-950 overflow-x-hidden">
 
-    <!-- Top Navigation -->
-    <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-lg">📡</span>
-                <span class="font-extrabold text-base tracking-tight text-white">Radio Sentinel</span>
-                <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">Open Source</span>
-            </div>
-            <nav class="flex items-center gap-4 text-xs font-semibold">
-                <a href="#features" class="text-slate-400 hover:text-white transition">Fonctionnalités</a>
-                <a href="#architecture" class="text-slate-400 hover:text-white transition">Architecture</a>
-                <a href="#quickstart" class="text-slate-400 hover:text-white transition">Démarrage</a>
-                <a href="https://github.com/Gnzikoune/radio-sentinel" target="_blank"
-                   class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2">
-                   <span>⭐ Voir sur GitHub</span>
+    <!-- Top Navigation Header -->
+    <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-slate-950/85 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            
+            <!-- Logo & Brand -->
+            <a href="index.html" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-xl shadow-lg shadow-cyan-500/10 group-hover:scale-105 transition">
+                    📡
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold text-base tracking-tight text-white group-hover:text-cyan-400 transition">Radio Sentinel<span class="text-cyan-400">™</span></span>
+                        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded-full bg-slate-900 text-cyan-400 border border-cyan-800/80 font-bold">Enterprise</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono hidden sm:block">Observatoire d'Intelligence Cellulaire</div>
+                </div>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-400">
+                <a href="#cockpit" class="hover:text-white transition">Cockpit v3</a>
+                <a href="#features" class="hover:text-white transition">Capacités Clés</a>
+                <a href="#rapport" class="hover:text-white transition">Audit 3GPP</a>
+                <a href="#clients" class="hover:text-white transition">Solutions Régulateurs & DSI</a>
+                <a href="docs.html" class="text-cyan-400 hover:text-cyan-300 font-bold transition flex items-center gap-1">
+                    <span>📖 Documentation</span>
                 </a>
             </nav>
+
+            <!-- CTA Actions -->
+            <div class="flex items-center gap-3">
+                <a href="docs.html" class="md:hidden text-xs font-bold text-cyan-400 px-3 py-1.5 rounded-lg border border-cyan-800">
+                    Docs
+                </a>
+                <a href="#contact"
+                   class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs transition shadow-lg shadow-cyan-500/25 active:scale-95 flex items-center gap-1.5">
+                    <span>Demander une Démo</span>
+                    <span>→</span>
+                </a>
+            </div>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="gradient-radial pt-20 pb-16 px-6 text-center border-b border-slate-800/80">
-        <div class="max-w-4xl mx-auto space-y-6">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/60 border border-cyan-800/80 text-cyan-300">
-                <span>⚡ Audit RF & Cyber-Sécurité Télécom</span>
-                <span class="text-slate-500">•</span>
-                <span>Matériel 100% Recyclé</span>
+    <section class="glow-radial pt-20 pb-20 px-4 sm:px-6 text-center border-b border-slate-800/80 relative">
+        <div class="max-w-5xl mx-auto space-y-6">
+
+            <!-- Sovereign Badge -->
+            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-950/70 border border-cyan-700/60 text-cyan-300 shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="font-bold">SOUVERAINETÉ TÉLÉCOM & AUDIT SPECTRAL EN MOBILITÉ</span>
             </div>
-            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
-                Transformez une vieille clé USB en <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">Observatoire Mobile Professionnel</span>
+
+            <!-- Main Punchline -->
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white leading-tight">
+                L'Intelligence Cellulaire & l'Audit Télécom de <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">Nouvelle Génération</span>.
             </h1>
-            <p class="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                Radio Sentinel combine le détournement d'un modem 3G grand public (*Alcatel X602D*) et un smartphone Android pour cartographier le spectre hertzien, trianguler les pylônes et détecter les fausses stations de base (IMSI-Catchers) à 0 €.
+
+            <!-- Subhead -->
+            <p class="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
+                Mesurez la couverture mobile réelle avec une rigueur métrologique, comparez les opérateurs en temps réel, triangulez les pylônes par barycentre énergétique et détectez les tentatives d'interception radio (IMSI-Catchers).
             </p>
+
+            <!-- Buttons -->
             <div class="flex flex-wrap items-center justify-center gap-3 pt-4">
-                <a href="https://github.com/Gnzikoune/radio-sentinel" target="_blank"
-                   class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition shadow-lg shadow-cyan-500/20">
-                   🚀 Télécharger le projet GitHub
+                <a href="docs.html"
+                   class="px-6 py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm transition shadow-xl shadow-cyan-500/25 flex items-center gap-2">
+                    <span>📖 Consulter la Documentation Officielle</span>
+                    <span>→</span>
                 </a>
-                <a href="https://github.com/Gnzikoune/radio-sentinel/blob/main/README.md" target="_blank"
-                   class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-sm transition">
-                   📖 Lire la documentation technique
+                <a href="#cockpit"
+                   class="px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 font-bold text-sm transition flex items-center gap-2">
+                    <span>⚡ Découvrir le Cockpit v3</span>
                 </a>
+            </div>
+
+            <!-- Key Trust Metrics -->
+            <div class="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left font-mono">
+                <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800">
+                    <div class="text-[10px] text-slate-500 uppercase">Précision Spectrale</div>
+                    <div class="text-xl font-bold text-cyan-400 mt-0.5">± 1 dBm (AT 3GPP)</div>
+                    <div class="text-[10px] text-slate-400">Écoute passive brute</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800">
+                    <div class="text-[10px] text-slate-500 uppercase">Architecture</div>
+                    <div class="text-xl font-bold text-emerald-400 mt-0.5">Double Sonde</div>
+                    <div class="text-[10px] text-slate-400">RF direct + GNSS/Data</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800">
+                    <div class="text-[10px] text-slate-500 uppercase">Base Pylônes Intégrée</div>
+                    <div class="text-xl font-bold text-indigo-400 mt-0.5">OpenCellID Gabon</div>
+                    <div class="text-[10px] text-slate-400">Filtre géodésique Haversine</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800">
+                    <div class="text-[10px] text-slate-500 uppercase">Contre-Mesures</div>
+                    <div class="text-xl font-bold text-rose-400 mt-0.5">Anti-IMSI Catcher</div>
+                    <div class="text-[10px] text-slate-400">Filtre anti-faux-positifs</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Cockpit v3 Interactive Showcase Section -->
+    <section id="cockpit" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8">
+        
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/60 border border-cyan-800 text-cyan-300">
+                <span>🎛️ COCKPIT OPÉRATIONNEL MULTI-ESPACES v3</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Une Ergonomie de Vol Sans Saturation Cognitive</h2>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Le poste de pilotage de Radio Sentinel sépare la télémétrie critique (HUD de Vol persistant) des 5 espaces d'analyse spécialisés pour une prise de décision instantanée sur le terrain.
+            </p>
+        </div>
+
+        <!-- Realistic Cockpit Mockup Container -->
+        <div class="rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl overflow-hidden glass-panel">
+            
+            <!-- 1. Flight HUD Header Mockup -->
+            <div class="bg-slate-900/90 border-b border-slate-800 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+                
+                <!-- Left: Port & Signal -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-800 text-emerald-400 font-bold">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>COM12 [CONNECTÉ]</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400">Puissance :</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-cyan-950 border border-cyan-800 text-cyan-300 font-extrabold text-sm">
+                            -84 dBm (CSQ 15)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Center: Operator & Tech -->
+                <div class="flex items-center gap-3 text-slate-300">
+                    <div class="px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700 flex items-center gap-1.5">
+                        <span class="text-cyan-400">🇬🇦</span>
+                        <span class="font-bold">Gabon Telecom / Moov Africa (62801)</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800 text-[11px]">
+                        UMTS Band 1 (2140 MHz)
+                    </span>
+                </div>
+
+                <!-- Right: GPS Status & Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] flex items-center gap-1">
+                        <span>🛰️</span> -0.3901, 9.4542 (±3m)
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-purple-600 text-white font-bold text-[11px] shadow">
+                        📄 Rapport Audit
+                    </span>
+                </div>
+            </div>
+
+            <!-- 2. Workspace Tabs Navigation -->
+            <div class="bg-slate-950/80 border-b border-slate-800 px-4 sm:px-6 py-2.5 flex items-center gap-2 overflow-x-auto text-xs font-mono">
+                <button onclick="switchTab('map')" id="btn-tab-map" class="tab-btn active px-3.5 py-1.5 rounded-lg border border-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5">
+                    <span>🗺️</span> Carte SIG & Pylônes
+                </button>
+                <button onclick="switchTab('dual')" id="btn-tab-dual" class="tab-btn px-3.5 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                    <span>⚡</span> Audit Bi-Réseau
+                </button>
+                <button onclick="switchTab('spectrum')" id="btn-tab-spectrum" class="tab-btn px-3.5 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                    <span>📊</span> Visualiseur Spectre
+                </button>
+                <button onclick="switchTab('security')" id="btn-tab-security" class="tab-btn px-3.5 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                    <span>🛡️</span> Cyber-Sécurité
+                </button>
+                <button onclick="switchTab('console')" id="btn-tab-console" class="tab-btn px-3.5 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                    <span>⌨️</span> Console AT
+                </button>
+            </div>
+
+            <!-- 3. Dynamic Mockup Body Display -->
+            <div class="p-6 sm:p-8 min-h-[380px] bg-slate-950/60" id="cockpit-content">
+                
+                <!-- View 1 : Carte SIG (Default) -->
+                <div id="view-map" class="space-y-4">
+                    <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                            <span class="text-white font-bold">Trace SIG Active — Avenue Bouët / Libreville</span>
+                            <span class="text-slate-500">• 22 622 points géolocalisés</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px]">Pylône Confirmé (Haversine 1.2 km)</span>
+                        </div>
+                    </div>
+
+                    <!-- Simulated GIS Map Canvas -->
+                    <div class="h-64 sm:h-72 w-full rounded-2xl bg-slate-900 border border-slate-800 relative overflow-hidden flex items-center justify-center p-4">
+                        
+                        <!-- Grid Lines -->
+                        <div class="absolute inset-0 opacity-15" style="background-image: radial-gradient(#38bdf8 1px, transparent 1px); background-size: 24px 24px;"></div>
+                        
+                        <!-- Radar Sweep Animation -->
+                        <div class="absolute w-72 h-72 rounded-full border border-cyan-500/20 flex items-center justify-center pointer-events-none">
+                            <div class="radar-sweep"></div>
+                            <div class="w-48 h-48 rounded-full border border-cyan-500/20"></div>
+                            <div class="w-24 h-24 rounded-full border border-cyan-500/20"></div>
+                        </div>
+
+                        <!-- Cell Tower Landmark -->
+                        <div class="absolute top-1/4 right-1/3 flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full bg-rose-500/20 border border-rose-500 flex items-center justify-center text-sm shadow-lg shadow-rose-500/30">
+                                🗼
+                            </div>
+                            <span class="text-[10px] font-mono font-bold text-rose-300 mt-1 bg-slate-950/90 px-1.5 py-0.5 rounded border border-rose-900">
+                                Moov Africa (CID 33293)
+                            </span>
+                        </div>
+
+                        <!-- Vehicle / Rover Marker with Beam -->
+                        <div class="absolute bottom-1/4 left-1/3 flex flex-col items-center">
+                            <div class="w-7 h-7 rounded-full bg-cyan-500/30 border border-cyan-400 flex items-center justify-center text-xs animate-bounce shadow-lg shadow-cyan-400/30">
+                                🚗
+                            </div>
+                            <span class="text-[10px] font-mono font-bold text-cyan-300 mt-1 bg-slate-950/90 px-1.5 py-0.5 rounded border border-cyan-800">
+                                Sonde Mobile (-84 dBm)
+                            </span>
+                        </div>
+
+                        <!-- Vector Beam connecting car to tower -->
+                        <svg class="absolute inset-0 w-full h-full pointer-events-none">
+                            <line x1="36%" y1="72%" x2="64%" y2="30%" stroke="#06b6d4" stroke-width="2" stroke-dasharray="6,4" opacity="0.8" />
+                        </svg>
+
+                        <!-- Legend Box -->
+                        <div class="absolute bottom-3 right-3 p-2.5 rounded-xl bg-slate-950/90 border border-slate-800 text-[10px] font-mono space-y-1">
+                            <div class="text-slate-400 font-bold">Graduation ARCEP / UIT :</div>
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center gap-1 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> &ge; -75 dBm</span>
+                                <span class="flex items-center gap-1 text-cyan-400"><span class="w-2 h-2 rounded-full bg-cyan-500"></span> -85 dBm</span>
+                                <span class="flex items-center gap-1 text-amber-400"><span class="w-2 h-2 rounded-full bg-amber-500"></span> -95 dBm</span>
+                                <span class="flex items-center gap-1 text-rose-400"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Zone Blanche</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- View 2 : Audit Bi-Réseau (Hidden by default) -->
+                <div id="view-dual" class="hidden space-y-4 font-mono text-xs">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                            <div class="text-cyan-400 font-bold flex items-center gap-2">
+                                <span>📡</span> Sonde 1 : Clé USB HSPA+ (Écoute Spectrale Passive)
+                            </div>
+                            <div class="space-y-1 text-slate-300">
+                                <div>Opérateur : <strong class="text-white">Gabon Telecom / Moov (62801)</strong></div>
+                                <div>Signal RF : <strong class="text-emerald-400">-79.2 dBm (Bon)</strong></div>
+                                <div>Cell ID : <strong class="text-white">33293 (LAC 303)</strong></div>
+                                <div>Porteuse : <strong class="text-white">Canal 10712 (2140.0 MHz)</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                            <div class="text-indigo-400 font-bold flex items-center gap-2">
+                                <span>📱</span> Sonde 2 : Carte SIM Mobile (Audit QoS 4G Actif)
+                            </div>
+                            <div class="space-y-1 text-slate-300">
+                                <div>Opérateur SIM : <strong class="text-white">Airtel Gabon (62802)</strong></div>
+                                <div>Technologie : <strong class="text-indigo-300">4G LTE Cat 4</strong></div>
+                                <div>Débit Descendant : <strong class="text-emerald-400">14.8 Mbps</strong></div>
+                                <div>Latence RTT / Ping : <strong class="text-amber-300">48 ms / 0.5 ms</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View 3 : Spectre (Hidden) -->
+                <div id="view-spectrum" class="hidden space-y-4 font-mono text-xs">
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                        <span class="text-slate-400">Évolution de la puissance RF reçue sur la fenêtre glissante</span>
+                        <span class="text-cyan-400 font-bold">Moyenne : -88.9 dBm</span>
+                    </div>
+                    <div class="h-48 rounded-xl bg-slate-900/60 border border-slate-800 flex items-end gap-1.5 p-4 justify-between">
+                        <div class="w-full bg-cyan-500/20 border-t-2 border-cyan-400 h-[65%] rounded-t"></div>
+                        <div class="w-full bg-cyan-500/20 border-t-2 border-cyan-400 h-[72%] rounded-t"></div>
+                        <div class="w-full bg-cyan-500/20 border-t-2 border-cyan-400 h-[58%] rounded-t"></div>
+                        <div class="w-full bg-emerald-500/20 border-t-2 border-emerald-400 h-[85%] rounded-t"></div>
+                        <div class="w-full bg-emerald-500/20 border-t-2 border-emerald-400 h-[80%] rounded-t"></div>
+                        <div class="w-full bg-amber-500/20 border-t-2 border-amber-400 h-[45%] rounded-t"></div>
+                        <div class="w-full bg-cyan-500/20 border-t-2 border-cyan-400 h-[68%] rounded-t"></div>
+                        <div class="w-full bg-cyan-500/20 border-t-2 border-cyan-400 h-[74%] rounded-t"></div>
+                    </div>
+                </div>
+
+                <!-- View 4 : Cyber-Sécurité (Hidden) -->
+                <div id="view-security" class="hidden space-y-4 font-mono text-xs">
+                    <div class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-800 text-emerald-300 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="font-bold">STATUT SPECTRAL : SÉCURISÉ</span>
+                        </div>
+                        <span class="text-[11px] text-emerald-400">Chiffrement 3GPP Kasumi / SNOW actif</span>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 space-y-1">
+                        <div class="font-bold text-white">Filtre Anti-Faux-Positifs Activé :</div>
+                        <p class="text-[11px]">Les reconnexions transitoires du modem à partir de la valeur sentinelle (-113 dBm) sont neutralisées. Aucune fausse alerte générée.</p>
+                    </div>
+                </div>
+
+                <!-- View 5 : Console AT (Hidden) -->
+                <div id="view-console" class="hidden space-y-2 font-mono text-xs">
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-cyan-300 space-y-1">
+                        <div>&gt; AT+CGMI</div>
+                        <div class="text-slate-400">Alcatel</div>
+                        <div class="pt-1">&gt; AT+CGMM</div>
+                        <div class="text-slate-400">OneTouch X602D (HSPA+ USB Modem)</div>
+                        <div class="pt-1">&gt; AT+CSQ</div>
+                        <div class="text-slate-400">+CSQ: 15,99  [RSSI: -84 dBm]</div>
+                        <div class="pt-1 text-emerald-400">OK</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Features Grid -->
-    <section id="features" class="py-20 px-6 max-w-7xl mx-auto">
-        <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <h2 class="text-xs font-mono uppercase tracking-widest text-cyan-400">Capacités & Modules Clés</h2>
-            <p class="text-2xl md:text-3xl font-extrabold text-white">Une suite d'ingénierie télécom complète</p>
+    <!-- Bento Grid : 6 Core Enterprise Capabilities -->
+    <section id="features" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-12 border-t border-slate-800/80">
+        
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/60 border border-cyan-800 text-cyan-300">
+                <span>⚡ CAPACITÉS STRATÉGIQUES</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Une Suite d'Ingénierie & d'Audit Sans Équivalent</h2>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Radio Sentinel combine le matériel de terrain, l'intelligence algorithmique et la conformité réglementaire dans une solution clé en main.
+            </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
             <!-- Card 1 -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-2xl">🗺️</div>
+            <div class="p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4 hover:border-cyan-500/50 transition">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-2xl shadow-lg shadow-cyan-500/10">
+                    🗺️
+                </div>
                 <h3 class="text-lg font-bold text-white">Cartographie Heatmap Continue</h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Interpolation spatiale le long des axes de circulation pour générer un dégradé de couverture radio précis (Vert / Jaune / Rouge), directement sur Leaflet avec Google Satellite HD.
+                    Interpolation spatiale haute résolution générant un dégradé continu de couverture (Vert / Jaune / Rouge) le long des parcours de wardriving, avec fond satellite Google HD et OpenStreetMap.
                 </p>
+                <div class="text-[11px] font-mono text-cyan-400 font-bold">Standard ARCEP / 3GPP TS 36.133</div>
             </div>
 
             <!-- Card 2 -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-2xl">⚡</div>
-                <h3 class="text-lg font-bold text-white">Audit Bi-Réseau & Performance 4G</h3>
+            <div class="p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4 hover:border-emerald-500/50 transition">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/10">
+                    🛰️
+                </div>
+                <h3 class="text-lg font-bold text-white">Barycentre Réel en mW & OpenCellID</h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Compare simultanément deux opérateurs : écoute spectrale brute sur la clé USB (ex. Azur) et performance data réelle sur la SIM du téléphone (débit descendant, latence RTT, ping serveur).
+                    Convertit les dBm logarithmiques en milliwatts réels pour calculer le centre de gravité des émissions et trianguler les pylônes, enrichi par la base officielle OpenCellID Gabon (MCC 628) et un filtre anti-collision Haversine.
                 </p>
+                <div class="text-[11px] font-mono text-emerald-400 font-bold">Convergence spatiale millimétrique</div>
             </div>
 
             <!-- Card 3 -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-2xl">🛰️</div>
-                <h3 class="text-lg font-bold text-white">Triangulation par Barycentre mW</h3>
+            <div class="p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4 hover:border-indigo-500/50 transition">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/10">
+                    ⚡
+                </div>
+                <h3 class="text-lg font-bold text-white">Audit Bi-Réseau & Corrélation QoS</h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Convertit les dBm logarithmiques en milliwatts réels pour isoler le centre de gravité des émissions et estimer la position des pylônes émetteurs avec filtre Haversine anti-réutilisation de Cell ID.
+                    Superpose deux opérateurs en parallèle : l'écoute spectrale passive de la sonde physique (Alcatel X602D) et l'audit de performance active de la carte SIM mobile (débit réel Mbps, RTT, latence serveur).
                 </p>
+                <div class="text-[11px] font-mono text-indigo-400 font-bold">Corrélation Couche Physique & Applicative</div>
             </div>
 
             <!-- Card 4 -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-2xl">🛡️</div>
+            <div class="p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4 hover:border-rose-500/50 transition">
+                <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-2xl shadow-lg shadow-rose-500/10">
+                    🛡️
+                </div>
                 <h3 class="text-lg font-bold text-white">Détection IMSI-Catcher (Anti-Downgrade)</h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Détecte les rétrogradations forcées 3G->2G non chiffrées avec alertes visuelles et sonores instantanées pour protéger la confidentialité des communications mobiles.
+                    Neutralise les menaces d'interception radio en détectant les rétrogradations forcées vers le réseau 2G GSM non chiffré (A5/1), équipé d'un algorithme éliminant les faux-positifs lors des déconnexions matérielles.
                 </p>
+                <div class="text-[11px] font-mono text-rose-400 font-bold">Protection contre l'espionnage mobile</div>
             </div>
 
             <!-- Card 5 -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-2xl">📱</div>
-                <h3 class="text-lg font-bold text-white">Appairage par QR Code Intelligent</h3>
+            <div class="p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4 hover:border-purple-500/50 transition">
+                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-2xl shadow-lg shadow-purple-500/10">
+                    📄
+                </div>
+                <h3 class="text-lg font-bold text-white">Rapport d'Audit Exécutif Prêt pour PDF</h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Bascule automatiquement entre le mode Nomade 4G (tunnel sécurisé chiffré sans coupure en extérieur) et le mode Wi-Fi local à domicile. Zéro saisie d'URL sur le téléphone.
+                    Générateur autonome d'audits officiels (<code class="text-purple-300">/audit-report</code>) calculant le taux de couverture exploitable, la répartition de signal, l'inventaire des cellules et les pannes réseau réelles pour régulateurs et DSI.
                 </p>
+                <div class="text-[11px] font-mono text-purple-400 font-bold">Export natif PDF @media print</div>
             </div>
 
             <!-- Card 6 -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl">🌐</div>
-                <h3 class="text-lg font-bold text-white">Export 3D Google Earth & CSV</h3>
+            <div class="p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4 hover:border-amber-500/50 transition">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl shadow-lg shadow-amber-500/10">
+                    📱
+                </div>
+                <h3 class="text-lg font-bold text-white">Appairage Nomade 4G par Smart QR</h3>
                 <p class="text-xs text-slate-400 leading-relaxed">
-                    Génération en un clic de fichiers KML 3D extrudés selon la puissance radio reçue pour visualiser le relief hertzien dans Google Earth Pro, et export CSV compatible QGIS/Python.
+                    Zéro saisie d'URL en mobilité. Le système détecte automatiquement si un tunnel sécurisé (Cloudflare / Ngrok) est ouvert pour générer le QR code distant, ou fournit l'adresse IP locale en laboratoire.
                 </p>
+                <div class="text-[11px] font-mono text-amber-400 font-bold">Export direct QR en PNG</div>
             </div>
+
         </div>
     </section>
 
-    <!-- Quickstart Section -->
-    <section id="quickstart" class="py-20 px-6 bg-slate-900/50 border-t border-b border-slate-800/80">
-        <div class="max-w-4xl mx-auto space-y-6">
-            <div class="text-center space-y-2">
-                <h2 class="text-xs font-mono uppercase tracking-widest text-cyan-400">Démarrage Rapide</h2>
-                <p class="text-2xl font-extrabold text-white">Opérationnel en 3 commandes</p>
+    <!-- Institutional Solutions Section -->
+    <section id="clients" class="py-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-12 border-t border-slate-800/80">
+        
+        <div class="text-center max-w-3xl mx-auto space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/60 border border-cyan-800 text-cyan-300">
+                <span>🏛️ DÉPLOIEMENT INSTITUTIONNEL & B2B</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Conçu pour les Acteurs Stratégiques</h2>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Une solution éprouvée pour les organisations dont les opérations reposent sur la souveraineté radio et l'intégrité de la connectivité mobile.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+            <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-3">
+                <div class="text-sm font-bold text-cyan-400">Régulateurs Télécoms</div>
+                <p class="text-slate-300 font-sans leading-relaxed">
+                    Vérification impartiale des obligations de couverture des opérateurs titulaires de licence (ARCEP). Génération de procès-verbaux d'audit opposables avec coordonnées GPS et mesures métrologiques.
+                </p>
             </div>
 
-            <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono text-cyan-300 space-y-2">
-                <p class="text-slate-500"># 1. Cloner le dépôt GitHub</p>
-                <p>git clone https://github.com/Gnzikoune/radio-sentinel.git</p>
-                <p class="text-slate-500 pt-2"># 2. Installer les dépendances</p>
-                <p>cd radio-sentinel && pip install -r requirements.txt</p>
-                <p class="text-slate-500 pt-2"># 3. Lancer la station</p>
-                <p>./lancer.bat</p>
+            <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-3">
+                <div class="text-sm font-bold text-emerald-400">Opérateurs Mobiles & TowerCos</div>
+                <p class="text-slate-300 font-sans leading-relaxed">
+                    Contrôle de conformité des plans de fréquence et optimisation du rayonnement réel des antennes sans mobiliser de véhicules lourds de drive-test à coûts prohibitifs.
+                </p>
             </div>
+
+            <div class="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-3">
+                <div class="text-sm font-bold text-rose-400">Défense, Sécurité & DSI</div>
+                <p class="text-slate-300 font-sans leading-relaxed">
+                    Détection de dispositifs espions cellulaires (IMSI-Catchers) dans les périmètres sensibles et audit de résilience de la connectivité 4G/LTE de secours sur sites critiques.
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Commercial CTA & Contact Section -->
+    <section id="contact" class="py-20 px-4 sm:px-6 max-w-5xl mx-auto">
+        <div class="p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 border border-cyan-800/60 shadow-2xl space-y-6 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950 text-cyan-300 border border-cyan-700">
+                <span>🤝 LICENCE COMMERCIALE & PARTENARIATS</span>
+            </div>
+
+            <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                Déployez Radio Sentinel™ au Sein de Votre Organisation
+            </h2>
+
+            <p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                Vous souhaitez organiser une démonstration opérationnelle, acquérir une licence d'exploitation ou intégrer l'API Radio Sentinel dans votre infrastructure de supervision ?
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+                <a href="mailto:gildas.nzikoune@gmail.com?subject=Radio%20Sentinel%20-%20Demande%20de%20démonstration%20ou%20licence%20commerciale"
+                   class="px-8 py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm transition shadow-xl shadow-cyan-500/30 flex items-center gap-2">
+                    <span>📧 Contacter le Concepteur (Gildas Nzikoune)</span>
+                    <span>→</span>
+                </a>
+                <a href="docs.html"
+                   class="px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition border border-slate-700 flex items-center gap-2">
+                    <span>📖 Lire la Documentation Complète</span>
+                </a>
+            </div>
+
+            <div class="pt-4 text-xs font-mono text-slate-500">
+                Accords de confidentialité (NDA) et déploiements sur mesure disponibles sur demande.
+            </div>
+
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-12 px-6 border-t border-slate-800/80 text-center text-xs text-slate-500 font-mono space-y-2">
-        <div>Radio Sentinel • Projet Open Source sous Licence MIT</div>
-        <div>Conçu avec passion pour la souveraineté radio et l'indépendance technologique.</div>
-        <div class="pt-3">
-            <a href="https://github.com/Gnzikoune/radio-sentinel" class="text-cyan-400 hover:underline">GitHub Repository</a>
-            • <a href="https://github.com/Gnzikoune/radio-sentinel/blob/main/README_EN.md" class="text-slate-400 hover:underline">English Documentation</a>
+    <footer class="py-12 px-6 border-t border-slate-800/80 text-center text-xs text-slate-500 font-mono space-y-3">
+        <div class="flex items-center justify-center gap-3">
+            <span class="text-white font-bold">Radio Sentinel™</span>
+            <span>•</span>
+            <span>Plateforme Propriétaire d'Intelligence Spectrale</span>
+        </div>
+        <div>Tous droits réservés © 2026 Gildas Nzikoune. Reproduction et exploitation commerciale sous licence exclusive.</div>
+        <div class="pt-2 flex items-center justify-center gap-4 text-slate-400">
+            <a href="docs.html" class="hover:text-cyan-400 transition">Documentation Technique</a>
+            <span>•</span>
+            <a href="#cockpit" class="hover:text-cyan-400 transition">Cockpit v3</a>
+            <span>•</span>
+            <a href="#contact" class="hover:text-cyan-400 transition">Contact Commercial</a>
         </div>
     </footer>
+
+    <!-- Interactive Cockpit Tab Switcher Script -->
+    <script>
+        function switchTab(tabId) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Hide all views
+            ['map', 'dual', 'spectrum', 'security', 'console'].forEach(id => {
+                const el = document.getElementById('view-' + id);
+                if (el) el.classList.add('hidden');
+            });
+
+            // Activate chosen button and view
+            const activeBtn = document.getElementById('btn-tab-' + tabId);
+            const activeView = document.getElementById('view-' + tabId);
+            if (activeBtn) activeBtn.classList.add('active');
+            if (activeView) activeView.classList.remove('hidden');
+        }
+    </script>
 
 </body>
 </html>

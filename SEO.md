@@ -9,7 +9,7 @@ Ce guide récapitule les actions concrètes à mener sur l'interface GitHub et s
 ### A. Description du projet (Section "About" à droite sur GitHub)
 Copiez-collez cette description optimisée pour le moteur de recherche :
 ```text
-Plateforme autonome d'audit spectral 3G/4G, cartographie SIG et détection d'IMSI-Catchers avec une vieille clé USB et un smartphone. 100% open source.
+Plateforme d'intelligence cellulaire, d'audit de couverture mobile 2G/3G/4G et de contre-mesures anti-IMSI-Catchers.
 ```
 
 ### B. Lien du site web (Website URL)
@@ -19,7 +19,7 @@ https://gnzikoune.github.io/radio-sentinel/
 ```
 
 ### C. Mots-clés GitHub ("Topics")
-Cliquez sur la roue crantée à côté de **About** sur GitHub et ajoutez exactement ces 18 tags :
+Cliquez sur la roue crantée à côté de **About** sur GitHub et ajoutez ces tags stratégiques :
 ```text
 wardriving
 rf-mapping
@@ -29,7 +29,7 @@ at-commands
 fastapi
 cartographie-reseau
 telecom
-open-source
+telecom-audit
 imsi-catcher
 cybersecurity
 opencellid

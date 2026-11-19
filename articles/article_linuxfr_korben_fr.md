@@ -72,7 +72,7 @@ L'interface web (bâtie avec Leaflet, Chart.js et Tailwind CSS) propose :
 
 ## 6. Tester et contribuer
 
-Le projet est 100 % open source sous licence MIT et disponible sur GitHub :
+Le projet est 100 % souverain sous licence MIT et disponible sur GitHub :
 
 👉 **Dépôt GitHub :** [https://github.com/Gnzikoune/radio-sentinel](https://github.com/Gnzikoune/radio-sentinel)  
 👉 **Site web vitrine :** [https://gnzikoune.github.io/radio-sentinel/](https://gnzikoune.github.io/radio-sentinel/)
