@@ -154,6 +154,16 @@ Radio Sentinel surveille en temps réel les indicateurs clés de sécurité 3GPP
 * **Export KML 3D (`/api/export-kml`)** : Modélise le trajet sous forme de colonnes ou de ruban continu dans Google Earth Pro. La hauteur d'extrusion de chaque point est proportionnelle à la qualité du signal radio reçu, permettant d'observer le relief de couverture hertzienne au-dessus des quartiers.
 * **Export CSV (`/api/export-csv`)** : Export tabulaire exhaustif compatible Excel, pandas et QGIS pour les analyses statistiques approfondies.
 
+### 8. Cockpit Modulaire Multi-Workspaces (UI v3 Anti-Saturation)
+Pour éliminer l'empilement vertical monolithique et éviter toute surcharge cognitive :
+* **Flight HUD Fixe (Barre Supérieure)** : Jauges de puissance instantanée, état de synchronisation du port COM, précision GNSS et boutons d'action rapide toujours visibles à l'écran.
+* **5 Espaces de Travail Dédiés (Workspaces sans rechargement)** :
+  - 🗺️ **Carte & SIG** : Vue cartographique plein format (75 % de l'écran) associée à un **drawer latéral rétractable** pour inspecter les métriques du pylône et la cellule sans masquer la carte.
+  - ⚡ **Audit Bi-Réseau** : Comparateur 3 colonnes Clé USB vs SIM 4G avec diagnostic automatique de congestion cœur de réseau versus atténuation hertzienne.
+  - 📊 **Spectre & Topologie** : Graphique temporel Chart.js grand format et tableau des cellules voisines (`AT+CCED=0,2`).
+  - 🛡️ **Cyber-Sécurité** : Moniteur anti IMSI-Catcher (2G Downgrade) et journal exhaustif des événements réseau (`OUTAGE`, `RECONNECT`).
+  - ⚙️ **Console AT & Matériel** : Fiche technique du modem Alcatel X602D et terminal interactif d'injection de commandes Hayes.
+
 ---
 
 ## 🔌 Spécifications des API REST

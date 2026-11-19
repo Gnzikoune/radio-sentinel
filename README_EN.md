@@ -58,6 +58,16 @@
 * *🔴 RF Attenuation*: Degraded signal ($< -95\text{ dBm}$) caused by physical obstacles or distance.
 * *🔵 Dual-Network Compare*: Real-time side-by-side comparison between passive listening and active SIM data.
 
+### 3. Modular Multi-Workspace Cockpit (UI v3)
+Eliminates vertical visual clutter and cognitive fatigue through NOC-inspired ergonomics:
+* **Persistent Flight HUD**: Top sticky bar continuously displaying live dBm, active operator, GNSS accuracy, and quick actions.
+* **5 Dedicated Workspaces (Instant Tab Switching)**:
+  - 🗺️ **Map & GIS**: Expansive 75% screen map view with a dedicated right-hand engineering telemetry drawer.
+  - ⚡ **Dual-Network Audit**: Full-width side-by-side modem vs SIM 4G comparator with real-time saturation diagnosis.
+  - 📊 **Spectrum & Topology**: High-resolution Chart.js time-series graph with neighbor cell table (`AT+CCED=0,2`).
+  - 🛡️ **Cybersecurity & Logs**: Anti-IMSI-catcher monitor with acoustic/visual alerts and outage event logs.
+  - ⚙️ **AT Console & Hardware**: Alcatel X602D hardware spec sheet and interactive serial Hayes terminal.
+
 ---
 
 ## 🚀 Quick Start Guide

@@ -994,8 +994,58 @@ function setupConsole() {
     });
 }
 
+// -------------------------------------------------------------
+// Module Gestionnaire d'Onglets & Cockpit Modulaire (UI v3)
+// -------------------------------------------------------------
+function setupWorkspaceTabs() {
+    const tabs = [
+        { btnId: 'tab-btn-map', targetId: 'workspace-map' },
+        { btnId: 'tab-btn-dual', targetId: 'workspace-dual' },
+        { btnId: 'tab-btn-spectrum', targetId: 'workspace-spectrum' },
+        { btnId: 'tab-btn-security', targetId: 'workspace-security' },
+        { btnId: 'tab-btn-hardware', targetId: 'workspace-hardware' }
+    ];
+
+    function activateTab(activeBtnId) {
+        tabs.forEach(t => {
+            const btn = document.getElementById(t.btnId);
+            const container = document.getElementById(t.targetId);
+            if (!btn || !container) return;
+
+            if (t.btnId === activeBtnId) {
+                btn.className = "px-3.5 py-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold transition flex items-center gap-2 whitespace-nowrap shadow-sm";
+                container.classList.remove('hidden');
+            } else {
+                btn.className = "px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent font-medium transition flex items-center gap-2 whitespace-nowrap";
+                container.classList.add('hidden');
+            }
+        });
+
+        if (activeBtnId === 'tab-btn-map' && leafletMap) {
+            setTimeout(() => {
+                leafletMap.invalidateSize();
+            }, 100);
+        }
+        if (activeBtnId === 'tab-btn-spectrum' && signalChart) {
+            setTimeout(() => {
+                signalChart.resize();
+            }, 100);
+        }
+    }
+
+    tabs.forEach(t => {
+        const btn = document.getElementById(t.btnId);
+        if (btn) {
+            btn.addEventListener('click', () => activateTab(t.btnId));
+        }
+    });
+
+    activateTab('tab-btn-map');
+}
+
 // Main initialization
 document.addEventListener('DOMContentLoaded', async () => {
+    setupWorkspaceTabs();
     initChart();
     initMap();
     await loadHistory();

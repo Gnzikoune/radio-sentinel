@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 
 <head>
     <meta charset="UTF-8">
@@ -24,558 +24,522 @@
         rel="stylesheet">
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen font-['Plus_Jakarta_Sans'] antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-['Plus_Jakarta_Sans'] antialiased flex flex-col">
 
-    <!-- Top Header -->
-    <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <!-- 1. FLIGHT HUD (Bandeau Supérieur Fixe Haute Densité) -->
+    <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-6 py-2.5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            
+            <!-- Logo & Titre Station -->
             <div class="flex items-center gap-3">
-                <div
-                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-                    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                    <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0">
                         </path>
                     </svg>
-                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span id="ping-indicator"
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span id="dot-indicator"
-                            class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                        <span id="ping-indicator" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span id="dot-indicator" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
-                        Radio Sentinel
-                        <span
-                            class="text-xs font-mono font-normal uppercase px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Station RF & GPS</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Observatoire et Cartographie de Couverture Cellulaire par
-                        Satellite</p>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base font-extrabold tracking-tight text-white">Radio Sentinel</h1>
+                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">v3 Cockpit</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 truncate max-w-[220px] sm:max-w-none">Observatoire & Cartographie RF</p>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
-                <!-- Port Modem -->
-                <div
-                    class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/80 flex items-center gap-1.5">
-                    <span class="text-slate-400">Modem :</span>
-                    <span id="badge-port" class="text-cyan-400 font-bold">Auto-détection...</span>
+            <!-- HUD Quick Metrics (Indicateurs compacts temps réel) -->
+            <div class="hidden sm:flex items-center gap-2 font-mono text-xs">
+                <!-- Port Modem Status -->
+                <div class="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 flex items-center gap-1.5" title="Port physique du modem USB">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span class="text-slate-400">Port :</span>
+                    <span id="badge-port" class="text-cyan-300 font-bold">Auto...</span>
                 </div>
 
-                <!-- GPS Status (Samsung A14) -->
-                <div id="badge-gps-container"
-                    class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/80 flex items-center gap-1.5">
+                <!-- Live GPS Status -->
+                <div id="badge-gps-container" class="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 flex items-center gap-1.5" title="État de la balise GNSS mobile">
                     <span class="text-slate-400">GPS :</span>
                     <span id="badge-gps" class="text-amber-400 font-semibold flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                        En attente du mobile
+                        En attente
                     </span>
                 </div>
+            </div>
 
-                <!-- Bouton activation directe du GPS sur cet appareil (Mobile ou PC) -->
+            <!-- Actions Rapides & Modal QR Code -->
+            <div class="flex items-center gap-2 font-mono text-xs">
                 <button id="btn-toggle-client-gps"
-                    class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 font-sans font-semibold transition flex items-center gap-1.5 active:scale-95 shadow-sm"
+                    class="px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-sans font-semibold transition flex items-center gap-1.5 active:scale-95 text-xs shadow-sm"
                     title="Activer le récepteur GPS de cet appareil directement sur ce tableau de bord">
-                    🛰️ Activer le GPS local
+                    🛰️ <span class="hidden md:inline">Activer </span>GPS
                 </button>
 
-                <!-- Bouton QR Code Appairage Mobile -->
                 <button id="btn-open-qr-modal"
-                    class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-sans font-semibold transition flex items-center gap-1.5 shadow-lg shadow-indigo-500/20 active:scale-95"
+                    class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-sans font-semibold transition flex items-center gap-1.5 shadow-lg shadow-indigo-500/20 active:scale-95 text-xs"
                     title="Scanner le QR Code pour ouvrir Radio Sentinel sur votre smartphone">
-                    📱 QR Code Mobile
+                    📱 QR Code
                 </button>
 
-                <!-- Export CSV -->
                 <a href="/api/export-csv"
-                    class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-sans font-semibold transition flex items-center gap-1.5 shadow-lg shadow-cyan-500/20">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
-                    Export CSV
+                    class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-sans font-medium transition hidden lg:flex items-center gap-1 text-xs">
+                    CSV
                 </a>
 
-                <!-- Export KML 3D (Google Earth) -->
                 <a href="/api/export-kml"
-                    class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-semibold transition flex items-center gap-1.5 shadow-lg shadow-emerald-500/20"
+                    class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-sans font-semibold transition flex items-center gap-1 text-xs shadow-sm"
                     title="Télécharger la cartographie 3D pour Google Earth Pro">
-                    🌍 Google Earth 3D (.KML)
+                    🌍 KML 3D
                 </a>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
-
-        <!-- Banner for Mobile GPS & Direct Activation -->
-        <div id="gps-helper-banner"
-            class="p-4 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900 border border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div
-                    class="flex-shrink-0 w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h4 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                        Position Satellite & Sonde 4G
-                    </h4>
-                    <p class="text-xs text-slate-400">
-                        Vous pouvez activer le GPS directement sur cet écran (smartphone/laptop) ou ouvrir <code class="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 font-mono text-xs">/gps</code> sur un second terminal.
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <button id="btn-banner-toggle-gps"
-                    class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-cyan-500/20 flex items-center gap-1.5">
-                    🛰️ Activer le GPS ici
-                </button>
-                <button id="btn-banner-qr"
-                    class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-sans font-bold transition shadow-lg shadow-indigo-500/20 flex items-center gap-1.5"
-                    title="Scanner pour ouvrir sur smartphone">
-                    📱 QR Code
-                </button>
-                <a href="/gps" target="_blank"
-                    class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition border border-slate-700">
-                    Page /gps ↗
-                </a>
-            </div>
+    <!-- 2. WORKSPACE TAB ROUTER (Barre d'onglets modulaire anti-saturation) -->
+    <nav class="bg-slate-900/60 border-b border-slate-800/80 px-4 lg:px-6 py-2 sticky top-[57px] z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-semibold">
+            <button id="tab-btn-map" class="px-3.5 py-2 rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold transition flex items-center gap-2 whitespace-nowrap shadow-sm">
+                <span>🗺️</span>
+                <span>Carte & Tracés SIG</span>
+            </button>
+            <button id="tab-btn-dual" class="px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent font-medium transition flex items-center gap-2 whitespace-nowrap">
+                <span>⚡</span>
+                <span>Audit Bi-Réseau & 4G</span>
+            </button>
+            <button id="tab-btn-spectrum" class="px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent font-medium transition flex items-center gap-2 whitespace-nowrap">
+                <span>📊</span>
+                <span>Spectre & Topologie</span>
+            </button>
+            <button id="tab-btn-security" class="px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent font-medium transition flex items-center gap-2 whitespace-nowrap">
+                <span>🛡️</span>
+                <span>Cyber-Sécurité & Logs</span>
+            </button>
+            <button id="tab-btn-hardware" class="px-3.5 py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent font-medium transition flex items-center gap-2 whitespace-nowrap">
+                <span>⚙️</span>
+                <span>Console AT & Matériel</span>
+            </button>
         </div>
+    </nav>
 
-        <!-- Cyber-Sécurité & Détection IMSI-Catcher Banner -->
-        <div id="security-monitor-banner"
-            class="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300">
-            <div class="flex items-center gap-3">
-                <div id="sec-icon-box"
-                    class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                        </path>
-                    </svg>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Surveillance Électromagnétique & Faux Relais</h4>
-                        <span id="sec-pill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                            🛡️ INTÉGRITÉ NOMINALE
-                        </span>
-                    </div>
-                    <p id="sec-details" class="text-xs text-slate-400 mt-0.5">
-                        Chiffrement 3GPP actif • Aucune rétrogradation 2G ni anomalie de signal détectée
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="btn-sec-simulate"
-                    class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-300 text-xs font-mono font-semibold transition border border-slate-700 flex items-center gap-1.5"
-                    title="Simuler une attaque de rétrogradation 2G pour démonstration devant témoins">
-                    🚨 Simuler Attaque 2G
-                </button>
-                <button id="btn-sec-reset" style="display: none;"
-                    class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono font-semibold transition border border-slate-700">
-                    ↺ Réinitialiser
-                </button>
-            </div>
-        </div>
+    <!-- 3. CONTENEURS D'ESPACES DE TRAVAIL (Workspaces) -->
+    <main class="max-w-7xl mx-auto px-4 lg:px-6 py-5 flex-1 w-full space-y-5">
 
-        <!-- Top Telemetry Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-            <!-- Card 1: Signal Strength -->
-            <div
-                class="p-5 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/80 border border-slate-800/80 relative overflow-hidden">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Puissance Radio
-                        Reçue</span>
-                    <span id="quality-pill"
-                        class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-slate-800 text-slate-400 border border-slate-700">
-                        Mesure en cours...
-                    </span>
-                </div>
-                <div class="mt-4 flex items-baseline gap-2">
-                    <span id="val-dbm" class="text-4xl font-extrabold font-mono text-cyan-400">--</span>
-                    <span class="text-sm font-mono text-slate-400">dBm</span>
-                    <span class="text-xs text-slate-500 ml-auto font-mono">CSQ: <strong id="val-csq"
-                            class="text-slate-300">--</strong>/31</span>
-                </div>
-                <!-- Progress bar -->
-                <div class="mt-4 w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div id="bar-signal" class="bg-cyan-500 h-full rounded-full transition-all duration-500"
-                        style="width: 0%;"></div>
-                </div>
-            </div>
-
-            <!-- Card 2: Connected Operator & Cell ID -->
-            <div class="p-5 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/80 border border-slate-800/80">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Opérateur & Pylône</span>
-                    <span id="val-country"
-                        class="text-xs px-2 py-0.5 rounded font-mono bg-slate-800 text-slate-400">--</span>
-                </div>
-                <div class="mt-4">
-                    <h3 id="val-operator" class="text-xl font-bold text-slate-100 truncate">Recherche d'antenne...</h3>
-                    <div class="flex items-center justify-between text-xs font-mono text-slate-400 mt-1">
-                        <span id="val-mcc-mnc">Code: --</span>
-                        <span id="val-cell-id" class="text-cyan-300 font-bold">Cell ID: --</span>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 font-mono">
-                    <span id="val-lac-channel">LAC: -- • UARFCN: --</span>
-                    <span id="val-neighbors-badge" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px]">0 voisine(s)</span>
-                </div>
-                <!-- Site OpenCellID identifié et note de plausibilité géographique -->
-                <div id="val-tower-box" class="mt-2 text-[10px] font-mono text-cyan-300 truncate hidden">
-                    <span id="val-tower-name">🏢 --</span>
-                </div>
-            </div>
-
-            <!-- Card 3: GPS Coordinates & Speed -->
-            <div class="p-5 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/80 border border-slate-800/80">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Position
-                        Satellite</span>
-                    <span id="gps-acc-pill"
-                        class="text-xs px-2 py-0.5 rounded font-mono bg-slate-800 text-slate-400 border border-slate-700">--</span>
-                </div>
-                <div class="mt-4">
-                    <h3 id="val-coordinates" class="text-base font-mono font-bold text-slate-100 truncate">En attente
-                        GPS...</h3>
-                    <p id="val-speed-text" class="text-xs font-mono text-cyan-400 mt-1">Vitesse : 0 km/h</p>
-                </div>
-                <div class="mt-3 text-xs text-slate-500 flex items-center justify-between">
-                    <span>Source</span>
-                    <span class="font-mono text-slate-400">Samsung Galaxy A14</span>
-                </div>
-            </div>
-
-            <!-- Card 4: Quality of Service (QoS) & Outages -->
-            <div class="p-5 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-900/80 border border-slate-800/80">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Stabilité &
-                        Pannes</span>
-                    <span class="text-xs px-2 py-0.5 rounded font-mono bg-slate-800 text-slate-300">Journal Local</span>
-                </div>
-                <div class="mt-4 flex items-baseline gap-3">
-                    <span id="stat-outages" class="text-3xl font-extrabold font-mono text-emerald-400">0</span>
-                    <span class="text-xs text-slate-400">coupure(s) détectée(s)</span>
-                </div>
-                <div
-                    class="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-2 font-mono">
-                    <span>Moyenne CSQ : <strong id="stat-avg" class="text-slate-200">--</strong></span>
-                    <span>Points GPS : <strong id="stat-geo" class="text-cyan-300">0</strong></span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Section: Audit Bi-Réseau & Performance 4G (Sonde Samsung A14 avec SIM) -->
-        <div id="dual-audit-card" class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-900 border border-slate-800 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold">
-                        ⚡
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-                            Audit Bi-Réseau & Performance 4G Mobile
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">SIM + Spectre</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-400">Corrélation temps réel entre l'écoute physique passive (Clé USB) et la performance data active (Samsung A14)</p>
-                    </div>
-                </div>
-                <div id="dual-diag-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                    <span class="w-2 h-2 rounded-full bg-slate-500"></span>
-                    <span>En attente de la sonde mobile...</span>
-                </div>
-            </div>
-
-            <!-- 3 Columns Comparator -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3">
-                <!-- Col 1: Sonde Spectrale (Clé USB) -->
-                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono mb-1">
-                        <span>📡 SONDE SPECTRE (CLÉ USB)</span>
-                        <span class="text-cyan-400 font-bold">Sans SIM</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-100" id="dual-modem-op">--</div>
-                    <div class="text-xs font-mono text-slate-400 mt-1 flex justify-between">
-                        <span id="dual-modem-tech">3G+ UTRAN</span>
-                        <span id="dual-modem-dbm" class="text-cyan-400 font-bold">-- dBm</span>
-                    </div>
-                    <div class="text-[10px] font-mono text-slate-500 mt-1 truncate" id="dual-modem-cell">
-                        Cell ID: -- • CH: --
-                    </div>
-                </div>
-
-                <!-- Col 2: Sonde Data 4G (Samsung A14) -->
-                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80">
-                    <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono mb-1">
-                        <span>📱 SONDE DATA (SAMSUNG A14)</span>
-                        <span id="dual-sim-badge" class="text-emerald-400 font-bold">SIM 4G</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-100" id="dual-sim-op">Airtel Gabon</div>
-                    <div class="text-xs font-mono text-slate-400 mt-1 flex justify-between">
-                        <span id="dual-sim-downlink" class="text-amber-300 font-bold">Débit: -- Mbps</span>
-                        <span id="dual-sim-ping" class="text-emerald-400 font-bold">Ping: -- ms</span>
-                    </div>
-                    <div class="text-[10px] font-mono text-slate-500 mt-1 truncate" id="dual-sim-rtt">
-                        Techno: 4G LTE • RTT: -- ms
-                    </div>
-                </div>
-
-                <!-- Col 3: Diagnostic de Corrélation -->
-                <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 flex flex-col justify-between">
-                    <div>
-                        <div class="text-[11px] text-slate-400 font-mono mb-1">
-                            🎯 VERDICT DE CORRÉLATION
+        <!-- ============================================================== -->
+        <!-- ESPACE 1 : CARTE & TRACÉS SIG (Grand Format + Drawer Latéral) -->
+        <!-- ============================================================== -->
+        <section id="workspace-map" class="space-y-4">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                
+                <!-- Zone Carte Principale (3 Colonnes) -->
+                <div class="lg:col-span-3 space-y-3">
+                    
+                    <!-- Barre d'outils et sélecteur de tuiles -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 p-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono">
+                        <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800/80">
+                            <button id="btn-view-satellite" class="px-2.5 py-1 rounded-md text-xs font-semibold transition bg-cyan-600 text-white shadow">
+                                🛰️ Hybride
+                            </button>
+                            <button id="btn-view-satellite_pure" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
+                                🌍 Sat Pur
+                            </button>
+                            <button id="btn-view-dark" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
+                                🌑 Sombre
+                            </button>
+                            <button id="btn-view-streets" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
+                                🗺️ Rues
+                            </button>
+                            <button id="btn-view-topo" class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
+                                ⛰️ Relief
+                            </button>
                         </div>
-                        <p id="dual-diag-text" class="text-xs text-slate-300 leading-relaxed">
-                            Ouvrez l'URL <code class="text-cyan-300 font-mono">/gps</code> sur votre Samsung pour démarrer la comparaison bi-réseau en direct.
+
+                        <div class="flex items-center gap-1.5">
+                            <button id="btn-toggle-heatmap"
+                                class="px-2.5 py-1.5 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition flex items-center gap-1 font-semibold"
+                                title="Activer/Désactiver la Carte Thermique continue">
+                                🔥 Heatmap (ON)
+                            </button>
+                            <button id="btn-center-tower"
+                                class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition flex items-center gap-1 font-semibold">
+                                📡 Pylône
+                            </button>
+                            <button id="btn-recenter"
+                                class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 transition flex items-center gap-1 font-semibold">
+                                📍 Mobile
+                            </button>
+                            <button id="btn-toggle-fullscreen"
+                                class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+                                title="Plein Écran">
+                                ⛶
+                            </button>
+                            <button id="btn-clear-trail"
+                                class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-slate-700 transition"
+                                title="Effacer le tracé de test">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Conteneur Carte Leaflet -->
+                    <div id="map" class="h-[520px] w-full rounded-2xl overflow-hidden border border-slate-800 relative z-10 transition-all duration-300 shadow-xl">
+                    </div>
+
+                    <!-- Légende continue -->
+                    <div class="flex flex-wrap items-center gap-3 text-xs font-mono bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                        <span class="text-slate-400 font-bold uppercase text-[10px]">Légende :</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> ≥ -75 dBm (Fort)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-500"></span> -76 à -90 dBm (Moyen)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-rose-500"></span> &lt; -90 dBm (Faible)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-cyan-400 border border-white"></span> Mobile (GPS)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-400 border border-white animate-pulse"></span> Triangulation</span>
+                        <span id="tower-triangulation-status" class="ml-auto text-slate-400 text-[11px]">⏳ Déplacez-vous pour trianguler</span>
+                    </div>
+
+                </div>
+
+                <!-- Drawer Latéral d'Ingénierie SIG (1 Colonne) -->
+                <div class="space-y-4">
+                    
+                    <!-- Signal Instantané -->
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-semibold uppercase text-[11px]">Signal Reçu</span>
+                            <span id="quality-pill" class="text-xs px-2 py-0.5 rounded-full font-semibold bg-slate-800 text-slate-400 border border-slate-700">En cours...</span>
+                        </div>
+                        <div class="flex items-baseline gap-2">
+                            <span id="val-dbm" class="text-3xl font-extrabold font-mono text-cyan-400">--</span>
+                            <span class="text-sm font-mono text-slate-400">dBm</span>
+                            <span class="text-xs text-slate-500 ml-auto font-mono">CSQ: <strong id="val-csq" class="text-slate-300">--</strong>/31</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div id="bar-signal" class="bg-cyan-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Fiche Pylône & Cellule Active -->
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-semibold uppercase text-[11px]">Pylône & Cellule</span>
+                            <span id="val-country" class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-800 text-slate-400">--</span>
+                        </div>
+                        <h4 id="val-operator" class="text-sm font-bold text-slate-100 truncate">Recherche d'antenne...</h4>
+                        <div class="text-xs font-mono text-slate-400 space-y-1 pt-1 border-t border-slate-800/80">
+                            <div class="flex justify-between">
+                                <span>Code : <strong id="val-mcc-mnc" class="text-slate-300">--</strong></span>
+                                <span id="val-cell-id" class="text-cyan-300 font-bold">Cell ID: --</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span id="val-lac-channel">LAC: --</span>
+                                <span id="val-neighbors-badge" class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[10px]">0 voisine(s)</span>
+                            </div>
+                            <div id="val-tower-box" class="pt-1 text-[11px] text-cyan-300 font-semibold truncate hidden">
+                                <span id="val-tower-name">🏢 --</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Position Satellite Smartphone -->
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400 font-semibold uppercase text-[11px]">Position GNSS</span>
+                            <span id="gps-acc-pill" class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-slate-800 text-slate-400 border border-slate-700">--</span>
+                        </div>
+                        <h4 id="val-coordinates" class="text-xs font-mono font-bold text-slate-200 truncate">En attente GPS...</h4>
+                        <p id="val-speed-text" class="text-xs font-mono text-cyan-400">Vitesse : 0 km/h</p>
+                    </div>
+
+                    <!-- Métriques Globales -->
+                    <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 text-xs font-mono">
+                        <div class="flex justify-between text-slate-400">
+                            <span>Points GPS captés :</span>
+                            <strong id="stat-geo" class="text-cyan-300">0</strong>
+                        </div>
+                        <div class="flex justify-between text-slate-400">
+                            <span>Moyenne signal :</span>
+                            <strong id="stat-avg" class="text-slate-200">-- CSQ</strong>
+                        </div>
+                        <div class="flex justify-between text-slate-400">
+                            <span>Coupures (Outages) :</span>
+                            <strong id="stat-outages" class="text-emerald-400">0</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- ESPACE 2 : AUDIT BI-RÉSEAU & PERFORMANCE 4G (SIM + SPECTRE)   -->
+        <!-- ============================================================== -->
+        <section id="workspace-dual" class="space-y-4 hidden">
+            
+            <div id="dual-audit-card" class="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-5">
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-bold text-lg">
+                            ⚡
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                                Audit Bi-Réseau & Performance 4G Active
+                                <span class="text-[10px] px-2 py-0.5 rounded-full font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">SIM + Clé USB</span>
+                            </h3>
+                            <p class="text-xs text-slate-400">Corrélation temps réel entre l'écoute physique passive (Clé USB) et la performance data active (Samsung Galaxy A14)</p>
+                        </div>
+                    </div>
+                    <div id="dual-diag-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                        <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                        <span>En attente de la sonde mobile...</span>
+                    </div>
+                </div>
+
+                <!-- 3 Colonnes de Diagnostic -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+                    <!-- Col 1 : Clé USB -->
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 space-y-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span>📡 SONDE SPECTRE (CLÉ USB)</span>
+                            <span class="text-cyan-400 font-bold">Sans SIM</span>
+                        </div>
+                        <div class="text-base font-bold text-slate-100" id="dual-modem-op">--</div>
+                        <div class="text-xs font-mono text-slate-400 flex justify-between pt-1 border-t border-slate-900">
+                            <span id="dual-modem-tech">3G+ UTRAN</span>
+                            <span id="dual-modem-dbm" class="text-cyan-400 font-bold">-- dBm</span>
+                        </div>
+                        <div class="text-[11px] font-mono text-slate-500 truncate" id="dual-modem-cell">
+                            Cell ID: -- • CH: --
+                        </div>
+                    </div>
+
+                    <!-- Col 2 : Samsung A14 SIM -->
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 space-y-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span>📱 SONDE DATA (SAMSUNG A14)</span>
+                            <span id="dual-sim-badge" class="text-emerald-400 font-bold">SIM 4G</span>
+                        </div>
+                        <div class="text-base font-bold text-slate-100" id="dual-sim-op">Airtel Gabon</div>
+                        <div class="text-xs font-mono text-slate-400 flex justify-between pt-1 border-t border-slate-900">
+                            <span id="dual-sim-downlink" class="text-amber-300 font-bold">Débit: -- Mbps</span>
+                            <span id="dual-sim-ping" class="text-emerald-400 font-bold">Ping: -- ms</span>
+                        </div>
+                        <div class="text-[11px] font-mono text-slate-500 truncate" id="dual-sim-rtt">
+                            Techno: 4G LTE • RTT: -- ms
+                        </div>
+                    </div>
+
+                    <!-- Col 3 : Verdict de Corrélation -->
+                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs text-slate-400 font-mono mb-1">
+                                🎯 VERDICT DE CORRÉLATION
+                            </div>
+                            <p id="dual-diag-text" class="text-xs text-slate-300 leading-relaxed">
+                                Ouvrez l'URL <code class="text-cyan-300 font-mono">/gps</code> sur votre Samsung pour démarrer la comparaison bi-réseau en direct.
+                            </p>
+                        </div>
+                        <div class="mt-3 text-[10px] text-slate-500 font-mono border-t border-slate-900 pt-1.5 flex justify-between">
+                            <span>Couche Physique vs Données</span>
+                            <span class="text-slate-400">Radio Sentinel v3</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Bannière d'aide mobile GPS -->
+            <div id="gps-helper-banner" class="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🛰️</span>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-100">Liaison Satellite & Sonde 4G Smartphone</h4>
+                        <p class="text-xs text-slate-400">Scannez le QR Code pour ouvrir la sonde sur votre Samsung Galaxy A14.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-banner-toggle-gps" class="px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition">
+                        🛰️ Activer ici
+                    </button>
+                    <button id="btn-banner-qr" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition">
+                        📱 QR Code
+                    </button>
+                    <a href="/gps" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition border border-slate-700">
+                        Page /gps ↗
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- ESPACE 3 : SPECTRE & HISTORIQUE TEMPOREL                        -->
+        <!-- ============================================================== -->
+        <section id="workspace-spectrum" class="space-y-4 hidden">
+            
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                            Télémétrie Temporelle de l'Onde (dBm)
+                        </h2>
+                        <p class="text-xs text-slate-400">Évolution de la puissance physique brute en continu rafraîchie toutes les 1,5 secondes</p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-mono">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-400"></span> Puissance (dBm)</span>
+                        <span class="text-slate-500">Horodatage réel</span>
+                    </div>
+                </div>
+
+                <div class="h-80 w-full">
+                    <canvas id="signalChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- ESPACE 4 : CYBER-SÉCURITÉ & JOURNAL D'ÉVÉNEMENTS               -->
+        <!-- ============================================================== -->
+        <section id="workspace-security" class="space-y-4 hidden">
+            
+            <!-- Moniteur Cyber-Sécurité Anti-IMSI Catcher -->
+            <div id="security-monitor-banner" class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 shadow-xl">
+                <div class="flex items-center gap-3">
+                    <div id="sec-icon-box" class="flex-shrink-0 w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl">
+                        🛡️
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-slate-200">Surveillance Électromagnétique & Faux Relais</h4>
+                            <span id="sec-pill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                🛡️ INTÉGRITÉ NOMINALE
+                            </span>
+                        </div>
+                        <p id="sec-details" class="text-xs text-slate-400 mt-1">
+                            Chiffrement 3GPP actif • Aucune rétrogradation 2G ni anomalie de signal détectée
                         </p>
                     </div>
-                    <div class="mt-2 text-[10px] text-slate-500 font-mono border-t border-slate-900 pt-1 flex justify-between">
-                        <span>Couche Physique vs Données</span>
-                        <span class="text-slate-400">Radio Sentinel v2.5</span>
-                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Interactive Map Section with Full Layer Switcher & GIS Controls -->
-        <div id="map-section-card" class="p-6 rounded-2xl bg-slate-900 border border-slate-800/80 space-y-4">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
-                            </path>
-                        </svg>
-                        Cartographie Spatiale & Couverture Cellulaire (SIG)
-                    </h2>
-                    <p class="text-xs text-slate-400">Tracé géographique satellite des ondes, triangulation de l'antenne
-                        et analyse spatiale</p>
-                </div>
-
-                <!-- Quick Layer Switcher & View Buttons -->
-                <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-                    <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800">
-                        <button id="btn-view-satellite"
-                            class="px-2.5 py-1 rounded-md text-xs font-semibold transition bg-cyan-600 text-white shadow">
-                            🛰️ Hybride
-                        </button>
-                        <button id="btn-view-satellite_pure"
-                            class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
-                            🌍 Sat Pur
-                        </button>
-                        <button id="btn-view-dark"
-                            class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
-                            🌑 Sombre
-                        </button>
-                        <button id="btn-view-streets"
-                            class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
-                            🗺️ Rues
-                        </button>
-                        <button id="btn-view-topo"
-                            class="px-2.5 py-1 rounded-md text-xs font-semibold transition text-slate-400 hover:text-white">
-                            ⛰️ Relief
-                        </button>
-                    </div>
-
-                    <!-- Bouton Toggle Heatmap Continue -->
-                    <button id="btn-toggle-heatmap"
-                        class="px-2.5 py-1.5 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition flex items-center gap-1 font-semibold"
-                        title="Activer/Désactiver la Carte Thermique continue">
-                        🔥 Carte Thermique (ON)
+                <div class="flex items-center gap-2">
+                    <button id="btn-sec-simulate"
+                        class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-rose-950 text-slate-300 hover:text-rose-300 text-xs font-mono font-semibold transition border border-slate-700 flex items-center gap-1.5"
+                        title="Simuler une attaque de rétrogradation 2G pour démonstration devant témoins">
+                        🚨 Simuler Attaque 2G
                     </button>
-
-                    <button id="btn-center-tower"
-                        class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition flex items-center gap-1 font-semibold">
-                        📡 Antenne
-                    </button>
-                    <button id="btn-recenter"
-                        class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 transition flex items-center gap-1 font-semibold">
-                        📍 Mon Mobile
-                    </button>
-                    <button id="btn-toggle-fullscreen"
-                        class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
-                        title="Plein Écran">
-                        ⛶
-                    </button>
-                    <button id="btn-clear-trail"
-                        class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-slate-700 transition"
-                        title="Effacer le tracé de test">
-                        🗑️
+                    <button id="btn-sec-reset" style="display: none;"
+                        class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono font-semibold transition border border-slate-700">
+                        ↺ Réinitialiser
                     </button>
                 </div>
             </div>
 
-            <!-- Legend Row -->
-            <div
-                class="flex flex-wrap items-center gap-4 text-xs font-mono bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80">
-                <span class="text-slate-400 font-bold uppercase text-[10px]">Légende :</span>
-                <span class="flex items-center gap-1.5"><span
-                        class="w-3.5 h-3.5 rounded-full bg-gradient-to-r from-rose-500 via-amber-400 to-cyan-400"></span>
-                    <strong class="text-orange-300">Aura Thermique = Dégradé Krigeage RF continu</strong>
-                </span>
-                <span class="flex items-center gap-1.5"><span
-                        class="w-3.5 h-3.5 rounded-full bg-cyan-500 border border-white"></span>
-                    <strong class="text-cyan-300">Point Cyan = Pylône Référencé (OpenCellID Gabon)</strong>
-                </span>
-                <span class="flex items-center gap-1.5"><span
-                        class="w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-amber-200 animate-pulse"></span>
-                    <strong class="text-amber-300">Point Jaune = Antenne-Relais estimée (triangulation)</strong>
-                </span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> ≥ -75
-                    dBm (Excellent)</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500"></span> -76 à
-                    -90 dBm (Moyen)</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500"></span> &lt; -90
-                    dBm (Faible)</span>
-                <span class="flex items-center gap-1.5"><span
-                        class="w-3 h-3 rounded-full bg-cyan-400 border border-white"></span> Mobile A14 (Temps
-                    Réel)</span>
-                <!-- Statut triangulation antenne : mis à jour dynamiquement par app.js -->
-                <span id="tower-triangulation-status" class="text-xs text-slate-400 font-mono">⏳ Déplacez-vous pour
-                    trianguler l'antenne (≥ 50 m)</span>
-            </div>
-
-            <!-- Leaflet Map Container -->
-            <div class="h-[480px] w-full rounded-xl overflow-hidden border border-slate-800 relative z-10 transition-all duration-300"
-                id="map">
-                <!-- Map rendered here by Leaflet -->
-            </div>
-        </div>
-
-        <!-- Real-time Chart Section -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800/80 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-                        Télémétrie Réelle de l'Onde (dBm)
-                    </h2>
-                    <p class="text-xs text-slate-400">Mesure physique brute de l'antenne-relais rafraîchie toutes les 2
-                        secondes</p>
-                </div>
-                <div class="flex items-center gap-4 text-xs font-mono">
-                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-400"></span>
-                        Puissance (dBm)</span>
-                    <span class="text-slate-500">Horodatage réel</span>
-                </div>
-            </div>
-
-            <div class="h-64 w-full">
-                <canvas id="signalChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Bottom Grid: Hardware Info + Interactive AT Console + Event Log -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Hardware Specs Box -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800/80 space-y-4">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
-                        </path>
-                    </svg>
-                    Périphérique Radio Branché
-                </h3>
-                <div class="space-y-3 text-xs">
-                    <div class="flex justify-between py-1.5 border-b border-slate-800/80">
-                        <span class="text-slate-400">Modèle Matériel :</span>
-                        <span id="hw-model" class="font-mono font-semibold text-slate-200">--</span>
-                    </div>
-                    <div class="flex justify-between py-1.5 border-b border-slate-800/80">
-                        <span class="text-slate-400">Fabricant :</span>
-                        <span id="hw-mfg" class="font-mono text-slate-200">--</span>
-                    </div>
-                    <div class="flex justify-between py-1.5 border-b border-slate-800/80">
-                        <span class="text-slate-400">Numéro IMEI Réel :</span>
-                        <span id="hw-imei" class="font-mono text-cyan-400 font-bold">--</span>
-                    </div>
-                    <div class="flex justify-between py-1.5 border-b border-slate-800/80">
-                        <span class="text-slate-400">Firmware Baseband :</span>
-                        <span id="hw-fw" class="font-mono text-slate-300 truncate max-w-[180px]">--</span>
-                    </div>
-                    <div class="flex justify-between py-1.5 border-b border-slate-800/80">
-                        <span class="text-slate-400">Cellule 3GPP (Cell ID) :</span>
-                        <span id="hw-cell-id" class="font-mono text-cyan-300 font-bold">--</span>
-                    </div>
-                    <div class="flex justify-between py-1.5 border-b border-slate-800/80">
-                        <span class="text-slate-400">Canal Radio (UARFCN) :</span>
-                        <span id="hw-freq" class="font-mono text-emerald-400 font-semibold">--</span>
-                    </div>
-                    <div class="flex justify-between py-1.5">
-                        <span class="text-slate-400">Architecture Puce :</span>
-                        <span class="font-mono text-purple-400">Spreadtrum SC7702</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive AT Console -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800/80 space-y-4">
+            <!-- Journal des Événements Réels -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                            </path>
-                        </svg>
-                        Terminal Commandes AT
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <span class="text-emerald-400">📋</span>
+                        Journal des Événements & Coupures (Outages)
                     </h3>
-                    <span class="text-[10px] text-slate-500 font-mono">Port Série Direct</span>
+                    <span class="text-xs text-slate-500 font-mono">Horodatage Local</span>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex gap-2">
-                        <input id="at-input" type="text" placeholder="Ex: AT+CSQ ou ATI" value="AT+CSQ"
-                            class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500">
-                        <button id="at-send-btn"
-                            class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-lg text-xs font-mono font-bold transition">
-                            Envoyer
-                        </button>
-                    </div>
-                    <div id="at-output"
-                        class="bg-slate-950 border border-slate-800/80 rounded-lg p-3 font-mono text-xs text-slate-300 h-28 overflow-y-auto whitespace-pre-wrap">
-                        Prêt. Tapez une commande AT pour interroger directement le processeur du modem.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Live Event & Outage Log -->
-            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800/80 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Journal des Événements Réels
-                    </h3>
-                    <span class="text-[10px] text-slate-500 font-mono">Horodatage Local</span>
-                </div>
-
-                <div id="events-list" class="space-y-2 h-44 overflow-y-auto pr-1 text-xs">
-                    <div class="p-2 rounded bg-slate-950/60 border border-slate-800/80 text-slate-400">
+                <div id="events-list" class="space-y-2 h-72 overflow-y-auto pr-1 text-xs font-mono">
+                    <div class="p-2.5 rounded bg-slate-950/60 border border-slate-800/80 text-slate-400">
                         Initialisation du journal de surveillance...
                     </div>
                 </div>
             </div>
 
-        </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- ESPACE 5 : CONSOLE AT & MATÉRIEL MODEM                         -->
+        <!-- ============================================================== -->
+        <section id="workspace-hardware" class="space-y-4 hidden">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                
+                <!-- Spécifications Matériel -->
+                <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <span class="text-cyan-400">🔌</span>
+                        Périphérique Radio USB Détecté
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">Modèle Matériel :</span>
+                            <span id="hw-model" class="font-mono font-semibold text-slate-200">--</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">Fabricant :</span>
+                            <span id="hw-mfg" class="font-mono text-slate-200">--</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">Numéro IMEI Réel :</span>
+                            <span id="hw-imei" class="font-mono text-cyan-400 font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">Firmware Baseband :</span>
+                            <span id="hw-fw" class="font-mono text-slate-300 truncate max-w-[200px]">--</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">Cellule 3GPP (Cell ID) :</span>
+                            <span id="hw-cell-id" class="font-mono text-cyan-300 font-bold">--</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">Canal Radio (UARFCN) :</span>
+                            <span id="hw-freq" class="font-mono text-emerald-400 font-semibold">--</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-slate-400">Architecture Chipset :</span>
+                            <span class="font-mono text-purple-400 font-bold">Spreadtrum SC7702 (Alcatel X602D)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal Commandes AT -->
+                <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                            <span class="text-cyan-400">💻</span>
+                            Terminal Commandes Hayes (AT)
+                        </h3>
+                        <span class="text-[10px] text-slate-500 font-mono">Port Série Direct</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex gap-2">
+                            <input id="at-input" type="text" placeholder="Ex: AT+CSQ ou ATI" value="AT+CSQ"
+                                class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-500">
+                            <button id="at-send-btn"
+                                class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded-xl text-xs font-mono font-bold transition">
+                                Envoyer
+                            </button>
+                        </div>
+                        <div id="at-output"
+                            class="bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-300 h-44 overflow-y-auto whitespace-pre-wrap">
+                            Prêt. Tapez une commande AT pour interroger directement le microcontrôleur du modem.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
 
     </main>
 
-    <!-- Modal QR Code Intelligent (Nomade 4G vs Wi-Fi Local) -->
+    <!-- 4. MODAL QR CODE INTELLIGENT (Nomade 4G vs Wi-Fi Local) -->
     <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
             <!-- Bouton Fermer -->
@@ -596,7 +560,7 @@
 
             <!-- Selecteur d'Environnement Reseau (Nomade 4G vs Wi-Fi Local) -->
             <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-semibold">
-                <button id="btn-qr-env-nomad" class="py-2.5 px-2 rounded-lg bg-indigo-600 text-white transition shadow flex items-center justify-center gap-1.5">
+                <button id="btn-qr-env-nomad" class="py-2.5 px-2 rounded-lg bg-indigo-600 text-white transition shadow flex items-center justify-center gap-1.5 font-bold">
                     <span>🌍</span>
                     <span>Sortie Nomade 4G</span>
                 </button>
@@ -612,10 +576,10 @@
                 <div class="flex-1">
                     <div id="qr-tunnel-title" class="font-bold">Tunnel Nomade Internet Actif</div>
                     <div id="qr-tunnel-desc" class="text-[11px] text-emerald-200/80 mt-0.5 leading-relaxed">
-                        Scannez ce QR Code chez vous avant de partir : le Samsung restera connecté au PC meme en basculant en 4G dans la rue !
+                        Scannez ce QR Code chez vous avant de partir : le Samsung restera connecté au PC même en basculant en 4G dans la rue !
                     </div>
                 </div>
-                <button id="btn-refresh-tunnel-status" title="Verifier le statut" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-200 rounded font-mono border border-slate-700">
+                <button id="btn-refresh-tunnel-status" title="Vérifier le statut" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-200 rounded font-mono border border-slate-700">
                     🔄 Actualiser
                 </button>
             </div>
@@ -656,13 +620,14 @@
 
             <!-- Conseil utilisateur averti -->
             <div id="qr-mode-advice" class="text-[11px] text-slate-400 text-center leading-relaxed">
-                👉 Ouvrez l'appareil photo du Samsung A14 et visez l'ecran pour ouvrir la session sans saisie.
+                👉 Ouvrez l'appareil photo du Samsung A14 et visez l'écran pour ouvrir la session sans saisie.
             </div>
         </div>
     </div>
 
-    <footer class="border-t border-slate-800/80 mt-12 py-6 text-center text-xs text-slate-500 font-mono">
-        Radio Sentinel • Observatoire Cellulaire & Cartographie RF Mobile • Conçu avec le Samsung Galaxy A14
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 mt-auto py-5 text-center text-xs text-slate-500 font-mono">
+        Radio Sentinel v3 Cockpit Modulaire • Observatoire Cellulaire & Cartographie RF Mobile • Conçu avec le Samsung Galaxy A14
     </footer>
 
     <script src="/static/app.js"></script>
