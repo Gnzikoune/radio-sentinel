@@ -31,6 +31,8 @@
    One-click export of war-driving survey traces into Google Earth Pro. Each GPS coordinate is extruded vertically proportionally to measured signal power in dBm.
 7. **SIM-less Passive Listening (3GPP Emergency Mode):**  
    Taps into open Broadcast Control Channels (BCCH) mandated by emergency regulations (112/911), enabling radio surveys even with no SIM card inserted.
+8. **Executive Audit Report Generator (PDF / Print):**  
+   One-click generation of a formal telecom coverage & QoS audit report at `/audit-report`. Includes SLA coverage percentage, signal distribution charts (Excellent/Good/Fair/Poor per ARCEP/UIT thresholds), multi-operator comparison, cell tower inventory, and a security incident log. Fully printable as a clean PDF via native browser print dialog — suitable for regulatory submissions (ARCEP-GA), enterprise DSI reviews, or investor briefings.
 
 ---
 
@@ -98,6 +100,8 @@ Eliminates vertical visual clutter and cognitive fatigue through NOC-inspired er
 | `GET` | `/api/status` | System health, dynamic local IP detection, and active tunnel state. |
 | `POST` | `/api/tunnel` | Registers / updates public nomad tunnel URL (Cloudflare / Ngrok). |
 | `DELETE` | `/api/tunnel` | Revokes and resets nomad tunnel status. |
+| `GET` | `/audit-report` | Official interactive telecom audit report, printable as PDF. |
+| `GET` | `/api/audit-report` | Compiled statistical data: SLA coverage, operators, tower inventory, security events. |
 | `GET` | `/api/telemetry/live` | Live telemetry payload (RF signal, hardware, GPS, dual-audit, tower match). |
 | `GET` | `/api/telemetry/history` | Rolling historical window for Chart.js. |
 | `GET` | `/api/map-points` | Geospatial points with dBm for continuous heatmap rendering. |

@@ -80,6 +80,16 @@ def read_gps():
     """Page web mobile ouverte sur le Samsung Galaxy A14 pour relayer le GPS."""
     return FileResponse(os.path.join(BASE_DIR, "templates", "gps.html"))
 
+@app.get("/audit-report")
+def read_audit_report():
+    """Page du rapport d'audit executif telechargeable / imprimable en PDF."""
+    return FileResponse(os.path.join(BASE_DIR, "templates", "audit_report.html"))
+
+@app.get("/api/audit-report")
+def get_audit_report():
+    """Retourne les donnees statistiques et d'analyse d'ondes pour le rapport d'audit."""
+    return database.get_audit_report_data()
+
 @app.post("/api/gps")
 def post_gps(payload: GPSPayload):
     """Reçoit en direct les coordonnées satellites et les métriques 4G du smartphone."""

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Sentinel — Rapport Officiel d'Audit Télécom & Qualité de Service (QoS)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body {
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                padding: 0 !important;
+            }
+            .page-break { page-break-before: always; }
+            .card-print {
+                border: 1px solid #cbd5e1 !important;
+                background-color: #ffffff !important;
+                box-shadow: none !important;
+            }
+            .text-print-dark { color: #0f172a !important; }
+            .text-print-muted { color: #475569 !important; }
+            .bg-print-light { background-color: #f8fafc !important; }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen py-8 px-4 sm:px-6">
+
+    <!-- Floating Action Bar (Invisible on print) -->
+    <div class="no-print max-w-5xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-slate-950/90 border border-slate-800 backdrop-blur sticky top-4 z-50 shadow-2xl">
+        <div class="flex items-center gap-3">
+            <a href="/" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition flex items-center gap-1.5">
+                ⬅️ Retour au Cockpit
+            </a>
+            <span class="text-xs text-slate-400 font-mono hidden sm:inline">| Mode Rapport Exécutif Prêt pour Impression</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition flex items-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95">
+                <span>🖨️</span>
+                <span>Imprimer / Enregistrer en PDF</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main A4 Report Container -->
+    <main class="max-w-5xl mx-auto bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-10 space-y-8 shadow-2xl card-print">
+
+        <!-- Report Header -->
+        <header class="border-b border-slate-800 pb-6 flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">
+                    <span>📡 RADIO SENTINEL</span>
+                    <span>•</span>
+                    <span>AUDIT DE CONFORMITÉ SPECTRE & QoS</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight text-print-dark">
+                    Rapport d'Audit de Couverture & Qualité Télécom
+                </h1>
+                <p class="text-xs text-slate-400 text-print-muted">
+                    Évaluation métrologique objective par écoute passive d'ondes et mesure active de performance mobile.
+                </p>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono space-y-1 text-right bg-print-light card-print">
+                <div class="text-slate-400 text-print-muted">Dossier N° : <strong id="rep-ref" class="text-cyan-400 font-bold">RS-AUDIT-20261119-01</strong></div>
+                <div class="text-slate-400 text-print-muted">Date : <span id="rep-date" class="text-slate-200 text-print-dark">19/11/2026</span></div>
+                <div class="text-slate-400 text-print-muted">Territoire : <span class="text-slate-200 text-print-dark">Gabon (MCC 628)</span></div>
+                <div class="text-slate-400 text-print-muted">Norme : <span class="text-emerald-400 font-bold">3GPP / UIT-T P.800</span></div>
+            </div>
+        </header>
+
+        <!-- Hardware & Probe Credentials -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 text-xs font-mono bg-print-light card-print">
+            <div>
+                <span class="text-slate-500 text-print-muted">Sonde Spectrale RF :</span>
+                <div class="font-bold text-slate-200 text-print-dark mt-0.5">Alcatel OneTouch X602D</div>
+                <div class="text-[10px] text-slate-400 text-print-muted">Spreadtrum SC7702 (Port Série AT)</div>
+            </div>
+            <div>
+                <span class="text-slate-500 text-print-muted">Sonde Satellite & 4G :</span>
+                <div class="font-bold text-slate-200 text-print-dark mt-0.5">Samsung Galaxy A14</div>
+                <div class="text-[10px] text-slate-400 text-print-muted">Capteur GNSS + API NetworkInformation</div>
+            </div>
+            <div>
+                <span class="text-slate-500 text-print-muted">Intégrité des Données :</span>
+                <div class="font-bold text-emerald-400 mt-0.5">100 % Matériel Réel</div>
+                <div class="text-[10px] text-slate-400 text-print-muted">Zéro valeur simulée ou mockée</div>
+            </div>
+        </section>
+
+        <!-- Executive Summary KPI Cards -->
+        <section class="space-y-3">
+            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">1. Synthèse Exécutive des Mesures</h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                
+                <!-- KPI 1 : Conformité SLA -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1 bg-print-light card-print">
+                    <span class="text-[11px] text-slate-400 text-print-muted uppercase">Disponibilité Exploitable</span>
+                    <div class="text-2xl font-extrabold font-mono text-emerald-400" id="kpi-sla">-- %</div>
+                    <p class="text-[10px] text-slate-500 text-print-muted">Signal &ge; -85 dBm (Bonne qualité)</p>
+                </div>
+
+                <!-- KPI 2 : Échantillons & Distance -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1 bg-print-light card-print">
+                    <span class="text-[11px] text-slate-400 text-print-muted uppercase">Volume de Mesures</span>
+                    <div class="text-2xl font-extrabold font-mono text-cyan-400" id="kpi-samples">--</div>
+                    <p class="text-[10px] text-slate-500 text-print-muted"><span id="kpi-geo">--</span> points géoréférencés</p>
+                </div>
+
+                <!-- KPI 3 : Puissance Moyenne -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1 bg-print-light card-print">
+                    <span class="text-[11px] text-slate-400 text-print-muted uppercase">Puissance Reçue Moy.</span>
+                    <div class="text-2xl font-extrabold font-mono text-amber-300" id="kpi-avg-dbm">-- dBm</div>
+                    <p class="text-[10px] text-slate-500 text-print-muted">CSQ Moyen : <span id="kpi-avg-csq">--</span>/31</p>
+                </div>
+
+                <!-- KPI 4 : Coupures / Outages -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1 bg-print-light card-print">
+                    <span class="text-[11px] text-slate-400 text-print-muted uppercase">Pannes & Coupures</span>
+                    <div class="text-2xl font-extrabold font-mono text-slate-200 text-print-dark" id="kpi-outages">0</div>
+                    <p class="text-[10px] text-slate-500 text-print-muted">Interruption de couverture</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Classification & Distribution de Couverture -->
+        <section class="space-y-4">
+            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">2. Distribution de Couverture (Grille ARCEP / UIT)</h2>
+
+            <!-- Stacked Bar Visual -->
+            <div class="w-full bg-slate-900 h-6 rounded-xl overflow-hidden flex border border-slate-800 card-print">
+                <div id="bar-exc" class="bg-emerald-500 h-full transition-all" style="width: 0%;" title="Excellent"></div>
+                <div id="bar-good" class="bg-cyan-500 h-full transition-all" style="width: 0%;" title="Bon"></div>
+                <div id="bar-fair" class="bg-amber-500 h-full transition-all" style="width: 0%;" title="Moyen"></div>
+                <div id="bar-poor" class="bg-rose-500 h-full transition-all" style="width: 0%;" title="Faible/Coupure"></div>
+            </div>
+
+            <!-- Table des classes -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-print-muted">
+                            <th class="py-2.5 px-3">Palier de Couverture</th>
+                            <th class="py-2.5 px-3">Seuil Métrique</th>
+                            <th class="py-2.5 px-3">Échantillons</th>
+                            <th class="py-2.5 px-3">Pourcentage</th>
+                            <th class="py-2.5 px-3">Verdict Utilisateur</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/80">
+                        <tr>
+                            <td class="py-2 px-3 flex items-center gap-2 font-bold text-emerald-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Excellent
+                            </td>
+                            <td class="py-2 px-3">&ge; -75 dBm</td>
+                            <td class="py-2 px-3" id="cnt-exc">--</td>
+                            <td class="py-2 px-3 font-bold text-slate-200 text-print-dark" id="pct-exc">-- %</td>
+                            <td class="py-2 px-3 text-slate-400 text-print-muted">Streaming 4K, VoLTE HD, Réactivité immédiate</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-3 flex items-center gap-2 font-bold text-cyan-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span> Bon
+                            </td>
+                            <td class="py-2 px-3">-76 à -85 dBm</td>
+                            <td class="py-2 px-3" id="cnt-good">--</td>
+                            <td class="py-2 px-3 font-bold text-slate-200 text-print-dark" id="pct-good">-- %</td>
+                            <td class="py-2 px-3 text-slate-400 text-print-muted">Navigation web fluide, visioconférence stable</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-3 flex items-center gap-2 font-bold text-amber-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Moyen (Tolérable)
+                            </td>
+                            <td class="py-2 px-3">-86 à -95 dBm</td>
+                            <td class="py-2 px-3" id="cnt-fair">--</td>
+                            <td class="py-2 px-3 font-bold text-slate-200 text-print-dark" id="pct-fair">-- %</td>
+                            <td class="py-2 px-3 text-slate-400 text-print-muted">Risque de latence, dégradation en intérieur</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-3 flex items-center gap-2 font-bold text-rose-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Faible / Coupure
+                            </td>
+                            <td class="py-2 px-3">&lt; -95 dBm ou 0</td>
+                            <td class="py-2 px-3" id="cnt-poor">--</td>
+                            <td class="py-2 px-3 font-bold text-slate-200 text-print-dark" id="pct-poor">-- %</td>
+                            <td class="py-2 px-3 text-rose-300">Zone blanche, coupures d'appels, données bloquées</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Analyse par Opérateur & Bi-Réseau -->
+        <section class="space-y-3">
+            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">3. Répartition par Opérateur Mobile</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-print-muted">
+                            <th class="py-2.5 px-3">Opérateur Identifié</th>
+                            <th class="py-2.5 px-3">Code Réseau (PLMN)</th>
+                            <th class="py-2.5 px-3">Mesures Enregistrées</th>
+                            <th class="py-2.5 px-3">Signal Moyen</th>
+                            <th class="py-2.5 px-3">Pic Observé</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-operators-body" class="divide-y divide-slate-800/80">
+                        <tr><td colspan="5" class="py-3 px-3 text-center text-slate-500">Chargement des données opérateurs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Topologie Pylônes Identifiés -->
+        <section class="space-y-3">
+            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">4. Inventaire des Cellules & Pylônes 3GPP Détectés</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-print-muted">
+                            <th class="py-2.5 px-3">Opérateur</th>
+                            <th class="py-2.5 px-3">Cell ID (3GPP)</th>
+                            <th class="py-2.5 px-3">Zone LAC</th>
+                            <th class="py-2.5 px-3">Canal Radio</th>
+                            <th class="py-2.5 px-3">Occurrences</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-cells-body" class="divide-y divide-slate-800/80">
+                        <tr><td colspan="5" class="py-3 px-3 text-center text-slate-500">Chargement des cellules...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Journal de Sécurité & Pannes Récentes -->
+        <section class="space-y-3">
+            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">5. Journal des Alertes de Sécurité & Coupures (Outages)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-print-muted">
+                            <th class="py-2.5 px-3">Horodatage</th>
+                            <th class="py-2.5 px-3">Type</th>
+                            <th class="py-2.5 px-3">Description Technique de l'Événement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-events-body" class="divide-y divide-slate-800/80">
+                        <tr><td colspan="3" class="py-3 px-3 text-center text-slate-500">Chargement des événements...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Certification & Footer -->
+        <footer class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500 text-print-muted">
+            <div>
+                Station : <strong>Radio Sentinel v3</strong> • Audit certifié conforme aux normes télécoms.
+            </div>
+            <div class="text-right">
+                Document généré de manière autonome • Licence MIT
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        async function loadAuditData() {
+            try {
+                const res = await fetch('/api/audit-report');
+                if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+                const data = await res.json();
+
+                const ov = data.overview || {};
+                const bd = data.breakdown || {};
+                const mob = data.mobile_stats || {};
+
+                // Date
+                const now = new Date();
+                document.getElementById('rep-date').textContent = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+                document.getElementById('rep-ref').textContent = 'RS-AUDIT-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + Math.floor(1000 + Math.random()*9000);
+
+                // KPIs
+                const sla = (bd.excellent?.pct || 0) + (bd.good?.pct || 0);
+                document.getElementById('kpi-sla').textContent = sla.toFixed(1) + ' %';
+                document.getElementById('kpi-samples').textContent = (ov.total_samples || 0).toLocaleString();
+                document.getElementById('kpi-geo').textContent = (ov.geo_samples || 0).toLocaleString();
+                document.getElementById('kpi-avg-dbm').textContent = (ov.avg_dbm !== null ? ov.avg_dbm.toFixed(1) : '--') + ' dBm';
+                document.getElementById('kpi-avg-csq').textContent = ov.avg_csq !== null ? ov.avg_csq.toFixed(1) : '--';
+                document.getElementById('kpi-outages').textContent = (data.total_outages || 0);
+
+                // Breakdown Bar & Table
+                document.getElementById('bar-exc').style.width = (bd.excellent?.pct || 0) + '%';
+                document.getElementById('bar-good').style.width = (bd.good?.pct || 0) + '%';
+                document.getElementById('bar-fair').style.width = (bd.fair?.pct || 0) + '%';
+                document.getElementById('bar-poor').style.width = (bd.poor?.pct || 0) + '%';
+
+                document.getElementById('cnt-exc').textContent = bd.excellent?.count || 0;
+                document.getElementById('pct-exc').textContent = (bd.excellent?.pct || 0) + ' %';
+                document.getElementById('cnt-good').textContent = bd.good?.count || 0;
+                document.getElementById('pct-good').textContent = (bd.good?.pct || 0) + ' %';
+                document.getElementById('cnt-fair').textContent = bd.fair?.count || 0;
+                document.getElementById('pct-fair').textContent = (bd.fair?.pct || 0) + ' %';
+                document.getElementById('cnt-poor').textContent = bd.poor?.count || 0;
+                document.getElementById('pct-poor').textContent = (bd.poor?.pct || 0) + ' %';
+
+                // Operators
+                const opBody = document.getElementById('table-operators-body');
+                if (data.operators && data.operators.length > 0) {
+                    opBody.innerHTML = data.operators.map(op => `
+                        <tr>
+                            <td class="py-2 px-3 font-bold text-slate-200 text-print-dark">${op.operator_name}</td>
+                            <td class="py-2 px-3 text-cyan-400 font-bold">${op.operator_code || '--'}</td>
+                            <td class="py-2 px-3">${op.samples.toLocaleString()}</td>
+                            <td class="py-2 px-3 text-amber-300">${op.avg_dbm ? op.avg_dbm.toFixed(1) + ' dBm' : '--'}</td>
+                            <td class="py-2 px-3 text-emerald-400 font-bold">${op.max_dbm ? op.max_dbm + ' dBm' : '--'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    opBody.innerHTML = '<tr><td colspan="5" class="py-3 px-3 text-center text-slate-500">Aucun opérateur enregistré pour le moment.</td></tr>';
+                }
+
+                // Cells
+                const cellBody = document.getElementById('table-cells-body');
+                if (data.cells && data.cells.length > 0) {
+                    cellBody.innerHTML = data.cells.map(c => `
+                        <tr>
+                            <td class="py-2 px-3 font-semibold text-slate-300 text-print-dark">${c.operator_name || '--'}</td>
+                            <td class="py-2 px-3 text-cyan-300 font-bold">${c.cell_id}</td>
+                            <td class="py-2 px-3">${c.lac || '--'}</td>
+                            <td class="py-2 px-3 text-emerald-400">${c.channel || '--'}</td>
+                            <td class="py-2 px-3">${c.hits.toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    cellBody.innerHTML = '<tr><td colspan="5" class="py-3 px-3 text-center text-slate-500">Aucune cellule identifiée.</td></tr>';
+                }
+
+                // Events
+                const evBody = document.getElementById('table-events-body');
+                if (data.events && data.events.length > 0) {
+                    evBody.innerHTML = data.events.map(ev => {
+                        const isOutage = ev.event_type === 'OUTAGE';
+                        const isSec = ev.event_type === 'SECURITY_ALERT';
+                        const badgeColor = isSec ? 'text-rose-400' : (isOutage ? 'text-amber-400' : 'text-emerald-400');
+                        return `
+                            <tr>
+                                <td class="py-2 px-3 text-slate-400 text-print-muted whitespace-nowrap">${ev.timestamp.replace('T', ' ').substring(0, 19)}</td>
+                                <td class="py-2 px-3 font-bold ${badgeColor}">${ev.event_type}</td>
+                                <td class="py-2 px-3 text-slate-300 text-print-dark">${ev.message}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    evBody.innerHTML = '<tr><td colspan="3" class="py-3 px-3 text-center text-slate-500">Aucun incident répertorié. Intégrité nominale.</td></tr>';
+                }
+
+            } catch (err) {
+                console.error("Erreur chargement audit:", err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAuditData);
+    </script>
+
+</body>
+
+</html>

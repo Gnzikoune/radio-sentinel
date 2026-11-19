@@ -168,3 +168,115 @@ def get_official_tower(mcc: int, net: int, cell_id: int,
     res = lookup_tower(conn, mcc, net, cell_id, user_lat=user_lat, user_lon=user_lon)
     conn.close()
     return res
+
+def get_audit_report_data():
+    """Compile l'ensemble des métriques statistiques pour le rapport d'audit exécutif."""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # 1. Statistiques globales d'échantillonnage
+    cursor.execute("""
+        SELECT COUNT(*) as total_samples,
+               MIN(timestamp) as start_time,
+               MAX(timestamp) as end_time,
+               AVG(csq) as avg_csq,
+               MIN(csq) as min_csq,
+               MAX(csq) as max_csq,
+               AVG(dbm) as avg_dbm,
+               MIN(dbm) as min_dbm,
+               MAX(dbm) as max_dbm
+        FROM telemetry
+        WHERE csq IS NOT NULL AND csq != 99
+    """)
+    overview = dict(cursor.fetchone() or {})
+
+    # Échantillons géolocalisés
+    cursor.execute("SELECT COUNT(*) as geo_samples FROM telemetry WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+    overview.update(dict(cursor.fetchone() or {}))
+
+    # 2. Répartition par classes de couverture (Normes UIT / ARCEP)
+    cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm >= -75")
+    excellent = cursor.fetchone()[0] or 0
+
+    cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm >= -85 AND dbm < -75")
+    good = cursor.fetchone()[0] or 0
+
+    cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm >= -95 AND dbm < -85")
+    fair = cursor.fetchone()[0] or 0
+
+    cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm < -95 OR csq = 0 OR csq = 99 OR dbm IS NULL")
+    poor = cursor.fetchone()[0] or 0
+
+    total_cov = excellent + good + fair + poor
+    breakdown = {
+        "excellent": {"count": excellent, "pct": round((excellent / total_cov * 100), 1) if total_cov else 0},
+        "good": {"count": good, "pct": round((good / total_cov * 100), 1) if total_cov else 0},
+        "fair": {"count": fair, "pct": round((fair / total_cov * 100), 1) if total_cov else 0},
+        "poor": {"count": poor, "pct": round((poor / total_cov * 100), 1) if total_cov else 0},
+        "total": total_cov
+    }
+
+    # 3. Métriques de performance 4G mobile (Sonde Samsung A14)
+    cursor.execute("""
+        SELECT AVG(mobile_downlink) as avg_downlink,
+               MAX(mobile_downlink) as max_downlink,
+               AVG(mobile_ping) as avg_ping,
+               MIN(mobile_ping) as min_ping,
+               COUNT(mobile_ping) as mobile_samples
+        FROM telemetry
+        WHERE mobile_downlink IS NOT NULL OR mobile_ping IS NOT NULL
+    """)
+    mobile_stats = dict(cursor.fetchone() or {})
+
+    # 4. Analyse par opérateur détecté
+    cursor.execute("""
+        SELECT operator_name,
+               operator_code,
+               COUNT(*) as samples,
+               AVG(dbm) as avg_dbm,
+               MAX(dbm) as max_dbm
+        FROM telemetry
+        WHERE operator_name IS NOT NULL AND operator_name != '--'
+        GROUP BY operator_name
+        ORDER BY samples DESC
+    """)
+    operators = [dict(r) for r in cursor.fetchall()]
+
+    # 5. Cellules et Pylônes identifiés
+    cursor.execute("""
+        SELECT DISTINCT operator_name, lac, cell_id, channel, COUNT(*) as hits
+        FROM telemetry
+        WHERE cell_id IS NOT NULL AND cell_id != '--'
+        GROUP BY operator_name, lac, cell_id, channel
+        ORDER BY hits DESC
+        LIMIT 15
+    """)
+    cells = [dict(r) for r in cursor.fetchall()]
+
+    # 6. Coupures et alertes de sécurité
+    cursor.execute("""
+        SELECT timestamp, event_type, message
+        FROM events
+        ORDER BY id DESC
+        LIMIT 25
+    """)
+    events = [dict(r) for r in cursor.fetchall()]
+
+    cursor.execute("SELECT COUNT(*) FROM events WHERE event_type = 'OUTAGE'")
+    total_outages = cursor.fetchone()[0] or 0
+
+    cursor.execute("SELECT COUNT(*) FROM events WHERE event_type = 'SECURITY_ALERT'")
+    total_sec_alerts = cursor.fetchone()[0] or 0
+
+    conn.close()
+
+    return {
+        "overview": overview,
+        "breakdown": breakdown,
+        "mobile_stats": mobile_stats,
+        "operators": operators,
+        "cells": cells,
+        "events": events,
+        "total_outages": total_outages,
+        "total_sec_alerts": total_sec_alerts
+    }

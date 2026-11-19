@@ -150,6 +150,19 @@ Radio Sentinel surveille en temps réel les indicateurs clés de sécurité 3GPP
 * **Bandeau d'alerte interactif** : Sirène clignotante, diagnostic d'attaque et bouton de réinitialisation.
 * **Module d'audit & simulation** : Endpoint `/api/security/simulate-downgrade` permettant de tester la chaîne d'alerte lors de présentations officielles ou d'exercices d'entraînement.
 
+### 8. Générateur de Rapport d'Audit Exécutif (PDF / Print)
+
+Accessible via le bouton **📄 Rapport Audit** dans le cockpit ou directement sur `/audit-report`, cette page génère un rapport officiel de couverture et de qualité de service (QoS) télécom, prêt à être imprimé ou exporté en PDF via la fonction d'impression du navigateur.
+
+* **Métriques clés (KPI)** : SLA de couverture (%), volume d'échantillons géolocalisés, signal moyen en dBm, nombre de ruptures de service.
+* **Répartition ARCEP/UIT** : Distribution visuelle Excellent / Bon / Moyen / Faible avec barres proportionnelles et table de comptage.
+* **Analyse multi-opérateurs** : Tableau comparatif par PLMN (Gabon Telecom, Azur Gabon…) avec signal moyen et pic.
+* **Inventaire des pylônes** : Cellules LTE/UMTS/GSM identifiées (Cell-ID, LAC, canal, hits).
+* **Journal d'incidents sécurité** : Événements de downgrade et anomalies horodatés.
+* **Mode impression natif** : CSS `@media print` dédié pour un rendu PDF propre sans éléments de navigation.
+
+> Idéal pour une présentation formelle à un régulateur (ARCEP-GA), une DSI, ou un investisseur télécom.
+
 ### 7. Export 3D Google Earth (KML) & CSV
 * **Export KML 3D (`/api/export-kml`)** : Modélise le trajet sous forme de colonnes ou de ruban continu dans Google Earth Pro. La hauteur d'extrusion de chaque point est proportionnelle à la qualité du signal radio reçu, permettant d'observer le relief de couverture hertzienne au-dessus des quartiers.
 * **Export CSV (`/api/export-csv`)** : Export tabulaire exhaustif compatible Excel, pandas et QGIS pour les analyses statistiques approfondies.
@@ -187,6 +200,8 @@ Pour éliminer l'empilement vertical monolithique et éviter toute surcharge cog
 | `GET` | `/api/status` | Statut du système, détection dynamique de l'IP locale et état du tunnel nomade 4G. |
 | `POST` | `/api/tunnel` | Enregistrement / mise à jour de l'URL publique du tunnel nomade (Cloudflare / Ngrok). |
 | `DELETE` | `/api/tunnel` | Révocation et fermeture de l'état du tunnel distant. |
+| `GET` | `/audit-report` | Rapport d'audit télécom officiel interactif, imprimable en PDF. |
+| `GET` | `/api/audit-report` | Données statistiques compilées : couverture SLA, opérateurs, inventaire pylônes, événements sécurité. |
 
 ---
 
