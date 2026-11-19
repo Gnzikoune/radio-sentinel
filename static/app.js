@@ -1148,6 +1148,7 @@ function setupQRCodeModal() {
     const qrDisplay = document.getElementById('qrcode-display');
     const qrText = document.getElementById('qr-target-url-text');
     const btnCopy = document.getElementById('btn-copy-qr-url');
+    const btnDownload = document.getElementById('btn-download-qr-png');
     const modeAdvice = document.getElementById('qr-mode-advice');
 
     if (!modal || !qrDisplay) return;
@@ -1334,6 +1335,40 @@ function setupQRCodeModal() {
             await fetchSystemStatus();
             renderModalUI();
             btnRefresh.textContent = old;
+        });
+    }
+
+    if (btnDownload) {
+        btnDownload.addEventListener('click', () => {
+            const canvas = qrDisplay.querySelector('canvas');
+            const img = qrDisplay.querySelector('img');
+            let dataUrl = null;
+
+            if (canvas) {
+                try {
+                    dataUrl = canvas.toDataURL('image/png');
+                } catch (e) {
+                    console.error("Erreur lecture canvas QR:", e);
+                }
+            }
+            if (!dataUrl && img && img.src) {
+                dataUrl = img.src;
+            }
+
+            if (dataUrl) {
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = `radio-sentinel-qr-${qrSelectedEnv}-${qrSelectedDest}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                const old = btnDownload.innerHTML;
+                btnDownload.innerHTML = "✅ Enregistre !";
+                setTimeout(() => { btnDownload.innerHTML = old; }, 2000);
+            } else {
+                alert("Image du QR Code en cours de generation. Reessayez dans un instant.");
+            }
         });
     }
 

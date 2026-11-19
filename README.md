@@ -215,6 +215,7 @@ Pour ne jamais avoir à saisir de longues URLs sur le clavier de votre télépho
    - 🛰️ **Balise GPS & Sonde 4G (`/gps`)** : Interface tactile ultra-légère conçue pour tourner en tâche de fond dans la poche ou sur support pare-brise.
    - 📊 **Tableau de Bord Complet (`/`)** : Le cockpit de commandement complet avec la carte satellite HD et les graphiques en direct sur smartphone.
 4. Pointez l'appareil photo du Samsung Galaxy A14 vers l'écran du PC et touchez la notification : Radio Sentinel est immédiatement appairé !
+5. **Export PNG en un clic (`📥 Enregistrer PNG`)** : Téléchargez le QR Code sous forme d'image PNG haute résolution pour l'imprimer, l'envoyer par messagerie ou l'archiver pour vos futures sorties terrain.
 
 #### Mode A : Vous emportez votre PC portable avec vous
 1. Activez le **Point d'accès mobile (partage Wi-Fi)** sur votre Samsung Galaxy A14.
