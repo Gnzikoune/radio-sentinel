@@ -1,5 +1,7 @@
 import os
-from fastapi import FastAPI
+import socket
+import time
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -14,11 +16,38 @@ from kml_service import generate_kml_3d
 
 app = FastAPI(title="Radio Sentinel - Observatoire Cellulaire & Cartographie RF")
 
+# ---------------------------------------------------------------------------
+# Etat global du tunnel (mis a jour par POST /api/tunnel depuis tunnel.ps1)
+# ---------------------------------------------------------------------------
+_tunnel_state: dict = {
+    "url": None,          # ex: "https://xxxx.trycloudflare.com"
+    "provider": None,     # "cloudflare" | "ngrok"
+    "registered_at": None # timestamp UNIX
+}
+
+_server_start_time: float = time.time()
+
+def _get_local_ip() -> str:
+    """Detecte l'adresse IP locale reelle (non 127.0.0.1)."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 class CommandRequest(BaseModel):
     command: str
+
+class TunnelPayload(BaseModel):
+    url: Optional[str] = None
+    provider: Optional[str] = "cloudflare"
+    active: bool = True
 
 class GPSPayload(BaseModel):
     latitude: float
@@ -73,6 +102,55 @@ def post_gps(payload: GPSPayload):
 def get_gps():
     """Retourne la position satellite actuelle du Samsung."""
     return gps_instance.get_current()
+
+@app.get("/api/status")
+def get_system_status():
+    """Retourne l'etat du serveur, l'IP locale detectee et l'etat du tunnel nomade."""
+    local_ip = _get_local_ip()
+    uptime_sec = int(time.time() - _server_start_time)
+    tunnel_url = _tunnel_state.get("url")
+    return {
+        "status": "online",
+        "uptime_sec": uptime_sec,
+        "local_ip": local_ip,
+        "local_url": f"https://{local_ip}:8000",
+        "local_gps_url": f"https://{local_ip}:8000/gps",
+        "tunnel": {
+            "active": bool(tunnel_url),
+            "url": tunnel_url,
+            "gps_url": f"{tunnel_url}/gps" if tunnel_url else None,
+            "provider": _tunnel_state.get("provider"),
+            "registered_at": _tunnel_state.get("registered_at")
+        },
+        "modem_connected": modem_instance.live_state.get("reg_status") not in (None, "--", "NON ENREGISTRE"),
+        "gps_connected": gps_instance.get_current().get("connected", False)
+    }
+
+@app.post("/api/tunnel")
+def register_tunnel(payload: TunnelPayload):
+    """Enregistre ou met a jour l'URL publique du tunnel nomade 4G."""
+    if payload.active and payload.url:
+        clean_url = payload.url.rstrip("/")
+        _tunnel_state["url"] = clean_url
+        _tunnel_state["provider"] = payload.provider or "cloudflare"
+        _tunnel_state["registered_at"] = time.time()
+        database.log_event("TUNNEL_ONLINE", f"Passerelle nomade 4G active ({_tunnel_state['provider']}): {clean_url}")
+        return {"status": "ok", "message": "Tunnel enregistré", "tunnel": _tunnel_state}
+    else:
+        _tunnel_state["url"] = None
+        _tunnel_state["provider"] = None
+        _tunnel_state["registered_at"] = None
+        database.log_event("TUNNEL_OFFLINE", "Passerelle nomade 4G fermée")
+        return {"status": "ok", "message": "Tunnel désactivé"}
+
+@app.delete("/api/tunnel")
+def delete_tunnel():
+    """Ferme ou reinitialise le tunnel nomade enregistre."""
+    _tunnel_state["url"] = None
+    _tunnel_state["provider"] = None
+    _tunnel_state["registered_at"] = None
+    database.log_event("TUNNEL_OFFLINE", "Passerelle nomade 4G fermée")
+    return {"status": "ok", "message": "Tunnel désactivé"}
 
 @app.get("/api/telemetry/live")
 def get_live():

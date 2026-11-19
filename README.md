@@ -167,6 +167,9 @@ Radio Sentinel surveille en temps réel les indicateurs clés de sécurité 3GPP
 | `POST` | `/api/command` | Console d'injection directe de commandes AT vers le modem. |
 | `GET` | `/api/export-csv` | Téléchargement du jeu de données brut au format CSV. |
 | `GET` | `/api/export-kml` | Génération et téléchargement du modèle géospatial 3D Google Earth. |
+| `GET` | `/api/status` | Statut du système, détection dynamique de l'IP locale et état du tunnel nomade 4G. |
+| `POST` | `/api/tunnel` | Enregistrement / mise à jour de l'URL publique du tunnel nomade (Cloudflare / Ngrok). |
+| `DELETE` | `/api/tunnel` | Révocation et fermeture de l'état du tunnel distant. |
 
 ---
 
