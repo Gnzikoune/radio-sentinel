@@ -194,7 +194,10 @@ def get_audit_report_data():
     cursor.execute("SELECT COUNT(*) as geo_samples FROM telemetry WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
     overview.update(dict(cursor.fetchone() or {}))
 
-    # 2. Répartition par classes de couverture (Normes UIT / ARCEP)
+    # 2. Répartition par classes de couverture (seuils opérationnels 3GPP / ARCEP)
+    # NOTE : on ne comptabilise QUE les lignes avec un dbm mesuré (dbm IS NOT NULL).
+    # Les lignes dbm IS NULL correspondent à des états transitoires du modem (boot,
+    # reconnexion en cours, CSQ=99) — ce ne sont PAS des mesures de signal réseau.
     cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm >= -75")
     excellent = cursor.fetchone()[0] or 0
 
@@ -204,7 +207,9 @@ def get_audit_report_data():
     cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm >= -95 AND dbm < -85")
     fair = cursor.fetchone()[0] or 0
 
-    cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm < -95 OR csq = 0 OR csq = 99 OR dbm IS NULL")
+    # "poor" = signal mesuré mais en dessous du seuil exploitable (inclut CSQ=0 → dbm=-113)
+    # On exclut dbm IS NULL pour ne pas gonfler artificiellement ce compteur.
+    cursor.execute("SELECT COUNT(*) FROM telemetry WHERE dbm < -95")
     poor = cursor.fetchone()[0] or 0
 
     total_cov = excellent + good + fair + poor
@@ -262,7 +267,15 @@ def get_audit_report_data():
     """)
     events = [dict(r) for r in cursor.fetchall()]
 
-    cursor.execute("SELECT COUNT(*) FROM events WHERE event_type = 'OUTAGE'")
+    # Outages réseaux réels = coupure de signal (CSQ tombé à 0 ou None)
+    # On exclut les OUTAGEs causés par des erreurs logicielles ou de port série
+    # (reconnexion BDD, PermissionError, etc.) car ils ne représentent pas une
+    # panne du réseau cellulaire mais des instabilités de l'outil de mesure.
+    cursor.execute("""
+        SELECT COUNT(*) FROM events
+        WHERE event_type = 'OUTAGE'
+        AND (message LIKE 'Coupure r%seau%' OR message LIKE 'Signal tomb%')
+    """)
     total_outages = cursor.fetchone()[0] or 0
 
     cursor.execute("SELECT COUNT(*) FROM events WHERE event_type = 'SECURITY_ALERT'")

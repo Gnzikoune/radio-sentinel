@@ -15,6 +15,11 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
+
+        @media print {
+            /* Masquer les URLs de tunnels Cloudflare/Ngrok dans le PDF diffusable */
+            a[href*="trycloudflare"], a[href*="ngrok"], .tunnel-url { display: none !important; }
+        }
         @media print {
             .no-print { display: none !important; }
             body {
@@ -62,7 +67,7 @@
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950 text-cyan-300 border border-cyan-800">
                     <span>📡 RADIO SENTINEL</span>
                     <span>•</span>
-                    <span>AUDIT DE CONFORMITÉ SPECTRE & QoS</span>
+                    <span>AUDIT DE COUVERTURE RF & SIGNAL HSPA+</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight text-print-dark">
                     Rapport d'Audit de Couverture & Qualité Télécom
@@ -76,7 +81,7 @@
                 <div class="text-slate-400 text-print-muted">Dossier N° : <strong id="rep-ref" class="text-cyan-400 font-bold">RS-AUDIT-20261119-01</strong></div>
                 <div class="text-slate-400 text-print-muted">Date : <span id="rep-date" class="text-slate-200 text-print-dark">19/11/2026</span></div>
                 <div class="text-slate-400 text-print-muted">Territoire : <span class="text-slate-200 text-print-dark">Gabon (MCC 628)</span></div>
-                <div class="text-slate-400 text-print-muted">Norme : <span class="text-emerald-400 font-bold">3GPP / UIT-T P.800</span></div>
+                <div class="text-slate-400 text-print-muted">Norme : <span class="text-emerald-400 font-bold">3GPP TS 36.133 / seuils ARCEP</span></div>
             </div>
         </header>
 
@@ -99,6 +104,13 @@
             </div>
         </section>
 
+
+        <!-- Disclaimer encart (visible + print) -->
+        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs font-mono text-amber-300 space-y-1">
+            <div class="font-bold text-amber-400">⚠ Avertissement — Portée du document</div>
+            <p class="text-amber-200/80">Ce rapport est un outil d'aide à la décision basé sur des mesures passives RSSI (AT+CSQ, UMTS/HSPA+). Il n'est pas certifié par un organisme accrédité. Les seuils utilisés (&ge; -75 / -85 / -95 dBm) sont des seuils opérationnels issus de 3GPP TS 36.133 et couramment utilisés par les régulateurs, mais ne constituent pas un engagement contractuel de QoS au sens de l'UIT-T E.800. Les URL de tunnels distants ont été masquées dans cette version imprimable.</p>
+        </div>
+
         <!-- Executive Summary KPI Cards -->
         <section class="space-y-3">
             <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">1. Synthèse Exécutive des Mesures</h2>
@@ -107,9 +119,9 @@
                 
                 <!-- KPI 1 : Conformité SLA -->
                 <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-1 bg-print-light card-print">
-                    <span class="text-[11px] text-slate-400 text-print-muted uppercase">Disponibilité Exploitable</span>
+                    <span class="text-[11px] text-slate-400 text-print-muted uppercase">Taux de Couverture Exploitable</span>
                     <div class="text-2xl font-extrabold font-mono text-emerald-400" id="kpi-sla">-- %</div>
-                    <p class="text-[10px] text-slate-500 text-print-muted">Signal &ge; -85 dBm (Bonne qualité)</p>
+                    <p class="text-[10px] text-slate-500 text-print-muted">Mesures signal ≥ -85 dBm / total mesures valides</p>
                 </div>
 
                 <!-- KPI 2 : Échantillons & Distance -->
@@ -138,7 +150,7 @@
 
         <!-- Classification & Distribution de Couverture -->
         <section class="space-y-4">
-            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">2. Distribution de Couverture (Grille ARCEP / UIT)</h2>
+            <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-400 font-bold">2. Distribution de Couverture (Seuils opérationnels 3GPP / ARCEP)</h2>
 
             <!-- Stacked Bar Visual -->
             <div class="w-full bg-slate-900 h-6 rounded-xl overflow-hidden flex border border-slate-800 card-print">
@@ -266,7 +278,7 @@
         <!-- Certification & Footer -->
         <footer class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500 text-print-muted">
             <div>
-                Station : <strong>Radio Sentinel v3</strong> • Audit certifié conforme aux normes télécoms.
+                Station : <strong>Radio Sentinel v3</strong> • Outil de mesures passives open-source (non certifié).
             </div>
             <div class="text-right">
                 Document généré de manière autonome • Licence MIT
