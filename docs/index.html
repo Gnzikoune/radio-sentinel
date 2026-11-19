@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Sentinel — Observatoire Cellulaire & Cartographie RF Open Source</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Radio Sentinel : Plateforme open source d'audit spectral, cartographie de couverture 3G/4G, géolocalisation de pylônes et détection d'IMSI-Catchers avec une vieille clé USB 3G et un smartphone.">
+    <meta name="keywords"
+        content="wardriving, rf-mapping, cellular-network, gsm-modem, at-commands, fastapi, cartographie-reseau, telecom, open-source, imsi-catcher, alcatel-x602d, opencellid, gabon, airtel, moov">
+    <meta name="author" content="Gnzikoune">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://gnzikoune.github.io/radio-sentinel/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gnzikoune.github.io/radio-sentinel/">
+    <meta property="og:title" content="Radio Sentinel — Observatoire Cellulaire & Cartographie RF">
+    <meta property="og:description"
+        content="Transformez une vieille clé USB 3G à 0 € en scanner de réseau mobile professionnel avec cartographie Heatmap et détection d'IMSI-Catchers.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Gnzikoune/radio-sentinel/main/static/preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://gnzikoune.github.io/radio-sentinel/">
+    <meta property="twitter:title" content="Radio Sentinel — Observatoire Cellulaire & Cartographie RF">
+    <meta property="twitter:description"
+        content="Station autonome d'audit hertzien 3G/4G, géolocalisation de pylônes et détection de rétrogradation 2G non sécurisée.">
+    <meta property="twitter:image" content="https://raw.githubusercontent.com/Gnzikoune/radio-sentinel/main/static/preview.png">
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Radio Sentinel",
+      "operatingSystem": "Windows, Linux",
+      "applicationCategory": "TelecommunicationsApplication, UtilitiesApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "description": "Station autonome d'audit spectral 3G/4G, de cartographie de couverture RF et de détection d'anomalies cellulaires avec du matériel recyclé.",
+      "url": "https://github.com/Gnzikoune/radio-sentinel",
+      "author": {
+        "@type": "Person",
+        "name": "Gnzikoune"
+      }
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-radial { background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15) 0%, rgba(15, 23, 42, 0) 70%); }
+    </style>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-slate-950">
+
+    <!-- Top Navigation -->
+    <header class="border-b border-slate-800/80 sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-lg">📡</span>
+                <span class="font-extrabold text-base tracking-tight text-white">Radio Sentinel</span>
+                <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800">Open Source</span>
+            </div>
+            <nav class="flex items-center gap-4 text-xs font-semibold">
+                <a href="#features" class="text-slate-400 hover:text-white transition">Fonctionnalités</a>
+                <a href="#architecture" class="text-slate-400 hover:text-white transition">Architecture</a>
+                <a href="#quickstart" class="text-slate-400 hover:text-white transition">Démarrage</a>
+                <a href="https://github.com/Gnzikoune/radio-sentinel" target="_blank"
+                   class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2">
+                   <span>⭐ Voir sur GitHub</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-radial pt-20 pb-16 px-6 text-center border-b border-slate-800/80">
+        <div class="max-w-4xl mx-auto space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-950/60 border border-cyan-800/80 text-cyan-300">
+                <span>⚡ Audit RF & Cyber-Sécurité Télécom</span>
+                <span class="text-slate-500">•</span>
+                <span>Matériel 100% Recyclé</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                Transformez une vieille clé USB en <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">Observatoire Mobile Professionnel</span>
+            </h1>
+            <p class="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                Radio Sentinel combine le détournement d'un modem 3G grand public (*Alcatel X602D*) et un smartphone Android pour cartographier le spectre hertzien, trianguler les pylônes et détecter les fausses stations de base (IMSI-Catchers) à 0 €.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3 pt-4">
+                <a href="https://github.com/Gnzikoune/radio-sentinel" target="_blank"
+                   class="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition shadow-lg shadow-cyan-500/20">
+                   🚀 Télécharger le projet GitHub
+                </a>
+                <a href="https://github.com/Gnzikoune/radio-sentinel/blob/main/README.md" target="_blank"
+                   class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-sm transition">
+                   📖 Lire la documentation technique
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+            <h2 class="text-xs font-mono uppercase tracking-widest text-cyan-400">Capacités & Modules Clés</h2>
+            <p class="text-2xl md:text-3xl font-extrabold text-white">Une suite d'ingénierie télécom complète</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-2xl">🗺️</div>
+                <h3 class="text-lg font-bold text-white">Cartographie Heatmap Continue</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Interpolation spatiale le long des axes de circulation pour générer un dégradé de couverture radio précis (Vert / Jaune / Rouge), directement sur Leaflet avec Google Satellite HD.
+                </p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-2xl">⚡</div>
+                <h3 class="text-lg font-bold text-white">Audit Bi-Réseau & Performance 4G</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Compare simultanément deux opérateurs : écoute spectrale brute sur la clé USB (ex. Azur) et performance data réelle sur la SIM du téléphone (débit descendant, latence RTT, ping serveur).
+                </p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-2xl">🛰️</div>
+                <h3 class="text-lg font-bold text-white">Triangulation par Barycentre mW</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Convertit les dBm logarithmiques en milliwatts réels pour isoler le centre de gravité des émissions et estimer la position des pylônes émetteurs avec filtre Haversine anti-réutilisation de Cell ID.
+                </p>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-2xl">🛡️</div>
+                <h3 class="text-lg font-bold text-white">Détection IMSI-Catcher (Anti-Downgrade)</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Détecte les rétrogradations forcées 3G->2G non chiffrées avec alertes visuelles et sonores instantanées pour protéger la confidentialité des communications mobiles.
+                </p>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-2xl">📱</div>
+                <h3 class="text-lg font-bold text-white">Appairage par QR Code Intelligent</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Bascule automatiquement entre le mode Nomade 4G (tunnel sécurisé chiffré sans coupure en extérieur) et le mode Wi-Fi local à domicile. Zéro saisie d'URL sur le téléphone.
+                </p>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl">🌐</div>
+                <h3 class="text-lg font-bold text-white">Export 3D Google Earth & CSV</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Génération en un clic de fichiers KML 3D extrudés selon la puissance radio reçue pour visualiser le relief hertzien dans Google Earth Pro, et export CSV compatible QGIS/Python.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quickstart Section -->
+    <section id="quickstart" class="py-20 px-6 bg-slate-900/50 border-t border-b border-slate-800/80">
+        <div class="max-w-4xl mx-auto space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-xs font-mono uppercase tracking-widest text-cyan-400">Démarrage Rapide</h2>
+                <p class="text-2xl font-extrabold text-white">Opérationnel en 3 commandes</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 text-xs font-mono text-cyan-300 space-y-2">
+                <p class="text-slate-500"># 1. Cloner le dépôt GitHub</p>
+                <p>git clone https://github.com/Gnzikoune/radio-sentinel.git</p>
+                <p class="text-slate-500 pt-2"># 2. Installer les dépendances</p>
+                <p>cd radio-sentinel && pip install -r requirements.txt</p>
+                <p class="text-slate-500 pt-2"># 3. Lancer la station</p>
+                <p>./lancer.bat</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-slate-800/80 text-center text-xs text-slate-500 font-mono space-y-2">
+        <div>Radio Sentinel • Projet Open Source sous Licence MIT</div>
+        <div>Conçu avec passion pour la souveraineté radio et l'indépendance technologique.</div>
+        <div class="pt-3">
+            <a href="https://github.com/Gnzikoune/radio-sentinel" class="text-cyan-400 hover:underline">GitHub Repository</a>
+            • <a href="https://github.com/Gnzikoune/radio-sentinel/blob/main/README_EN.md" class="text-slate-400 hover:underline">English Documentation</a>
+        </div>
+    </footer>
+
+</body>
+</html>

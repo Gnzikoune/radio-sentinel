@@ -1,5 +1,12 @@
 # 📡 Radio Sentinel — Observatoire Cellulaire & Cartographie RF
 
+[![Language: FR](https://img.shields.io/badge/Langue-Fran%C3%A7ais-blue.svg)](README.md)
+[![Language: EN](https://img.shields.io/badge/Language-English-green.svg)](README_EN.md)
+[![Website: GitHub Pages](https://img.shields.io/badge/Web-Live%20Showcase-purple.svg)](https://gnzikoune.github.io/radio-sentinel/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-teal.svg)](https://fastapi.tiangolo.com/)
+
 > **Plateforme autonome d'audit spectral, de géolocalisation d'infrastructures radio et de détection d'anomalies de sécurité mobile.**  
 > Projet né du détournement d'usage d'une clé USB 3G grand public (*Alcatel OneTouch X602D* / chipset *Spreadtrum SC7702*) et de la réutilisation d'un smartphone ordinaire (*Samsung Galaxy A14*) comme passerelle satellite multi-constellations haute fréquence.  
 > **100 % souverain, 0 € d'abonnement ou de clé API payante, zéro valeur simulée.**
