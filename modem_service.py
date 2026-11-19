@@ -18,6 +18,11 @@ OPERATOR_MAP = {
     "20820": "Bouygues Telecom"
 }
 
+# Valeur sentinelle AT+CSQ : quand CSQ=0, la formule donne -113 dBm.
+# Ce n'est PAS un signal RF mesuré — c'est l'état "aucun signal / modem en recherche".
+# Elle doit être exclue de toute comparaison de puissance pour éviter les faux positifs.
+MODEM_NO_SIGNAL_DBM = -113
+
 TECH_MAP = {
     "0": "GSM (2G)",
     "1": "GSM Compact",
@@ -332,8 +337,11 @@ class ModemService:
                 
                 # 1. Rétrogradation 2G suspecte (Downgrade Attack vers chiffrement faible A5/1)
                 if is_prev_3g_4g and is_curr_2g:
-                    dbm_diff = dbm - (self.prev_dbm if self.prev_dbm is not None else dbm)
-                    if dbm_diff >= 12 or (self.prev_lac and lac != "--" and lac != self.prev_lac):
+                    # Exclure le cas où prev_dbm est la valeur sentinelle "aucun signal"
+                    # (reconnexion après décrochage ≠ downgrade forcé par attaquant)
+                    prev_dbm_valid = self.prev_dbm is not None and self.prev_dbm != MODEM_NO_SIGNAL_DBM
+                    dbm_diff = dbm - (self.prev_dbm if prev_dbm_valid else dbm)
+                    if prev_dbm_valid and (dbm_diff >= 12 or (self.prev_lac and lac != "--" and lac != self.prev_lac)):
                         sec_alert = {
                             "status": "ALERT",
                             "level": "CRITICAL",
@@ -349,7 +357,11 @@ class ModemService:
                             "timestamp": now_iso
                         }
                 # 2. Saut anormal de puissance sur cellule inconnue
-                elif self.prev_cell_id and cell_id != "--" and self.prev_cell_id != cell_id and dbm is not None and self.prev_dbm is not None:
+                # Garde : exclure les transitions depuis MODEM_NO_SIGNAL_DBM (-113 dBm, CSQ=0).
+                # Un bond de -113 → -73 est une simple reconnexion après décrochage, pas un IMSI-catcher.
+                elif (self.prev_cell_id and cell_id != "--" and self.prev_cell_id != cell_id
+                      and dbm is not None and self.prev_dbm is not None
+                      and self.prev_dbm != MODEM_NO_SIGNAL_DBM):
                     dbm_diff = dbm - self.prev_dbm
                     if dbm_diff >= 25:
                         sec_alert = {
@@ -361,7 +373,11 @@ class ModemService:
                         database.log_event("SECURITY_ALERT", sec_alert["message"])
 
             self.prev_tech = tech_desc
-            self.prev_dbm = dbm
+            # Ne conserver prev_dbm que si c'est un signal RF valide mesuré.
+            # La valeur sentinelle MODEM_NO_SIGNAL_DBM (-113, CSQ=0) ne doit pas
+            # servir de référence pour les comparaisons de puissance suivantes.
+            if dbm is not None and dbm != MODEM_NO_SIGNAL_DBM:
+                self.prev_dbm = dbm
             self.prev_lac = lac
             self.prev_cell_id = cell_id
 
