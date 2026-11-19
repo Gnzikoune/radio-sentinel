@@ -26,3 +26,5 @@ Desktop.ini
 
 # Binaire passerelle Cloudflare Tunnel (téléchargé dynamiquement)
 cloudflared.exe
+ngrok.exe
+ngrok.zip

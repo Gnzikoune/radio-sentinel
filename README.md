@@ -224,9 +224,11 @@ Pour ne jamais avoir à saisir de longues URLs sur le clavier de votre télépho
 4. Aucun accès Internet fixe requis : 100 % autonome partout sur le terrain.
 
 #### Mode B : Vous laissez le PC allumé à la maison et sortez avec le téléphone seul en 4G
-1. Sur le PC à la maison, double-cliquez sur **`tunnel.bat`**.
-2. Une URL publique chiffrée et gratuite est générée automatiquement par Cloudflare (ex: `https://radio-sentinel-xyz.trycloudflare.com`).
-3. Dans la rue avec votre Samsung connecté en 4G (Airtel ou Moov), deux options s'offrent à vous :
+1. Sur le PC à la maison, double-cliquez sur **`tunnel.bat`** *(ou `tunnel.bat -Provider ngrok` en secours si vous préférez Ngrok)*.
+2. Une URL publique chiffrée HTTPS est générée automatiquement (Cloudflare Tunnel par défaut, gratuit sans compte ni restriction).
+3. Le tableau de bord du PC s'ouvre automatiquement avec le **QR Code Nomade 4G**.
+4. Pointez votre Samsung Galaxy A14 vers l'écran : le téléphone charge l'adresse publique Internet.
+5. Dès que vous franchissez le pas de votre porte et que le Wi-Fi domestique bascule en 4G, **votre session continue sans aucune déconnexion** ! Deux modes au choix sur le smartphone :
    - **Option 1 (Tableau de bord All-in-One)** : Ouvrez `https://<VOTRE_TUNNEL>.trycloudflare.com` directement sur le smartphone et cliquez sur le bouton vert **`🛰️ Activer le GPS local`** en haut de page. Vous avez ainsi la carte satellite HD, les graphiques temps réel et la transmission GPS active sur un seul et même écran.
    - **Option 2 (Balise allégée)** : Ouvrez `https://<VOTRE_TUNNEL>.trycloudflare.com/gps` pour une interface tactile ultra-sobre minimisant la consommation de batterie.
-4. Votre position satellite, votre débit 4G et vos pings sont injectés en continu dans la base de données de votre PC à la maison à travers la ville !
+6. Votre position satellite, votre débit 4G et vos pings sont injectés en continu dans la base de données de votre PC à la maison à travers la ville !
