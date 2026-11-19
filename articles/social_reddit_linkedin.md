@@ -56,5 +56,5 @@ Le projet est entièrement documenté et libre d'accès sous licence MIT :
 
 N'hésitez pas à tester, partager ou contribuer !
 
-#Telecom #Cybersecurity #OpenSource #Wardriving #Python #FastAPI #SDR #Innovation #AfriqueTech #Gabon #RadioFrequency #QoS
+#Telecom #Cybersecurity #TelecomSecurity #Wardriving #Python #FastAPI #SDR #Innovation #AfriqueTech #Gabon #RadioFrequency #QoS
 ```

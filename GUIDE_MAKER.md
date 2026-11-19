@@ -137,7 +137,7 @@ La page web mobile (`templates/gps.html`) utilise deux APIs natives des navigate
 ## 6. Étape 5 : Cartographie Interactive & Résolution des Pièges Physiques
 
 ### Intégration Leaflet Multi-Vues 100% Gratuite
-Pour afficher la carte sans dépendre d'une clé d'API payante (comme Google Maps ou Mapbox), nous avons intégré la bibliothèque open-source **Leaflet** avec 4 sources de tuiles gratuites mondiales :
+Pour afficher la carte sans dépendre d'une clé d'API payante (comme Google Maps ou Mapbox), nous avons intégré la bibliothèque cartographique **Leaflet** avec 4 sources de tuiles gratuites mondiales :
 * **Esri World Imagery :** Vue satellite haute résolution photographique.
 * **OpenStreetMap Dark :** Vue sombre idéale pour le tableau de bord de nuit.
 * **OpenStreetMap Standard :** Vue des rues, quartiers et boulevards.
