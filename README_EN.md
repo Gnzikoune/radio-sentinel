@@ -16,8 +16,9 @@
 
 ## 🎯 Key Operational Capabilities
 
-1. **Continuous High-Resolution RF Heatmap Coverage:**  
-   Dynamic spatial interpolation along survey routes producing professional-grade coverage gradients (Green / Amber / Red) strictly aligned with 3GPP and regulator standards, layered over Google Satellite HD and OpenStreetMap.
+1. **Continuous High-Resolution RF Heatmap & 360° Rotating Radar Sweep:**  
+   - **GIS Dynamic Heatmap**: Spatial interpolation along survey routes producing professional-grade coverage gradients (Green / Amber / Red) strictly aligned with 3GPP and regulator standards, layered over Google Satellite HD and OpenStreetMap.
+   - **Rotating Radar Sweep & Tactical Custom Icons**: Live 360° sweeping radar beam centered around the mobile probe coordinates, coupled with distinctive vector icons for the mobile rover (pulsing tactical reticle), estimated towers (golden lattice with radiating RF waves), and official OpenCellID towers (monopole mast with aviation obstruction lights and operator color-coding).
 2. **Base Station Identification & Real-Power Triangulation:**  
    - **Weighted Real-Power Centroid ($10^{\text{dBm}/10}\text{ mW}$)**: Calculates the physical energy center of gravity to pinpoint base stations accurately even in dense multipath urban corridors.
    - **Integrated Gabon OpenCellID Registry (MCC 628)**: Instant matching against official tower databases for Moov Africa (`MNC 01`), Airtel Gabon (`MNC 02`), and Azur (`MNC 03`).

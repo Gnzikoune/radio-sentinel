@@ -16,8 +16,9 @@
 
 ## 🎯 Capacités Stratégiques & Cas d'Usage
 
-1. **Cartographie de Couverture Continue (Heatmap SIG Haute Résolution) :**  
-   Interpolation spatiale dynamique le long des parcours de wardriving, produisant un gradient continu de couverture radio (Vert / Jaune / Rouge) strictement calibré sur les seuils 3GPP et régulateurs (ARCEP), avec couches satellite Google HD et OpenStreetMap.
+1. **Cartographie de Couverture Continue & Balayage Radar 360° :**  
+   - **Heatmap SIG Haute Résolution** : Interpolation spatiale dynamique le long des parcours de wardriving, produisant un gradient continu de couverture radio (Vert / Jaune / Rouge) strictement calibré sur les seuils 3GPP et régulateurs (ARCEP), avec couches satellite Google HD et OpenStreetMap.
+   - **Balayage Radar Tournant & Icônes Tactiques Dédiées** : Visualisation d'un radar tournant à 360° autour de la position GPS mobile simulant la zone de détection RF active, complété par des icônes vectorielles distinctes pour la sonde mobile (réticule tactique), les pylônes estimés par barycentre (treillis doré à ondes rayonnantes) et les pylônes officiels OpenCellID (mât télécom avec feux d'obstacles et code couleur opérateur).
 2. **Identification & Triangulation des Pylônes-Relais :**  
    - **Barycentre pondéré en puissance réelle ($10^{\text{dBm}/10}\text{ mW}$)** : Calcul du centre de gravité énergétique des échantillons pour localiser avec précision les pylônes émetteurs même en milieu urbain dense.
    - **Base locale OpenCellID Gabon (MCC 628)** : Confrontation instantanée de la cellule active avec le registre officiel des sites Moov Africa (`MNC 01`), Airtel Gabon (`MNC 02`) et Azur (`MNC 03`).

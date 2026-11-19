@@ -10,6 +10,8 @@ let towerLayer = null;
 let officialTowerLayer = null;
 let estimatedTowerLatLng = null;
 let hasCenteredOnGPS = false;
+let radarSweepMarker = null;
+let isRadarActive = true;
 
 // Tile Layer References
 let tileLayers = {};
@@ -83,6 +85,147 @@ function initChart() {
                 }
             }
         }
+    });
+}
+
+// =========================================================================
+// FABRIQUE D'ICÔNES ET RADAR TACTIQUES LEAFLET
+// =========================================================================
+
+// 1. Balayage Radar Tournant autour de la position de la sonde mobile
+function createRadarSweepIcon() {
+    const html = `
+        <div class="radar-sweep-container">
+            <div class="radar-scope">
+                <div class="radar-sweep-beam"></div>
+                <div class="radar-ring-1"></div>
+                <div class="radar-ring-2"></div>
+                <div class="radar-ring-3"></div>
+                <div class="radar-axis-h"></div>
+                <div class="radar-axis-v"></div>
+                <div class="radar-tag top">500m</div>
+                <div class="radar-tag right">250m</div>
+            </div>
+        </div>
+    `;
+    return L.divIcon({
+        className: 'custom-leaflet-icon radar-sweep-marker',
+        html: html,
+        iconSize: [280, 280],
+        iconAnchor: [140, 140]
+    });
+}
+
+// 2. Icône Tactique de la Sonde Mobile / Rover (Ma Position GPS)
+function createUserRoverIcon() {
+    const html = `
+        <div class="custom-user-marker">
+            <div class="user-pulse-ring"></div>
+            <div class="user-pulse-ring-outer"></div>
+            <div class="user-beacon-center">
+                <svg viewBox="0 0 36 36" width="34" height="34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="18" cy="18" r="14" stroke="#38bdf8" stroke-width="2" stroke-dasharray="3, 2.5" opacity="0.85"/>
+                    <circle cx="18" cy="18" r="9.5" fill="rgba(15, 23, 42, 0.95)" stroke="#ffffff" stroke-width="2"/>
+                    <circle cx="18" cy="18" r="4.5" fill="#38bdf8"/>
+                    <circle cx="18" cy="18" r="2" fill="#ffffff"/>
+                    <line x1="18" y1="2" x2="18" y2="6.5" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+                    <line x1="18" y1="29.5" x2="18" y2="34" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+                    <line x1="2" y1="18" x2="6.5" y2="18" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+                    <line x1="29.5" y1="18" x2="34" y2="18" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </div>
+    `;
+    return L.divIcon({
+        className: 'custom-leaflet-icon user-rover-icon',
+        html: html,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+        popupAnchor: [0, -18]
+    });
+}
+
+// 3. Icône de Pylône Estimé par Barycentre Énergétique
+function createEstimatedTowerIcon() {
+    const html = `
+        <div class="custom-pylone-wrapper estimated">
+            <div class="pylone-icon-body">
+                <svg viewBox="0 0 48 54" width="40" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Ondes rayonnantes gauches et droites -->
+                    <path d="M11 18 C6 23 6 31 11 36" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" class="pylone-wave-1"/>
+                    <path d="M5 13 C-1 21 -1 33 5 41" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.6" class="pylone-wave-2"/>
+                    <path d="M37 18 C42 23 42 31 37 36" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" class="pylone-wave-1"/>
+                    <path d="M43 13 C49 21 49 33 43 41" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" opacity="0.6" class="pylone-wave-2"/>
+                    
+                    <!-- Pylône Treillis -->
+                    <path d="M24 10 L15 50 L33 50 Z" fill="rgba(15, 23, 42, 0.92)" stroke="#fbbf24" stroke-width="2.2" stroke-linejoin="round"/>
+                    <path d="M18 42 L30 42 M19 34 L29 34 M21 26 L27 26 M22 18 L26 18" stroke="#fbbf24" stroke-width="1.6"/>
+                    <path d="M18 42 L29 34 M30 42 L19 34 M19 34 L27 26 M29 34 L21 26" stroke="#d97706" stroke-width="1.2"/>
+                    
+                    <!-- Sommet & Émetteur Radio -->
+                    <line x1="24" y1="4" x2="24" y2="10" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="24" cy="4" r="3" fill="#fef08a" stroke="#d97706" stroke-width="1.5"/>
+                    <line x1="19" y1="10" x2="29" y2="10" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="pylone-badge estimated">Barycentre</div>
+        </div>
+    `;
+    return L.divIcon({
+        className: 'custom-leaflet-icon estimated-tower-icon',
+        html: html,
+        iconSize: [40, 52],
+        iconAnchor: [20, 46],
+        popupAnchor: [0, -46]
+    });
+}
+
+// 4. Icône de Pylône Officiel Référencé (OpenCellID)
+function createOfficialTowerIcon(opName, confidence) {
+    let opClass = 'fallback';
+    let opLower = (opName || '').toLowerCase();
+    if (opLower.includes('moov') || opLower.includes('gabon telecom')) opClass = 'moov';
+    else if (opLower.includes('airtel')) opClass = 'airtel';
+    else if (opLower.includes('azur')) opClass = 'azur';
+    else if (confidence === 'LOW') opClass = 'fallback';
+
+    let label = 'Pylône 3GPP';
+    if (opClass === 'moov') label = 'Moov Africa';
+    else if (opClass === 'airtel') label = 'Airtel';
+    else if (opClass === 'azur') label = 'Azur';
+
+    const html = `
+        <div class="custom-pylone-wrapper official ${opClass}">
+            <div class="pylone-icon-body">
+                <svg viewBox="0 0 48 54" width="40" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Ondes sectorielles -->
+                    <path d="M10 16 C6 22 6 32 10 38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="pylone-wave-1"/>
+                    <path d="M38 16 C42 22 42 32 38 38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" class="pylone-wave-1"/>
+                    
+                    <!-- Mât Monopole télécom -->
+                    <rect x="22.5" y="10" width="3" height="40" rx="1.5" fill="currentColor"/>
+                    <path d="M12 50 L36 50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M15 50 L24 28 L33 50" stroke="currentColor" stroke-width="1.8"/>
+                    
+                    <!-- Supports d'antennes sectorielles -->
+                    <rect x="15" y="14" width="18" height="4" rx="1" fill="#0f172a" stroke="currentColor" stroke-width="1.5"/>
+                    <rect x="14" y="11" width="3.5" height="10" rx="1" fill="currentColor"/>
+                    <rect x="30.5" y="11" width="3.5" height="10" rx="1" fill="currentColor"/>
+                    <rect x="22" y="7" width="4" height="11" rx="1" fill="currentColor"/>
+                    
+                    <!-- Feu d'obstacle aérien clignotant -->
+                    <circle cx="24" cy="4" r="2.5" fill="#ef4444" stroke="#ffffff" stroke-width="1" class="tower-light-blink"/>
+                </svg>
+            </div>
+            <div class="pylone-badge official">${label}</div>
+        </div>
+    `;
+    return L.divIcon({
+        className: 'custom-leaflet-icon official-tower-icon',
+        html: html,
+        iconSize: [40, 52],
+        iconAnchor: [20, 46],
+        popupAnchor: [0, -46]
     });
 }
 
@@ -219,6 +362,39 @@ function setupMapControls() {
                 leafletMap.setView(currentPositionMarker.getLatLng(), 16);
             } else {
                 alert("En attente de la position GPS du Samsung...");
+            }
+        });
+    }
+
+    // Activer / Désactiver le balayage radar tournant autour de la position
+    const btnToggleRadar = document.getElementById('btn-toggle-radar');
+    if (btnToggleRadar) {
+        btnToggleRadar.addEventListener('click', () => {
+            isRadarActive = !isRadarActive;
+            if (isRadarActive) {
+                btnToggleRadar.className = "px-2.5 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 transition flex items-center gap-1 font-semibold";
+                btnToggleRadar.innerHTML = "🌀 Radar (ON)";
+                if (currentPositionMarker) {
+                    const latLng = currentPositionMarker.getLatLng();
+                    if (!radarSweepMarker) {
+                        radarSweepMarker = L.marker(latLng, {
+                            icon: createRadarSweepIcon(),
+                            interactive: false,
+                            zIndexOffset: 100
+                        }).addTo(leafletMap);
+                    } else {
+                        radarSweepMarker.setLatLng(latLng);
+                        if (!leafletMap.hasLayer(radarSweepMarker)) {
+                            radarSweepMarker.addTo(leafletMap);
+                        }
+                    }
+                }
+            } else {
+                btnToggleRadar.className = "px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:text-white transition flex items-center gap-1 font-semibold";
+                btnToggleRadar.innerHTML = "🌀 Radar (OFF)";
+                if (radarSweepMarker && leafletMap.hasLayer(radarSweepMarker)) {
+                    leafletMap.removeLayer(radarSweepMarker);
+                }
             }
         });
     }
@@ -499,14 +675,10 @@ async function loadMapPoints() {
                 dashArray: '5, 5'
             });
 
-            // Point Jaune Émetteur
-            const towerMarker = L.circleMarker(estimatedTowerLatLng, {
-                radius: 12,
-                fillColor: '#fbbf24', // Jaune / Or éclatant
-                color: '#ffffff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 1
+            // Pylône Émetteur avec icône treillis dédiée et ondes rayonnantes
+            const towerMarker = L.marker(estimatedTowerLatLng, {
+                icon: createEstimatedTowerIcon(),
+                zIndexOffset: 1000
             });
 
             const topP = topPoints[0];
@@ -583,19 +755,43 @@ async function updateTelemetry() {
             gpsAccPill.textContent = `±${acc} m`;
             gpsAccPill.className = "text-xs px-2 py-0.5 rounded font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
 
-            // Marqueur Mobile en direct
+            // Marqueur Mobile en direct (Icône Tactique Sonde Mobile)
             const latLng = [gps.latitude, gps.longitude];
             if (!currentPositionMarker) {
-                currentPositionMarker = L.circleMarker(latLng, {
-                    radius: 8,
-                    fillColor: '#38bdf8',
-                    color: '#ffffff',
-                    weight: 2.5,
-                    fillOpacity: 1
+                currentPositionMarker = L.marker(latLng, {
+                    icon: createUserRoverIcon(),
+                    zIndexOffset: 2000
                 }).addTo(leafletMap);
-                currentPositionMarker.bindPopup("<strong class='text-slate-900'>Position actuelle (Samsung Galaxy A14)</strong>");
+                currentPositionMarker.bindPopup(`
+                    <div class="font-sans text-xs leading-relaxed">
+                        <div class="flex items-center gap-1.5 text-cyan-400 font-bold uppercase text-[11px] mb-1">
+                            <span>🎯</span> Ma Position (Sonde Mobile)
+                        </div>
+                        <strong class="text-white">Samsung Galaxy A14</strong><br>
+                        <span class="text-slate-300 font-mono">Vitesse : ${Math.round(gps.speed || 0)} km/h • Précision : ±${acc} m</span><br>
+                        <span class="text-cyan-300 font-mono text-[10px]">${gps.latitude.toFixed(5)}, ${gps.longitude.toFixed(5)}</span>
+                    </div>
+                `);
             } else {
                 currentPositionMarker.setLatLng(latLng);
+            }
+
+            // Balayage Radar Tournant autour de la position
+            if (isRadarActive) {
+                if (!radarSweepMarker) {
+                    radarSweepMarker = L.marker(latLng, {
+                        icon: createRadarSweepIcon(),
+                        interactive: false,
+                        zIndexOffset: 100
+                    }).addTo(leafletMap);
+                } else {
+                    radarSweepMarker.setLatLng(latLng);
+                    if (!leafletMap.hasLayer(radarSweepMarker)) {
+                        radarSweepMarker.addTo(leafletMap);
+                    }
+                }
+            } else if (radarSweepMarker && leafletMap.hasLayer(radarSweepMarker)) {
+                leafletMap.removeLayer(radarSweepMarker);
             }
 
             if (gps.accuracy) {
@@ -743,13 +939,10 @@ async function updateTelemetry() {
 
             const markerColor = conf === 'LOW' ? '#f59e0b' : '#06b6d4';
 
-            const offMarker = L.circleMarker(towLatLng, {
-                radius: 11,
-                fillColor: markerColor,
-                color: '#ffffff',
-                weight: 2.5,
-                opacity: 1,
-                fillOpacity: 0.95
+            // Pylône Officiel OpenCellID avec icône télécom dédiée
+            const offMarker = L.marker(towLatLng, {
+                icon: createOfficialTowerIcon(tow.site_name || tow.operator_name || '', conf),
+                zIndexOffset: 950
             });
 
             const offRadius = L.circle(towLatLng, {
