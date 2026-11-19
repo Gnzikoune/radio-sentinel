@@ -102,8 +102,6 @@ def insert_telemetry(data: dict):
     ))
     conn.commit()
     conn.close()
-    conn.commit()
-    conn.close()
 
 def log_event(event_type: str, message: str):
     conn = get_connection()

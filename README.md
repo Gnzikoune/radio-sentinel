@@ -98,7 +98,7 @@ Le pilote matériel dialogue directement avec le microcontrôleur du modem via l
   - **LAC** : *Location Area Code* (ex: `32204`).
   - **Cell ID** : Identifiant unique de la cellule active (ex: `921`).
   - **UARFCN / ARFCN** : Canal de fréquence porteuse physique et calcul automatique de la fréquence radio réelle en MHz (ex: canal `2995` $\rightarrow 936.6\text{ MHz}$).
-* **Tolérance au Débranchement (Hot-Plug)** : Détection dynamique de l'insertion/retrait de la clé USB avec journalisation automatique des événements de coupure (`OUTAGE`) et reprise sans plantage (`RECONNECT`).
+* **Tolérance au Débranchement & Robustesse Série** : Détection dynamique par VID/PID (`1BBB:022C`) avec isolation stricte des couches : les opérations de base de données ne bloquent ni ne rompent la communication série physique, assurant une stabilité 24/7 sur le port COM sans décrochage intempestif. Journalisation automatique des événements de coupure (`OUTAGE`) et reprise instantanée (`RECONNECT`).
 
 ### 2. Relais Satellite Mobile & Sonde 4G Active
 Pour supprimer le besoin d'acheter un dongle GPS USB et étendre l'écoute passive à la mesure de performance réelle :

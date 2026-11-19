@@ -420,7 +420,11 @@ class ModemService:
             })
 
             # Sauvegarde en BDD (avec GPS si actif)
-            database.insert_telemetry(self.live_state)
+            try:
+                database.insert_telemetry(self.live_state)
+            except Exception as dbe:
+                # Une erreur BDD temporaire ne doit JAMAIS fermer la liaison serie physique avec le modem
+                pass
 
     def _loop(self):
         while self.running:
@@ -429,8 +433,11 @@ class ModemService:
                     self.connect()
                 else:
                     self.poll_metrics()
+            except (serial.SerialException, OSError) as se:
+                self._disconnect(f"Câble modem débranché ou port inaccessible: {se}")
             except Exception as e:
-                self._disconnect(f"Exception dans la boucle: {e}")
+                # Toute autre erreur logicielle ne doit PAS fermer le port COM
+                pass
             time.sleep(1.5)
 
     def start(self):
