@@ -94,9 +94,48 @@
     font-size: 10px !important;
 }
 
-/* ==========================================================================
-   ICÔNES ET RADAR TACTIQUES LEAFLET RADIO SENTINEL™
-   ========================================================================== */
+/* Sonar Ping Echo pour antennes détectées par le radar */
+.radar-ping-echo {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(6, 182, 212, 0.75);
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 70%);
+    animation: sonarEcho 3.2s infinite ease-out;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes sonarEcho {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0.95;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1.6);
+        opacity: 0.35;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2.3);
+        opacity: 0;
+    }
+}
+
+.custom-pylone-wrapper.official.active-serving .pylone-icon-body {
+    filter: drop-shadow(0 0 14px rgba(34, 211, 238, 1)) !important;
+}
+
+.pylone-badge.active-serving {
+    background-color: rgba(6, 182, 212, 0.95) !important;
+    color: #020617 !important;
+    border-color: #38bdf8 !important;
+    font-weight: 800;
+}
+
 
 /* Élimination de la boîte blanche par défaut de Leaflet pour les DivIcons */
 .leaflet-div-icon.custom-leaflet-icon {

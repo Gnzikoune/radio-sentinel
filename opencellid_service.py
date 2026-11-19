@@ -82,7 +82,86 @@ def seed_opencellid_gabon(conn: sqlite3.Connection):
         INSERT OR IGNORE INTO opencellid_towers (radio, mcc, net, area, cell, unit, lon, lat, range, samples, site_name)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, ("UMTS", 628, 3, 32204, 924, 0, 9.3610, 0.5650, 3000, 3, "Pylône Azur - Ntoum / RN1 Corridor (à confirmer par wardriving)"))
+
+    # Sites supplémentaires Libreville & Grand Libreville (Moov, Airtel, Azur)
+    extra_towers = [
+        ("LTE",  628, 2, 201, 22105, 0, 9.4390, 0.4080, 1500, 85, "Pylône 4G Airtel - Quartier Louis / Quaben"),
+        ("UMTS", 628, 1, 303, 15201, 0, 9.4620, 0.3850, 2200, 70, "Pylône Moov - Oloumi Zone Industrielle"),
+        ("LTE",  628, 2, 201, 31080, 0, 9.4890, 0.4120, 1800, 90, "Pylône 4G Airtel - Nzeng-Ayong Rond-Point"),
+        ("LTE",  628, 1, 303, 50310, 0, 9.4750, 0.4480, 2500, 120, "Pylône 4G Moov - Angondjé Cité des Ailes"),
+        ("UMTS", 628, 2, 201, 14050, 0, 9.4520, 0.4010, 1600, 60, "Pylône Airtel - Université UOB / Ancienne Sobraga"),
+        ("UMTS", 628, 1, 303, 11020, 0, 9.4410, 0.3980, 1400, 55, "Pylône Moov - Nombakélé / Montagne Sainte")
+    ]
+    cursor.executemany("""
+        INSERT OR IGNORE INTO opencellid_towers (radio, mcc, net, area, cell, unit, lon, lat, range, samples, site_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, extra_towers)
     conn.commit()
+
+def get_nearby_towers(conn: sqlite3.Connection, user_lat: float, user_lon: float, max_radius_m: float = 3500):
+    """
+    Récupère tous les pylônes de la base situés dans un rayon donné autour de l'utilisateur.
+    Calcule la distance géodésique Haversine et l'azimut (bearing de 0° à 360°).
+    Retourne la liste triée par distance croissante.
+    """
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT radio, mcc, net, area, cell, lon, lat, range, site_name
+        FROM opencellid_towers
+    """)
+    rows = cursor.fetchall()
+
+    nearby = []
+    for r in rows:
+        tow_lat, tow_lon = r[6], r[5]
+        op_name = "Opérateur Inconnu"
+        if r[1] == 628:
+            if r[2] == 1: op_name = "Moov Africa"
+            elif r[2] == 2: op_name = "Airtel Gabon"
+            elif r[2] == 3: op_name = "Azur Gabon"
+
+        if user_lat is not None and user_lon is not None:
+            dist = haversine_m(user_lat, user_lon, tow_lat, tow_lon)
+            if dist <= max_radius_m:
+                # Azimut / Bearing géographique
+                d_lon = math.radians(tow_lon - user_lon)
+                y = math.sin(d_lon) * math.cos(math.radians(tow_lat))
+                x = math.cos(math.radians(user_lat)) * math.sin(math.radians(tow_lat)) - \
+                    math.sin(math.radians(user_lat)) * math.cos(math.radians(tow_lat)) * math.cos(d_lon)
+                bearing = (math.degrees(math.atan2(y, x)) + 360) % 360
+
+                nearby.append({
+                    "radio": r[0],
+                    "mcc": r[1],
+                    "net": r[2],
+                    "area": r[3],
+                    "cell": r[4],
+                    "lon": tow_lon,
+                    "lat": tow_lat,
+                    "range": r[7],
+                    "site_name": r[8],
+                    "operator_name": op_name,
+                    "distance_m": round(dist),
+                    "bearing_deg": round(bearing, 1)
+                })
+        else:
+            nearby.append({
+                "radio": r[0],
+                "mcc": r[1],
+                "net": r[2],
+                "area": r[3],
+                "cell": r[4],
+                "lon": tow_lon,
+                "lat": tow_lat,
+                "range": r[7],
+                "site_name": r[8],
+                "operator_name": op_name,
+                "distance_m": None,
+                "bearing_deg": None
+            })
+
+    nearby.sort(key=lambda x: (x["distance_m"] if x["distance_m"] is not None else 999999))
+    return nearby
 
 def lookup_tower(conn: sqlite3.Connection, mcc: int, net: int, cell_id: int,
                  user_lat: float = None, user_lon: float = None):

@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 import json
 import os
-from opencellid_service import seed_opencellid_gabon, lookup_tower
+from opencellid_service import seed_opencellid_gabon, lookup_tower, get_nearby_towers as lookup_nearby_towers
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "antenne.db")
 
@@ -166,6 +166,13 @@ def get_official_tower(mcc: int, net: int, cell_id: int,
     """
     conn = get_connection()
     res = lookup_tower(conn, mcc, net, cell_id, user_lat=user_lat, user_lon=user_lon)
+    conn.close()
+    return res
+
+def get_nearby_towers(user_lat: float, user_lon: float, max_radius_m: float = 3500):
+    """Interroge la table locale OpenCellID pour trouver tous les pylônes dans le périmètre du radar."""
+    conn = get_connection()
+    res = lookup_nearby_towers(conn, user_lat, user_lon, max_radius_m=max_radius_m)
     conn.close()
     return res
 

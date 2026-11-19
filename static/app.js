@@ -8,6 +8,7 @@ let heatLayer = null;
 let isHeatmapActive = true;
 let towerLayer = null;
 let officialTowerLayer = null;
+let nearbyTowersLayer = null;
 let estimatedTowerLatLng = null;
 let hasCenteredOnGPS = false;
 let radarSweepMarker = null;
@@ -180,8 +181,8 @@ function createEstimatedTowerIcon() {
     });
 }
 
-// 4. Icône de Pylône Officiel Référencé (OpenCellID)
-function createOfficialTowerIcon(opName, confidence) {
+// 4. Icône de Pylône Officiel Référencé (OpenCellID & Détection Radar)
+function createOfficialTowerIcon(opName, confidence, isServing = false, distanceM = null) {
     let opClass = 'fallback';
     let opLower = (opName || '').toLowerCase();
     if (opLower.includes('moov') || opLower.includes('gabon telecom')) opClass = 'moov';
@@ -189,13 +190,23 @@ function createOfficialTowerIcon(opName, confidence) {
     else if (opLower.includes('azur')) opClass = 'azur';
     else if (confidence === 'LOW') opClass = 'fallback';
 
-    let label = 'Pylône 3GPP';
-    if (opClass === 'moov') label = 'Moov Africa';
+    let label = 'Pylône';
+    if (opClass === 'moov') label = 'Moov';
     else if (opClass === 'airtel') label = 'Airtel';
     else if (opClass === 'azur') label = 'Azur';
 
+    if (isServing) {
+        label = `★ ${label}`;
+    } else if (distanceM) {
+        label = `${label} (${distanceM}m)`;
+    }
+
+    const servingClass = isServing ? 'active-serving' : '';
+
     const html = `
-        <div class="custom-pylone-wrapper official ${opClass}">
+        <div class="custom-pylone-wrapper official ${opClass} ${servingClass}">
+            <!-- Echo / Ping Sonar du radar -->
+            <div class="radar-ping-echo"></div>
             <div class="pylone-icon-body">
                 <svg viewBox="0 0 48 54" width="40" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <!-- Ondes sectorielles -->
@@ -217,7 +228,7 @@ function createOfficialTowerIcon(opName, confidence) {
                     <circle cx="24" cy="4" r="2.5" fill="#ef4444" stroke="#ffffff" stroke-width="1" class="tower-light-blink"/>
                 </svg>
             </div>
-            <div class="pylone-badge official">${label}</div>
+            <div class="pylone-badge official ${servingClass}">${label}</div>
         </div>
     `;
     return L.divIcon({
@@ -226,6 +237,74 @@ function createOfficialTowerIcon(opName, confidence) {
         iconSize: [40, 52],
         iconAnchor: [20, 46],
         popupAnchor: [0, -46]
+    });
+}
+
+// 5. Révélation et affichage dynamique des pylônes détectés par le balayage radar
+function updateNearbyRadarTowers(nearbyTowers, servingTower, gps) {
+    if (!nearbyTowersLayer || !leafletMap) return;
+    nearbyTowersLayer.clearLayers();
+
+    if (!nearbyTowers || !nearbyTowers.length) return;
+
+    const servingCell = servingTower ? String(servingTower.cell) : null;
+    const detectedCount = nearbyTowers.length;
+
+    // Mise à jour de l'indicateur de statut sous la carte
+    const towerStatusEl = document.getElementById('tower-triangulation-status');
+    if (towerStatusEl && (!estimatedTowerLatLng || geoSpread < MIN_SPREAD_FOR_TOWER)) {
+        towerStatusEl.innerHTML = `🌀 Balayage Radar : <strong class="text-cyan-400 font-bold">${detectedCount} pylône(s)</strong> détecté(s) dans le secteur`;
+    }
+
+    nearbyTowers.forEach(tow => {
+        const towLatLng = [tow.lat, tow.lon];
+        const isServing = (servingCell && String(tow.cell) === servingCell);
+
+        // Si c'est l'antenne active et qu'elle est déjà gérée par officialTowerLayer, on n'ajoute pas de doublon
+        if (isServing && servingTower) {
+            return;
+        }
+
+        const conf = 'HIGH';
+        const distM = tow.distance_m;
+        const bearing = tow.bearing_deg;
+
+        // Marqueur avec l'icône de pylône dédiée
+        const marker = L.marker(towLatLng, {
+            icon: createOfficialTowerIcon(tow.operator_name || tow.site_name, conf, false, distM),
+            zIndexOffset: 920
+        });
+
+        // Cercle d'écho radar autour du pylône découvert
+        const echoCircle = L.circle(towLatLng, {
+            radius: Math.min(250, (tow.range || 800) / 3),
+            color: '#06b6d4',
+            fillColor: '#06b6d4',
+            fillOpacity: 0.06,
+            weight: 1,
+            dashArray: '3, 4'
+        });
+
+        const distTxt = distM !== null ? `${distM} m (Azimut ${bearing !== null ? bearing + '°' : '--'})` : 'En attente GPS';
+
+        marker.bindPopup(`
+            <div class="font-sans text-xs leading-relaxed">
+                <div class="flex items-center gap-1.5 text-cyan-400 font-bold uppercase text-[11px] mb-1">
+                    <span>🗼</span> Pylône Détecté par Radar
+                </div>
+                <strong class="text-slate-100 text-sm">${tow.site_name || 'Antenne Relais'}</strong><br>
+                <span class="text-cyan-300 font-mono font-bold">${tow.operator_name}</span> • <span class="text-slate-400 font-mono">${tow.radio}</span><br>
+                <div class="my-1">
+                    <span class="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold text-[10px]">🌀 Écho Radar Confirmé</span>
+                </div>
+                <span class="text-emerald-400 font-mono font-bold">📍 Distance : ${distTxt}</span><br>
+                <span class="text-slate-300 font-mono text-[10px]">Cell ID : <strong class="text-cyan-300">${tow.cell}</strong> • LAC : ${tow.area}</span><br>
+                <span class="text-slate-500 font-mono text-[10px]">Coordonnées : ${tow.lat.toFixed(5)}, ${tow.lon.toFixed(5)}</span>
+            </div>
+        `);
+
+        nearbyTowersLayer.addLayer(echoCircle);
+        nearbyTowersLayer.addLayer(marker);
     });
 }
 
@@ -292,6 +371,7 @@ function initMap() {
     // Groupes de calques pour la Heatmap continue, l'antenne et les balises
     heatLayer = L.layerGroup().addTo(leafletMap);
     officialTowerLayer = L.layerGroup().addTo(leafletMap);
+    nearbyTowersLayer = L.layerGroup().addTo(leafletMap);
     towerLayer = L.layerGroup().addTo(leafletMap);
     mapPointsLayer = L.layerGroup().addTo(leafletMap);
 
@@ -1001,6 +1081,11 @@ async function updateTelemetry() {
                 valTowerBox.classList.remove('hidden');
                 valTowerName.innerHTML = `⚠️ <span class="text-amber-300">${data.tower_match_note}</span>`;
             }
+        }
+
+        // Détection et affichage des antennes-relais environnantes dans le balayage radar
+        if (data.nearby_towers && leafletMap) {
+            updateNearbyRadarTowers(data.nearby_towers, data.official_tower, gps);
         }
 
         // 7. Surveillance Cyber-Sécurité & Détection Faux Relais (IMSI-Catcher / 2G Downgrade)

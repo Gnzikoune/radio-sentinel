@@ -82,7 +82,8 @@
 | Method | Endpoint | Operational Role |
 |---|---|---|
 | `GET` | `/api/status` | Global station health, local IP auto-discovery, nomad tunnel status. |
-| `GET` | `/api/telemetry/live` | Complete real-time payload (physical RF, cell topology, GNSS, QoS). |
+| `GET` | `/api/telemetry/live` | Complete real-time payload (physical RF, cell topology, GNSS, QoS, radar-detected towers). |
+| `GET` | `/api/towers/nearby` | Cell towers referenced within the perimeter of the sweeping radar (metric distance, azimuth, MNO). |
 | `GET` | `/api/telemetry/history` | Rolling historical window for Chart.js spectral viewer. |
 | `GET` | `/api/map-points` | Geospatial survey samples for GIS heatmap and route plotting. |
 | `GET` | `/api/events` | Operational audit log (outages, reconnections, security alerts). |

@@ -118,7 +118,8 @@ Accessible sur `/audit-report` :
 | Méthode | Point d'Accès | Description Opérationnelle |
 |---|---|---|
 | `GET` | `/api/status` | Statut global de la station, détection d'IP locale et état du tunnel nomade. |
-| `GET` | `/api/telemetry/live` | Payload temps réel complet (RF physique, topologie cellule, GNSS, audit QoS). |
+| `GET` | `/api/telemetry/live` | Payload temps réel complet (RF physique, topologie cellule, GNSS, audit QoS, pylônes détectés par radar). |
+| `GET` | `/api/towers/nearby` | Pylônes cellulaires référencés dans le périmètre du radar (distance métrique, azimut, opérateur). |
 | `GET` | `/api/telemetry/history` | Fenêtre temporelle glissante pour le visualiseur spectral Chart.js. |
 | `GET` | `/api/map-points` | Échantillons géoréférencés pour la heatmap et le tracé de route SIG. |
 | `GET` | `/api/events` | Journal des événements d'exploitation, pannes et alertes de sécurité. |

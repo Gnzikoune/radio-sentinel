@@ -247,15 +247,36 @@ def get_live():
             }
         }
 
+    nearby_towers = []
+    try:
+        if gps_data and gps_data.get("latitude") and gps_data.get("longitude"):
+            nearby_towers = database.get_nearby_towers(gps_data["latitude"], gps_data["longitude"], max_radius_m=4000)
+        elif official_tower and official_tower.get("lat") and official_tower.get("lon"):
+            nearby_towers = database.get_nearby_towers(official_tower["lat"], official_tower["lon"], max_radius_m=4000)
+        else:
+            nearby_towers = database.get_nearby_towers(0.4162, 9.4673, max_radius_m=5000)
+    except Exception:
+        pass
+
     return {
         "live": live,
         "hardware": modem_instance.hardware_info,
         "gps": gps_data,
         "stats": database.get_stats(),
         "official_tower": official_tower,
+        "nearby_towers": nearby_towers,
         "tower_match_note": tower_match_note,
         "dual_audit": dual_audit
     }
+
+@app.get("/api/towers/nearby")
+def get_nearby_towers_endpoint(lat: float = None, lon: float = None, radius: float = 4000):
+    """Retourne les pylônes cellulaires référencés dans le périmètre du radar."""
+    if lat is None or lon is None:
+        gps = gps_instance.get_current()
+        lat = gps.get("latitude") or 0.4162
+        lon = gps.get("longitude") or 9.4673
+    return database.get_nearby_towers(lat, lon, max_radius_m=radius)
 
 @app.get("/api/telemetry/history")
 def get_history(limit: int = 60):
