@@ -575,55 +575,86 @@
 
     </main>
 
-    <!-- Modal QR Code pour Appairage Mobile Instantané -->
-    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+    <!-- Modal QR Code Intelligent (Nomade 4G vs Wi-Fi Local) -->
+    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
             <!-- Bouton Fermer -->
             <button id="btn-close-qr-modal" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg font-bold p-1">
                 ✕
             </button>
 
-            <!-- En-tête Modale -->
+            <!-- En-tete Modale -->
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-lg">
                     📱
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-slate-100">Appairage Mobile Instantané</h3>
-                    <p class="text-xs text-slate-400">Scannez le QR Code depuis votre Samsung Galaxy A14</p>
+                    <h3 class="text-base font-bold text-slate-100">Appairage Mobile Intelligent</h3>
+                    <p class="text-xs text-slate-400">Scannez depuis votre Samsung pour audit mobile direct</p>
                 </div>
             </div>
 
-            <!-- Onglets de sélection du mode -->
+            <!-- Selecteur d'Environnement Reseau (Nomade 4G vs Wi-Fi Local) -->
             <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs font-semibold">
-                <button id="btn-qr-tab-dashboard" class="py-2 rounded-lg bg-indigo-600 text-white transition shadow">
-                    Tableau Complet
+                <button id="btn-qr-env-nomad" class="py-2.5 px-2 rounded-lg bg-indigo-600 text-white transition shadow flex items-center justify-center gap-1.5">
+                    <span>🌍</span>
+                    <span>Sortie Nomade 4G</span>
                 </button>
-                <button id="btn-qr-tab-gps" class="py-2 rounded-lg text-slate-400 hover:text-white transition">
-                    Balise GPS Simple
+                <button id="btn-qr-env-local" class="py-2.5 px-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5">
+                    <span>🏠</span>
+                    <span>Wi-Fi Local (Maison)</span>
                 </button>
             </div>
 
-            <!-- Conteneur QR Code Blanc Haute Visibilité -->
-            <div class="flex flex-col items-center justify-center p-5 bg-white rounded-2xl shadow-inner mx-auto max-w-[240px]">
-                <div id="qrcode-display" class="flex items-center justify-center"></div>
+            <!-- Banniere de Statut Dynamique du Tunnel -->
+            <div id="qr-tunnel-banner" class="p-3 rounded-xl border text-xs flex items-start gap-2.5 bg-emerald-950/40 border-emerald-800/80 text-emerald-300">
+                <span id="qr-tunnel-icon" class="text-base">🟢</span>
+                <div class="flex-1">
+                    <div id="qr-tunnel-title" class="font-bold">Tunnel Nomade Internet Actif</div>
+                    <div id="qr-tunnel-desc" class="text-[11px] text-emerald-200/80 mt-0.5 leading-relaxed">
+                        Scannez ce QR Code chez vous avant de partir : le Samsung restera connecté au PC meme en basculant en 4G dans la rue !
+                    </div>
+                </div>
+                <button id="btn-refresh-tunnel-status" title="Verifier le statut" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-200 rounded font-mono border border-slate-700">
+                    🔄 Actualiser
+                </button>
             </div>
 
-            <!-- Affichage de l'URL & Bouton Copier -->
+            <!-- Sous-onglets de destination : Balise GPS vs Tableau Complet -->
+            <div class="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
+                <span class="text-slate-400 font-mono text-[11px]">Destination :</span>
+                <div class="flex gap-1.5">
+                    <button id="btn-qr-dest-gps" class="px-3 py-1 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold transition">
+                        🛰️ Balise GPS & 4G (/gps)
+                    </button>
+                    <button id="btn-qr-dest-dash" class="px-3 py-1 rounded-md text-slate-400 hover:text-white border border-transparent transition">
+                        📊 Tableau Complet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Conteneur QR Code Blanc Haute Visibilite -->
+            <div class="flex flex-col items-center justify-center p-5 bg-white rounded-2xl shadow-inner mx-auto max-w-[230px]">
+                <div id="qrcode-display" class="flex items-center justify-center min-h-[190px]"></div>
+            </div>
+
+            <!-- Affichage de l'URL & Boutons Copier / Telecharger -->
             <div class="space-y-1.5">
-                <div class="text-[11px] font-mono text-slate-400 flex justify-between">
-                    <span>URL Cible :</span>
-                    <button id="btn-copy-qr-url" class="text-cyan-400 hover:underline">Copier le lien</button>
+                <div class="text-[11px] font-mono text-slate-400 flex justify-between items-center">
+                    <span>URL Scannable :</span>
+                    <div class="flex gap-2">
+                        <button id="btn-copy-qr-url" class="text-cyan-400 hover:underline">Copier le lien</button>
+                    </div>
                 </div>
                 <div id="qr-target-url-text" class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-cyan-300 break-all select-all">
                     --
                 </div>
             </div>
 
-            <!-- Conseil utilisateur -->
-            <p class="text-[11px] text-slate-400 text-center leading-relaxed">
-                👉 Ouvrez l'application <strong>Appareil photo</strong> ou le lecteur QR de votre téléphone, visez l'écran et appuyez sur la notification pour ouvrir le tableau de bord sans rien saisir.
-            </p>
+            <!-- Conseil utilisateur averti -->
+            <div id="qr-mode-advice" class="text-[11px] text-slate-400 text-center leading-relaxed">
+                👉 Ouvrez l'appareil photo du Samsung A14 et visez l'ecran pour ouvrir la session sans saisie.
+            </div>
         </div>
     </div>
 

@@ -1120,68 +1120,171 @@ function setupClientGPS() {
 }
 
 // -------------------------------------------------------------
-// Module QR Code pour Appairage Mobile Sans Saisie
+// Module QR Code Intelligent pour Appairage Mobile Sans Saisie
+// Distingue le Mode Nomade 4G (Tunnel Cloudflare) du Wi-Fi Local
 // -------------------------------------------------------------
 let qrCodeInstance = null;
-let currentQrMode = 'dashboard'; // 'dashboard' ou 'gps'
+let qrSelectedEnv = 'nomad'; // 'nomad' (Cloudflare 4G) ou 'local' (Wi-Fi)
+let qrSelectedDest = 'gps';  // 'gps' (/gps) ou 'dash' (/)
+let serverStatusCache = null;
 
 function setupQRCodeModal() {
     const modal = document.getElementById('qr-modal');
     const btnOpenHeader = document.getElementById('btn-open-qr-modal');
     const btnOpenBanner = document.getElementById('btn-banner-qr');
     const btnClose = document.getElementById('btn-close-qr-modal');
-    const btnTabDashboard = document.getElementById('btn-qr-tab-dashboard');
-    const btnTabGps = document.getElementById('btn-qr-tab-gps');
+    
+    const btnEnvNomad = document.getElementById('btn-qr-env-nomad');
+    const btnEnvLocal = document.getElementById('btn-qr-env-local');
+    const btnDestGps = document.getElementById('btn-qr-dest-gps');
+    const btnDestDash = document.getElementById('btn-qr-dest-dash');
+    const btnRefresh = document.getElementById('btn-refresh-tunnel-status');
+
+    const tunnelBanner = document.getElementById('qr-tunnel-banner');
+    const tunnelIcon = document.getElementById('qr-tunnel-icon');
+    const tunnelTitle = document.getElementById('qr-tunnel-title');
+    const tunnelDesc = document.getElementById('qr-tunnel-desc');
+
     const qrDisplay = document.getElementById('qrcode-display');
     const qrText = document.getElementById('qr-target-url-text');
     const btnCopy = document.getElementById('btn-copy-qr-url');
+    const modeAdvice = document.getElementById('qr-mode-advice');
 
     if (!modal || !qrDisplay) return;
 
-    function getBaseUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const tunnelParam = urlParams.get('tunnel');
-        if (tunnelParam) {
-            return tunnelParam.replace(/\/+$/, '');
+    async function fetchSystemStatus() {
+        try {
+            const res = await fetch('/api/status');
+            if (res.ok) {
+                serverStatusCache = await res.json();
+            }
+        } catch (e) {
+            console.warn("Impossible de recuperer le statut du serveur:", e);
         }
-        return window.location.origin;
     }
 
-    function renderQr(mode) {
-        currentQrMode = mode;
-        const base = getBaseUrl();
-        const targetUrl = mode === 'gps' ? `${base}/gps` : base;
+    function computeTargetUrl() {
+        // Priorite tunnel: parametre d'URL ou backend /api/status
+        const urlParams = new URLSearchParams(window.location.search);
+        const tunnelParam = urlParams.get('tunnel');
+        let tunnelUrl = tunnelParam ? tunnelParam.replace(/\/+$/, '') : null;
+        if (!tunnelUrl && serverStatusCache && serverStatusCache.tunnel && serverStatusCache.tunnel.url) {
+            tunnelUrl = serverStatusCache.tunnel.url.replace(/\/+$/, '');
+        }
 
-        if (btnTabDashboard && btnTabGps) {
-            if (mode === 'dashboard') {
-                btnTabDashboard.className = "py-2 rounded-lg bg-indigo-600 text-white transition shadow";
-                btnTabGps.className = "py-2 rounded-lg text-slate-400 hover:text-white transition";
+        let localUrl = window.location.origin;
+        if (serverStatusCache && serverStatusCache.local_url) {
+            localUrl = serverStatusCache.local_url;
+        }
+
+        if (qrSelectedEnv === 'nomad') {
+            if (tunnelUrl) {
+                return qrSelectedDest === 'gps' ? `${tunnelUrl}/gps` : tunnelUrl;
             } else {
-                btnTabDashboard.className = "py-2 rounded-lg text-slate-400 hover:text-white transition";
-                btnTabGps.className = "py-2 rounded-lg bg-indigo-600 text-white transition shadow";
+                return null; // Pas de tunnel disponible
+            }
+        } else {
+            return qrSelectedDest === 'gps' ? `${localUrl}/gps` : localUrl;
+        }
+    }
+
+    function renderModalUI() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tunnelParam = urlParams.get('tunnel');
+        const hasTunnel = Boolean(tunnelParam || (serverStatusCache && serverStatusCache.tunnel && serverStatusCache.tunnel.active));
+        const tunnelUrl = tunnelParam || (serverStatusCache && serverStatusCache.tunnel && serverStatusCache.tunnel.url);
+
+        // Mise a jour visuelle des boutons Environnement
+        if (btnEnvNomad && btnEnvLocal) {
+            if (qrSelectedEnv === 'nomad') {
+                btnEnvNomad.className = "py-2.5 px-2 rounded-lg bg-indigo-600 text-white transition shadow flex items-center justify-center gap-1.5 font-bold";
+                btnEnvLocal.className = "py-2.5 px-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
+            } else {
+                btnEnvNomad.className = "py-2.5 px-2 rounded-lg text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5";
+                btnEnvLocal.className = "py-2.5 px-2 rounded-lg bg-indigo-600 text-white transition shadow flex items-center justify-center gap-1.5 font-bold";
             }
         }
 
-        if (qrText) qrText.textContent = targetUrl;
+        // Mise a jour visuelle des boutons Destination
+        if (btnDestGps && btnDestDash) {
+            if (qrSelectedDest === 'gps') {
+                btnDestGps.className = "px-3 py-1 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold transition";
+                btnDestDash.className = "px-3 py-1 rounded-md text-slate-400 hover:text-white border border-transparent transition";
+            } else {
+                btnDestGps.className = "px-3 py-1 rounded-md text-slate-400 hover:text-white border border-transparent transition";
+                btnDestDash.className = "px-3 py-1 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 font-semibold transition";
+            }
+        }
 
-        qrDisplay.innerHTML = '';
-        if (typeof QRCode !== 'undefined') {
-            qrCodeInstance = new QRCode(qrDisplay, {
-                text: targetUrl,
-                width: 190,
-                height: 190,
-                colorDark: "#0f172a",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
+        // Mise a jour du bandeau d'alerte contextuel
+        if (tunnelBanner) {
+            if (qrSelectedEnv === 'nomad') {
+                if (hasTunnel) {
+                    tunnelBanner.className = "p-3 rounded-xl border text-xs flex items-start gap-2.5 bg-emerald-950/40 border-emerald-800/80 text-emerald-300";
+                    tunnelIcon.textContent = "🟢";
+                    tunnelTitle.textContent = "Tunnel Internet 4G Actif (" + (serverStatusCache?.tunnel?.provider || "Cloudflare") + ")";
+                    tunnelDesc.textContent = "Scannez ce QR Code chez vous avant de partir : le Samsung restera connecte au PC meme en basculant en donnees mobiles 4G dehors !";
+                    if (modeAdvice) modeAdvice.textContent = "👉 Recommande pour la collecte terrain : liaison permanente avec la maison.";
+                } else {
+                    tunnelBanner.className = "p-3 rounded-xl border text-xs flex items-start gap-2.5 bg-amber-950/40 border-amber-800/80 text-amber-300";
+                    tunnelIcon.textContent = "⚠️";
+                    tunnelTitle.textContent = "Aucun tunnel nomade actif pour le moment !";
+                    tunnelDesc.textContent = "Lancez 'tunnel.bat' sur votre PC pour generer une adresse Internet publique. Sans tunnel, votre telephone ne pourra pas contacter le PC hors de portee du Wi-Fi.";
+                    if (modeAdvice) modeAdvice.textContent = "⚠️ Lancez tunnel.bat sur le PC puis cliquez sur 'Actualiser' pour generer le QR 4G.";
+                }
+            } else {
+                tunnelBanner.className = "p-3 rounded-xl border text-xs flex items-start gap-2.5 bg-slate-950/70 border-slate-800 text-slate-300";
+                tunnelIcon.textContent = "🏠";
+                tunnelTitle.textContent = "Mode Wi-Fi Local (Meme Box / Meme Reseau)";
+                tunnelDesc.textContent = "Fonctionne uniquement tant que votre telephone reste sur le meme reseau Wi-Fi que le PC. Si vous sortez de la maison, utilisez l'onglet 'Sortie Nomade 4G'.";
+                if (modeAdvice) modeAdvice.textContent = "👉 Valable uniquement a domicile avec le Samsung connecte a la box Wi-Fi.";
+            }
+        }
+
+        // Calcul et rendu de l'URL
+        const targetUrl = computeTargetUrl();
+
+        if (targetUrl) {
+            if (qrText) qrText.textContent = targetUrl;
+            qrDisplay.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                qrCodeInstance = new QRCode(qrDisplay, {
+                    text: targetUrl,
+                    width: 190,
+                    height: 190,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } else {
+                qrDisplay.innerHTML = `<span class="text-xs text-slate-500 font-mono">Chargement du moteur QR...</span>`;
+            }
         } else {
-            qrDisplay.innerHTML = `<span class="text-xs text-slate-500 font-mono">Génération du code...</span>`;
+            if (qrText) qrText.textContent = "En attente du lancement de tunnel.bat sur le PC...";
+            qrDisplay.innerHTML = `
+                <div class="text-center p-3 text-slate-600 font-mono text-xs">
+                    <div class="text-2xl mb-1">⏳</div>
+                    <div>Tunnel non detecte</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Double-cliquez sur tunnel.bat</div>
+                </div>
+            `;
         }
     }
 
-    function openModal() {
+    async function openModal() {
         modal.classList.remove('hidden');
-        renderQr(currentQrMode);
+        await fetchSystemStatus();
+
+        // Si un tunnel est actif, selectionner automatiquement 'nomad'
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasTunnel = Boolean(urlParams.get('tunnel') || (serverStatusCache && serverStatusCache.tunnel && serverStatusCache.tunnel.active));
+        if (hasTunnel) {
+            qrSelectedEnv = 'nomad';
+        } else {
+            // Par defaut si pas de tunnel encore lance, afficher l'onglet nomade avec l'invite a lancer tunnel.bat
+            qrSelectedEnv = 'nomad';
+        }
+        renderModalUI();
     }
 
     function closeModal() {
@@ -1196,22 +1299,58 @@ function setupQRCodeModal() {
         if (e.target === modal) closeModal();
     });
 
-    if (btnTabDashboard) btnTabDashboard.addEventListener('click', () => renderQr('dashboard'));
-    if (btnTabGps) btnTabGps.addEventListener('click', () => renderQr('gps'));
-
-    if (btnCopy) {
-        btnCopy.addEventListener('click', () => {
-            const base = getBaseUrl();
-            const targetUrl = currentQrMode === 'gps' ? `${base}/gps` : base;
-            navigator.clipboard.writeText(targetUrl).then(() => {
-                const old = btnCopy.textContent;
-                btnCopy.textContent = "✅ Lien copié !";
-                setTimeout(() => { btnCopy.textContent = old; }, 2000);
-            });
+    if (btnEnvNomad) {
+        btnEnvNomad.addEventListener('click', () => {
+            qrSelectedEnv = 'nomad';
+            renderModalUI();
         });
     }
 
-    // Si un tunnel public est passé dans l'URL (?tunnel=...), afficher le QR code immédiatement
+    if (btnEnvLocal) {
+        btnEnvLocal.addEventListener('click', () => {
+            qrSelectedEnv = 'local';
+            renderModalUI();
+        });
+    }
+
+    if (btnDestGps) {
+        btnDestGps.addEventListener('click', () => {
+            qrSelectedDest = 'gps';
+            renderModalUI();
+        });
+    }
+
+    if (btnDestDash) {
+        btnDestDash.addEventListener('click', () => {
+            qrSelectedDest = 'dash';
+            renderModalUI();
+        });
+    }
+
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', async () => {
+            const old = btnRefresh.textContent;
+            btnRefresh.textContent = "⏳...";
+            await fetchSystemStatus();
+            renderModalUI();
+            btnRefresh.textContent = old;
+        });
+    }
+
+    if (btnCopy) {
+        btnCopy.addEventListener('click', () => {
+            const url = computeTargetUrl();
+            if (url) {
+                navigator.clipboard.writeText(url).then(() => {
+                    const old = btnCopy.textContent;
+                    btnCopy.textContent = "✅ Copie !";
+                    setTimeout(() => { btnCopy.textContent = old; }, 2000);
+                });
+            }
+        });
+    }
+
+    // Si un tunnel public est passe dans l'URL (?tunnel=...), ouvrir la modale aussitot
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tunnel')) {
         setTimeout(openModal, 400);

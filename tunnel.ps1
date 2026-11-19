@@ -64,6 +64,13 @@ while (-not $Process.HasExited) {
             $PublicUrl = $Matches[0]
             $OpenedBrowser = $true
 
+            # Enregistrement automatique de l'URL dans l'API de Radio Sentinel
+            try {
+                [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
+                $TunnelBody = "{""url"":""$PublicUrl"",""provider"":""cloudflare"",""active"":true}"
+                Invoke-RestMethod -Uri "https://localhost:8000/api/tunnel" -Method Post -Body $TunnelBody -ContentType "application/json" -TimeoutSec 3 -ErrorAction SilentlyContinue | Out-Null
+            } catch {}
+
             Write-Host ""
             Write-Host "=================================================================" -ForegroundColor Green
             Write-Host "TUNNEL PUBLIC ACTIF - VOS URLS D'ACCES 4G MOBILE :" -ForegroundColor Green

@@ -205,11 +205,16 @@ antenne/
 3. Accédez au tableau de bord local :  
    👉 **`https://127.0.0.1:8000`**
 
-### 3. Appairage Mobile par QR Code (Zéro Saisie Manuelle)
+### 2. Appairage Mobile par QR Code Intelligent (Zéro Saisie Manuelle)
 Pour ne jamais avoir à saisir de longues URLs sur le clavier de votre téléphone :
-1. Sur le tableau de bord PC, cliquez sur le bouton violet **`📱 QR Code Mobile`** (ou double-cliquez sur `tunnel.bat` qui l'ouvre automatiquement).
-2. Pointez simplement l'appareil photo de votre smartphone vers l'écran du PC.
-3. Touchez la notification : Radio Sentinel s'ouvre instantanément sur votre Samsung A14 !
+1. Sur le tableau de bord PC, cliquez sur le bouton violet **`📱 QR Code Mobile`** (ou double-cliquez sur `tunnel.bat` qui l'ouvre automatiquement avec l'URL publique).
+2. La fenêtre modale intelligente propose deux environnements bien distincts :
+   - 🌍 **Mode Sortie Nomade 4G (Recommandé pour sortir)** : Génère le QR Code de votre tunnel sécurisé Cloudflare (`https://xxxx.trycloudflare.com/gps`). En scannant ce code chez vous avant de sortir, votre smartphone charge l'URL publique : lorsque vous quittez la maison et que le Wi-Fi se coupe au profit de la 4G, **la transmission de télémétrie continue sans aucune coupure** !
+   - 🏠 **Mode Wi-Fi Local (Maison)** : Génère le QR Code avec l'adresse IP de votre box (`https://192.168.1.x:8000/gps`), réservé aux tests intérieurs sous le même réseau Wi-Fi.
+3. Deux cibles d'affichage au choix :
+   - 🛰️ **Balise GPS & Sonde 4G (`/gps`)** : Interface tactile ultra-légère conçue pour tourner en tâche de fond dans la poche ou sur support pare-brise.
+   - 📊 **Tableau de Bord Complet (`/`)** : Le cockpit de commandement complet avec la carte satellite HD et les graphiques en direct sur smartphone.
+4. Pointez l'appareil photo du Samsung Galaxy A14 vers l'écran du PC et touchez la notification : Radio Sentinel est immédiatement appairé !
 
 #### Mode A : Vous emportez votre PC portable avec vous
 1. Activez le **Point d'accès mobile (partage Wi-Fi)** sur votre Samsung Galaxy A14.
