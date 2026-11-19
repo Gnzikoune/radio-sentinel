@@ -239,3 +239,13 @@ Pour ne jamais avoir à saisir de longues URLs sur le clavier de votre télépho
    - **Option 1 (Tableau de bord All-in-One)** : Ouvrez `https://<VOTRE_TUNNEL>.trycloudflare.com` directement sur le smartphone et cliquez sur le bouton vert **`🛰️ Activer le GPS local`** en haut de page. Vous avez ainsi la carte satellite HD, les graphiques temps réel et la transmission GPS active sur un seul et même écran.
    - **Option 2 (Balise allégée)** : Ouvrez `https://<VOTRE_TUNNEL>.trycloudflare.com/gps` pour une interface tactile ultra-sobre minimisant la consommation de batterie.
 6. Votre position satellite, votre débit 4G et vos pings sont injectés en continu dans la base de données de votre PC à la maison à travers la ville !
+
+---
+
+## 📢 Articles & Relais Communautaires
+
+Des articles détaillés prêts pour publication et partage sont disponibles dans le dossier [`articles/`](articles/) :
+* 🇫🇷 [Article complet en français pour LinuxFr / Korben / Dev.to](articles/article_linuxfr_korben_fr.md)
+* 🇬🇧 [Hardware hacking deep-dive for Hackaday / Dev.to / Hacker News](articles/article_hackaday_devto_en.md)
+* 💬 [Modèles de publications pour Reddit (r/wardriving, r/RTLSDR) & LinkedIn](articles/social_reddit_linkedin.md)
+* 🔍 [Guide complet d'optimisation SEO & Google Search Console](SEO.md)
