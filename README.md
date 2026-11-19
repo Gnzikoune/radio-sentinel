@@ -249,3 +249,4 @@ Des articles détaillés prêts pour publication et partage sont disponibles dan
 * 🇬🇧 [Hardware hacking deep-dive for Hackaday / Dev.to / Hacker News](articles/article_hackaday_devto_en.md)
 * 💬 [Modèles de publications pour Reddit (r/wardriving, r/RTLSDR) & LinkedIn](articles/social_reddit_linkedin.md)
 * 🔍 [Guide complet d'optimisation SEO & Google Search Console](SEO.md)
+* 🎨 [Spécifications de la refonte UI/UX modulaire (v3)](UI_REDESIGN_SPECS.md)
