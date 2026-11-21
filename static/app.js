@@ -1396,6 +1396,35 @@ function setupClientGPS() {
 
         updateGpsButtons(true);
 
+        // 1. Obtention rapide d'une première position réseau/cache pour affichage immédiat
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const c = pos.coords;
+                try {
+                    await fetch('/api/gps', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            latitude: c.latitude,
+                            longitude: c.longitude,
+                            accuracy: c.accuracy,
+                            speed: c.speed ? c.speed * 3.6 : 0,
+                            altitude: c.altitude,
+                            network_type: '4g',
+                            downlink_mbps: null,
+                            rtt_ms: null,
+                            ping_ms: 10,
+                            operator_sim: "SIM Mobile Directe",
+                            device_model: "Samsung Galaxy A14 (All-in-One)"
+                        })
+                    });
+                } catch(e) {}
+            },
+            (e) => console.log("Fix rapide initial non disponible, recherche GPS en cours :", e.message),
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 30000 }
+        );
+
+        // 2. Surveillance GNSS haute précision continue (timeout étendu à 30s)
         clientGpsWatchId = navigator.geolocation.watchPosition(
             async (pos) => {
                 const c = pos.coords;
@@ -1431,15 +1460,22 @@ function setupClientGPS() {
                 }
             },
             (err) => {
-                console.error("Erreur GPS:", err);
-                alert("Erreur GPS : " + err.message);
-                if (clientGpsWatchId !== null) {
-                    navigator.geolocation.clearWatch(clientGpsWatchId);
-                    clientGpsWatchId = null;
+                console.warn("Événement GPS:", err.code, err.message);
+                if (err.code === 1) { // PERMISSION_DENIED
+                    alert("Accès GPS refusé : veuillez autoriser la localisation dans les paramètres de votre navigateur.");
+                    if (clientGpsWatchId !== null) {
+                        navigator.geolocation.clearWatch(clientGpsWatchId);
+                        clientGpsWatchId = null;
+                    }
+                    updateGpsButtons(false);
+                } else if (err.code === 3) { // TIMEOUT
+                    console.warn("GPS timeout transitoire : recherche des satellites GNSS en cours...");
+                    // On ne coupe PAS la sonde pour un simple délai de synchronisation satellite !
+                } else {
+                    console.warn("Signal GPS indisponible temporairement...");
                 }
-                updateGpsButtons(false);
             },
-            { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+            { enableHighAccuracy: true, timeout: 30000, maximumAge: 3000 }
         );
     }
 

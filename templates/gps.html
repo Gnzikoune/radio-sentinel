@@ -228,22 +228,48 @@
             requestWakeLock();
             getNetworkInfo();
 
-            statusText.textContent = "Sonde active (GPS & 4G)";
-            statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-3";
-            statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+            statusText.textContent = "Acquisition satellites en cours...";
+            statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-3";
+            statusDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
             toggleBtn.className = "w-full py-3.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:scale-[0.98] text-white font-bold text-sm tracking-wide transition shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2";
             toggleBtn.innerHTML = `
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 Arrêter la Sonde
             `;
 
-            watchId = navigator.geolocation.watchPosition(
+            // 1. Obtention rapide d'une première position réseau/mise en cache pour démarrage immédiat
+            navigator.geolocation.getCurrentPosition(
                 sendTelemetry,
-                (err) => {
-                    alert("Erreur GPS : " + err.message);
-                    stopSonde();
+                (e) => console.log("Fix rapide initial non disponible, attente du signal GPS :", e.message),
+                { enableHighAccuracy: false, timeout: 8000, maximumAge: 30000 }
+            );
+
+            // 2. Surveillance GNSS haute précision continue (timeout étendu à 30s pour laisser au GPS le temps de verrouiller les satellites)
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    statusText.textContent = "Sonde active (GPS & 4G)";
+                    statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-3";
+                    statusDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+                    sendTelemetry(pos);
                 },
-                { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
+                (err) => {
+                    console.warn("Événement GPS:", err.code, err.message);
+                    if (err.code === 1) { // PERMISSION_DENIED
+                        alert("Accès GPS refusé : Veuillez autoriser la localisation dans les paramètres de votre navigateur Chrome.");
+                        stopSonde();
+                    } else if (err.code === 3) { // TIMEOUT
+                        // Ne PAS arrêter la sonde ni afficher d'alerte bloquante !
+                        // Le GPS du smartphone continue sa recherche de constellation satellite.
+                        statusText.textContent = "Recherche satellites en cours... (Patientez)";
+                        statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-3";
+                        statusDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+                    } else if (err.code === 2) { // POSITION_UNAVAILABLE
+                        statusText.textContent = "Signal satellite faible (rapprochez du pare-brise)";
+                        statusPill.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-3";
+                        statusDot.className = "w-2 h-2 rounded-full bg-amber-500";
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 30000, maximumAge: 3000 }
             );
 
             isRunning = true;
